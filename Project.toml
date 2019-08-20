@@ -1,0 +1,9 @@
+name = "Layered"
+uuid = "543da890-fecb-4311-ac3c-00ed56aa0c09"
+authors = ["Julius Krumbiegel "]
+version = "0.1.0"
+
+[deps]
+Homebrew = "d9be37ee-ecc9-5288-90f1-b9ca67657a75"
+StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
