@@ -10,12 +10,10 @@ end
 
 function getattributes(s::Shape{T}) where T
     needed = needed_attributes(T)
-    println(needed)
     attributes = Attributes(Dict(attr => getattribute(s, attr) for attr in needed))
 end
 
 function getattribute(l::LayerContent, attr)
-    println(l.attrs.attrs)
     if haskey(l.attrs, attr)
         return l.attrs[attr]
     else
@@ -45,6 +43,7 @@ function draw(p::Point, a::Attributes)
         p.x, p.y,
         s = a[Markersize].size,
         color = rgba(a[Stroke].color),
+        marker = a[Marker].marker,
     )
 end
 
@@ -82,7 +81,7 @@ function draw(r::Rect, a::Attributes)
         (bottomleft(r).xy...,),
         r.width,
         r.height,
-        rad2deg(r.angle.rad),
+        deg(r.angle),
         facecolor = rgba(a[Fill].color),
         edgecolor = rgba(a[Stroke].color),
         linewidth = a[Linewidth].width,

@@ -101,7 +101,7 @@ using Colors
 
 
 function test()
-    ltop = Layer(Transform(), Markersize(20), Fill("transparent"), Stroke("black"), Linewidth(1), Linestyle(:solid))
+    ltop = Layer(Transform(), Markersize(20), Marker(:.), Fill("transparent"), Stroke("black"), Linewidth(1), Linestyle(:solid))
     lmiddle = Layer(Transform(rotation=rad(pi)))
     lbottom = Layer(Transform(translation=(1, 1)))
     push!(ltop, lmiddle)
@@ -135,7 +135,7 @@ function test()
 
     rects = rect.(Ref((0, 0)), 5, 4, deg(0), Fill.(LCHuvA.(60, 70, range(0, 360, length=11)[1:end-1], 0.3)))
     push!.(rectlayers, rects)
-    push!.(rectlayers, point.(0, zeros(10), Markersize(1)))
+    push!.(rectlayers, point.(0, zeros(10)))
     push!.(ltop, line.((r1, r2) -> Line(r1.center, bottomleft(r2)), rects[1:end-1], rects[2:end]))
 
     fig, ax = PyPlot.subplots(1)

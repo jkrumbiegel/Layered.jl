@@ -18,7 +18,7 @@ point(f::Function, args...) = Shape(f, Point, args...)
 Base.show(io::IO, p::Point) = print(io, "Point($(p.xy[1]), $(p.xy[2]))")
 
 function needed_attributes(::Type{Point})
-    (Stroke, Markersize)
+    (Stroke, Markersize, Marker)
 end
 
 magnitude(p::Point) = sqrt(sum(p.xy .^ 2))
