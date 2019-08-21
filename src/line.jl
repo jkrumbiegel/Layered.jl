@@ -42,9 +42,12 @@ function addlength(l::Line, len::Real)
     Line(l.from - movement, l.to + movement)
 end
 
-function rotate(l::Line, angle::Real; around::Point=Point(0, 0), degrees=true)
+function rotate(l::Line, angle::Angle; around::Point=Point(0, 0))
     Line(
-        rotate(l.from, angle, around=around, degrees=degrees),
-        rotate(l.to, angle, around=around, degrees=degrees)
+        rotate(l.from, angle, around=around),
+        rotate(l.to, angle, around=around)
     )
 end
+
+line(args...) = Shape(Line(args...))
+line(f::Function, deps::Vararg{Shape,N}) where N = Shape(f, Line, deps...)

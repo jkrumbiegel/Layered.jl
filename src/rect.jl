@@ -2,24 +2,26 @@ struct Rect <: GeometricObject
     center::Point
     width::Float64
     height::Float64
-    angle::Float64
-    degrees::Bool
+    angle::Angle
 end
 
-function lowerleft(r::Rect)
-    r.center + rotate(Point(-r.width * 0.5, -r.height * 0.5), r.angle, degrees=r.degrees)
+rect(args...) = Shape(Rect(args...))
+rect(f::Function, deps::Vararg{Shape,N}) where N = Shape(f, Rect, deps...)
+
+function bottomleft(r::Rect)
+    r.center + rotate(Point(-r.width * 0.5, -r.height * 0.5), r.angle)
 end
 
-function lowerright(r::Rect)
-    r.center + rotate(Point( r.width * 0.5, -r.height * 0.5), r.angle, degrees=r.degrees)
+function bottomright(r::Rect)
+    r.center + rotate(Point( r.width * 0.5, -r.height * 0.5), r.angle)
 end
 
-function upperleft(r::Rect)
-    r.center + rotate(Point(-r.width * 0.5,  r.height * 0.5), r.angle, degrees=r.degrees)
+function topleft(r::Rect)
+    r.center + rotate(Point(-r.width * 0.5,  r.height * 0.5), r.angle)
 end
 
-function upperright(r::Rect)
-    r.center + rotate(Point( r.width * 0.5,  r.height * 0.5), r.angle, degrees=r.degrees)
+function topright(r::Rect)
+    r.center + rotate(Point( r.width * 0.5,  r.height * 0.5), r.angle)
 end
 
 topline(r::Rect) = Line(upperleft(r), upperright(r))

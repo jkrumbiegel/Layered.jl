@@ -1,5 +1,6 @@
 using Layered
 using Test
+import PyPlot
 
 @testset "points" begin
     p1 = Point(0, 0)
@@ -7,8 +8,8 @@ using Test
 end
 
 @testset "transform" begin
-    t1 = Transform(1, 0, (0, 0))
-    t2 = Transform(1, 0, (1, 1))
+    t1 = Transform(1, rad(0), (0, 0))
+    t2 = Transform(1, rad(0), (1, 1))
 
     t3 = t1 * t2
 
@@ -31,7 +32,7 @@ end
 
 @testset "upward_transform" begin
     ltop = Layer(Transform(scale=2))
-    lmiddle = Layer(Transform(rotation=pi))
+    lmiddle = Layer(Transform(rotation=rad(pi)))
     lbottom = Layer(Transform(translation=(1, 1)))
     push!(ltop, lmiddle)
     push!(lmiddle, lbottom)
@@ -53,7 +54,7 @@ end
 
 @testset "circle" begin
     ltop = Layer(Transform(scale=2))
-    lmiddle = Layer(Transform(rotation=pi))
+    lmiddle = Layer(Transform(rotation=rad(pi)))
     lbottom = Layer(Transform(translation=(1, 1)))
     push!(ltop, lmiddle)
     push!(lmiddle, lbottom)
@@ -69,3 +70,76 @@ end
     c = circle(circlethrough, p1, p2, p3)
     println(solve!(c))
 end
+
+@testset "draw" begin
+    ltop = Layer(Transform(scale=2))
+    lmiddle = Layer(Transform(rotation=rad(pi)))
+    lbottom = Layer(Transform(translation=(1, 1)))
+    push!(ltop, lmiddle)
+    push!(lmiddle, lbottom)
+
+    p1 = point(1, 1)
+    p2 = point(1, 1)
+    p3 = point(→, p1, p2)
+
+    push!(lbottom, p1)
+    push!(ltop, p2)
+    push!(lmiddle, p3)
+
+    c = circle(circlethrough, p1, p2, p3)
+    fig, ax = PyPlot.subplots(1)
+    draw(ltop)
+    display(fig)
+end
+
+using Pkg
+pkg"activate ."
+using Revise
+using Layered
+import PyPlot
+
+function test()
+    ltop = Layer(Transform())
+    lmiddle = Layer(Transform(rotation=rad(pi)))
+    lbottom = Layer(Transform(translation=(1, 1)))
+    push!(ltop, lmiddle)
+    push!(lmiddle, lbottom)
+
+    p1 = point(1, 1)
+    p2 = point(10, 1)
+    p3 = point(→, p1, p2)
+
+    push!(lbottom, p1)
+    push!(ltop, p2)
+    push!(lmiddle, p3)
+
+    c = circle(circlethrough, p1, p2, p3)
+
+    push!(lbottom, c)
+
+    l = line(p1, c) do p1, c
+        Line(p1, c.center)
+    end
+    push!(ltop, l)
+
+    l2 = line(l, p3) do l, p3
+        Line(fraction(l, 0.5), p3)
+    end
+    push!(lbottom, l2)
+
+    rectlayers = Layer.(Transform.(range(0.5, 2, length=10), deg.(range(0, 45, length=10)), [(i*10, i*10) for i in 1:10] ))
+
+    push!.(ltop, rectlayers)
+
+    rects = [rect((0, 0), 5, 4, deg(0)) for _ in 1:10]
+    push!.(rectlayers, rects)
+    push!.(rectlayers, point.(0, zeros(10)))
+    push!.(ltop, line.((r1, r2) -> Line(topright(r1), bottomleft(r2)), rects[1:end-1], rects[2:end]))
+
+    fig, ax = PyPlot.subplots(1)
+    draw(ltop)
+    ax.axis("equal")
+    display(fig)
+end
+
+test()

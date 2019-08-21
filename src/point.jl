@@ -10,6 +10,8 @@ struct Point <: GeometricObject
     end
 end
 
+Base.convert(::Type{Point}, t::Tuple{S, T}) where {S<:Real,T<:Real} = Point(t[1], t[2])
+
 point(args...) = Shape(Point(args...))
 point(f::Function, deps::Vararg{Shape,N}) where N = Shape(f, Point, deps...)
 
@@ -39,25 +41,22 @@ between(p1::Point, p2::Point, fraction::Real) = p1 + (p2 - p1) * fraction
 cross(p1::Point, p2::Point) = p1.x * p2.y - p1.y * p2.x
 dot(p1::Point, p2::Point) = p1.x * p2.x + p1.y * p2.y
 
-function angle(p::Point; degrees=True)
-    radians = atan(p.y, p.x)
-    degrees ? rad2deg(radians) : radians
+function angle(p::Point)
+    Angle(atan(p.y, p.x))
 end
 
-function signed_angle_to(p1::Point, p2::Point; degrees::Bool=true)
-    radians = atan(cross(p1, p2), dot(p1, p2))
-    return degrees ? rad2deg(radians) : radians
+function signed_angle_to(p1::Point, p2::Point)
+    Angle(atan(cross(p1, p2), dot(p1, p2)))
 end
 
-function _rotation_matrix(angle; degrees=true)
-    angle = degrees ? deg2rad(angle) : angle
+function _rotation_matrix(angle::Angle)
     c = cos(angle)
     s = sin(angle)
     SMatrix{2, 2, Float64}(c, s, -s, c)
 end
 
-function rotate(p::Point, angle::Real; around::Point=Point(0, 0), degrees=true)
+function rotate(p::Point, angle::Angle; around::Point=Point(0, 0))
     vector = from_to(around, p)
-    rotated_vector = Point(_rotation_matrix(angle, degrees=degrees) * vector.xy)
+    rotated_vector = Point(_rotation_matrix(angle) * vector.xy)
     rotated_vector + around
 end

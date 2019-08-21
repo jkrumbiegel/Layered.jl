@@ -4,6 +4,8 @@ mutable struct Layer <: LayerContent
     parent::Union{Layer, Nothing}
 end
 
+Base.Broadcast.broadcastable(l::Layer) = Ref(l)
+
 function Layer()
     Layer(Transform(), Vector{LayerContent}[], nothing)
 end
@@ -24,3 +26,7 @@ function upward_transform(l::Layer)
         return upward_transform(l.parent) * l.transform
     end
 end
+
+# current_layer =
+# function currentlayer()
+# end
