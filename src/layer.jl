@@ -2,16 +2,17 @@ mutable struct Layer <: LayerContent
     transform::Transform
     content::Vector{LayerContent}
     parent::Union{Layer, Nothing}
+    attrs::Attributes
 end
 
 Base.Broadcast.broadcastable(l::Layer) = Ref(l)
 
 function Layer()
-    Layer(Transform(), Vector{LayerContent}[], nothing)
+    Layer(Transform(), Vector{LayerContent}[], nothing, Attributes())
 end
 
-function Layer(t::Transform)
-    Layer(t, Vector{LayerContent}[], nothing)
+function Layer(t::Transform, varargs::Vararg{Attribute, N}) where N
+    Layer(t, Vector{LayerContent}[], nothing, Attributes(varargs...))
 end
 
 function Base.push!(l::Layer, lc::LayerContent)

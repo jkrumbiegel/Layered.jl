@@ -29,7 +29,9 @@ function Circle(center::Point, p1::Point)
 end
 
 circle(args...) = Shape(Circle(args...))
-circle(f::Function, deps::Vararg{Shape,N}) where N = Shape(f, Circle, deps...)
+circle(f::Function, args...) where N = Shape(f, Circle, args...)
+
+needed_attributes(::Type{Circle}) = (Fill, Stroke, Linewidth, Linestyle)
 
 function intersection(c::Circle, l::Line)
     # algorithm works for circle at (0, 0)

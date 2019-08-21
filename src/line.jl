@@ -50,4 +50,6 @@ function rotate(l::Line, angle::Angle; around::Point=Point(0, 0))
 end
 
 line(args...) = Shape(Line(args...))
-line(f::Function, deps::Vararg{Shape,N}) where N = Shape(f, Line, deps...)
+line(f::Function, args...) = Shape(f, Line, args...)
+
+needed_attributes(::Type{Line}) = (Linewidth, Stroke, Linestyle)

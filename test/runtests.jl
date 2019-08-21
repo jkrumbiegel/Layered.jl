@@ -97,15 +97,17 @@ pkg"activate ."
 using Revise
 using Layered
 import PyPlot
+using Colors
+
 
 function test()
-    ltop = Layer(Transform())
+    ltop = Layer(Transform(), Markersize(20), Fill("transparent"), Stroke("black"), Linewidth(1), Linestyle(:solid))
     lmiddle = Layer(Transform(rotation=rad(pi)))
     lbottom = Layer(Transform(translation=(1, 1)))
     push!(ltop, lmiddle)
     push!(lmiddle, lbottom)
 
-    p1 = point(1, 1)
+    p1 = point(1, 1, Stroke("red"))
     p2 = point(10, 1)
     p3 = point(→, p1, p2)
 
@@ -113,7 +115,7 @@ function test()
     push!(ltop, p2)
     push!(lmiddle, p3)
 
-    c = circle(circlethrough, p1, p2, p3)
+    c = circle(circlethrough, p1, p2, p3, Fill(RGBA(0.4, 0.3, 0.5, 0.2)))
 
     push!(lbottom, c)
 
@@ -127,19 +129,22 @@ function test()
     end
     push!(lbottom, l2)
 
-    rectlayers = Layer.(Transform.(range(0.5, 2, length=10), deg.(range(0, 45, length=10)), [(i*10, i*10) for i in 1:10] ))
+    rectlayers = Layer.(Transform.(range(0.5, 2, length=10), deg.(range(0, 20, length=10)), [(i*10, i*10) for i in 1:10] ))
 
     push!.(ltop, rectlayers)
 
-    rects = [rect((0, 0), 5, 4, deg(0)) for _ in 1:10]
+    rects = rect.(Ref((0, 0)), 5, 4, deg(0), Fill.(LCHuvA.(60, 70, range(0, 360, length=11)[1:end-1], 0.3)))
     push!.(rectlayers, rects)
-    push!.(rectlayers, point.(0, zeros(10)))
-    push!.(ltop, line.((r1, r2) -> Line(topright(r1), bottomleft(r2)), rects[1:end-1], rects[2:end]))
+    push!.(rectlayers, point.(0, zeros(10), Markersize(1)))
+    push!.(ltop, line.((r1, r2) -> Line(r1.center, bottomleft(r2)), rects[1:end-1], rects[2:end]))
 
     fig, ax = PyPlot.subplots(1)
     draw(ltop)
     ax.axis("equal")
     display(fig)
+    nothing
 end
 
 test()
+
+PyPlot.close_figs()

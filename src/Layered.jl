@@ -2,25 +2,31 @@ module Layered
 
 using StaticArrays
 
-export Point, Transform, Layer, Shape, upward_transform, solve!, →, point, line, Angle, rad, deg
+export Point, Transform, Layer, Shape, upward_transform, solve!, →, point, line, Angle, rad, deg, needed_attributes
 
 abstract type LayerContent end
 abstract type GeometricObject <: LayerContent end
 
 Base.Broadcast.broadcastable(g::GeometricObject) = Ref(g)
-Base.Broadcast.broadcastable(s::Shape) = Ref(s)
 
 struct Angle
     rad::Float64
 end
+
+Base.Broadcast.broadcastable(a::Angle) = Ref(a)
+
 deg(ang::Real) = Angle(deg2rad(ang))
 rad(ang::Real) = Angle(ang)
+deg(ang::Angle) = rad2deg(ang.rad)
+rad(ang::Angle) = ang.rad
+
 Base.:+(a1::Angle, a2::Angle) = Angle(a1.rad + a2.rad)
 Base.:-(a1::Angle, a2::Angle) = Angle(a1.rad - a2.rad)
 Base.cos(a::Angle) = cos(a.rad)
 Base.sin(a::Angle) = sin(a.rad)
 Base.tan(a::Angle) = tan(a.rad)
 
+include("attributes.jl")
 include("transform.jl")
 include("layer.jl")
 include("shape.jl")

@@ -5,8 +5,10 @@ struct Rect <: GeometricObject
     angle::Angle
 end
 
-rect(args...) = Shape(Rect(args...))
-rect(f::Function, deps::Vararg{Shape,N}) where N = Shape(f, Rect, deps...)
+rect(args...) = Shape(Rect(args[1:4]...), args[5:end]...)
+rect(f::Function, args...) where N = Shape(f, Rect, args...)
+
+needed_attributes(::Type{Rect}) = needed_attributes(Circle)
 
 function bottomleft(r::Rect)
     r.center + rotate(Point(-r.width * 0.5, -r.height * 0.5), r.angle)

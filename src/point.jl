@@ -12,10 +12,14 @@ end
 
 Base.convert(::Type{Point}, t::Tuple{S, T}) where {S<:Real,T<:Real} = Point(t[1], t[2])
 
-point(args...) = Shape(Point(args...))
-point(f::Function, deps::Vararg{Shape,N}) where N = Shape(f, Point, deps...)
+point(args...) = Shape(Point(args[1:2]...), args[3:end]...)
+point(f::Function, args...) = Shape(f, Point, args...)
 
 Base.show(io::IO, p::Point) = print(io, "Point($(p.xy[1]), $(p.xy[2]))")
+
+function needed_attributes(::Type{Point})
+    (Stroke, Markersize)
+end
 
 magnitude(p::Point) = sqrt(sum(p.xy .^ 2))
 normalize(p::Point) = p / magnitude(p)
