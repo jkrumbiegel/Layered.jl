@@ -26,7 +26,7 @@ function topright(r::Rect)
     r.center + rotate(Point( r.width * 0.5,  r.height * 0.5), r.angle)
 end
 
-topline(r::Rect) = Line(upperleft(r), upperright(r))
-bottomline(r::Rect) = Line(lowerleft(r), lowerright(r))
-leftline(r::Rect) = Line(lowerleft(r), upperleft(r))
-rightline(r::Rect) = Line(lowerright(r), upperright(r))
+topline(r::Rect) = Line(topleft(r), topright(r))
+bottomline(r::Rect) = Line(bottomleft(r), bottomright(r))
+leftline(r::Rect) = Line(bottomleft(r), topleft(r))
+rightline(r::Rect) = Line(bottomright(r), topright(r))

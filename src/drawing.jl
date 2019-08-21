@@ -56,6 +56,32 @@ function draw(l::Line, a::Attributes)
     )
 end
 
+CLOSEPOLY = 79
+CURVE3 = 3
+CURVE4 = 4
+LINETO = 2
+MOVETO = 1
+
+function PyPlot.matplotlib.path.Path(b::Bezier; kwargs...)
+    vertices = [b.from.xy, b.c1.xy, b.c2.xy, b.to.xy]
+    println(vertices)
+    codes = UInt8[MOVETO, CURVE4, CURVE4, CURVE4]
+    PyPlot.matplotlib.path.Path(vertices, codes; kwargs...)
+end
+
+function draw(b::Bezier, a::Attributes)
+    path = PyPlot.matplotlib.path.Path(b, closed=false)
+    ax = PyPlot.gca()
+    pathpatch = PyPlot.matplotlib.patches.PathPatch(
+        path,
+        edgecolor = rgba(a[Stroke].color),
+        linewidth = a[Linewidth].width,
+        linestyle = a[Linestyle].style,
+        facecolor = rgba(a[Fill].color),
+    )
+    ax.add_patch(pathpatch)
+end
+
 function PyPlot.plot(v::Vector{Point}; kwargs...)
     xx = [p.x for p in v]
     yy = [p.y for p in v]
