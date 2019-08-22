@@ -34,11 +34,15 @@ function Base.getproperty(p::Point, sym::Symbol)
     end
 end
 
+Base.convert(::Type{SVector{2, Float64}}, p::Point) = p.xy
+
 Base.:+(p1::Point, p2::Point) = Point(p1.xy + p2.xy)
 Base.:-(p1::Point, p2::Point) = Point(p1.xy - p2.xy)
 Base.:*(p::Point, factor::Real) = Point(p.xy .* factor)
 Base.:*(factor::Real, p::Point) = p * factor
 Base.:/(p::Point, r::Real) = Point(p.xy ./ r)
+Base.:(==)(p1::Point, p2::Point) = p1.xy == p2.xy
+Base.:(!=)(p1::Point, p2::Point) = p1.xy != p2.xy
 from_to(p1::Point, p2::Point) = p2 - p1
 const → = from_to
 between(p1::Point, p2::Point, fraction::Real) = p1 + (p2 - p1) * fraction

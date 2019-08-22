@@ -60,6 +60,37 @@ function PyPlot.matplotlib.path.Path(l::Line; kwargs...)
     PyPlot.matplotlib.path.Path(vertices, codes; kwargs...)
 end
 
+function PyPlot.matplotlib.path.Path(bp::BezierPath; kwargs...)
+    vertices = SVector{2, Float64}[]
+    codes = UInt8[]
+
+    n = length(bp.segments)
+    for i in 1:n
+        s = bp.segments[i]
+        if i == 1
+            push!(vertices, s.from)
+            push!(codes, MOVETO)
+        else
+            if s.from != bp.segments[i-1].to
+                push!(vertices, s.from)
+                push!(codes, MOVETO)
+            end
+        end
+        if typeof(s) <: Bezier
+            push!(vertices, s.c1)
+            push!(vertices, s.c2)
+            push!(vertices, s.to)
+            push!(codes, CURVE4)
+            push!(codes, CURVE4)
+            push!(codes, CURVE4)
+        elseif typeof(s) <: Line
+            push!(vertices, s.to)
+            push!(codes, LINETO)
+        end
+    end
+    PyPlot.matplotlib.path.Path(vertices, codes; kwargs...)
+end
+
 function draw(l::Line, a::Attributes)
     path = PyPlot.matplotlib.path.Path(l, closed=false)
     ax = PyPlot.gca()
@@ -80,6 +111,19 @@ end
 
 function draw(b::Bezier, a::Attributes)
     path = PyPlot.matplotlib.path.Path(b, closed=false)
+    ax = PyPlot.gca()
+    pathpatch = PyPlot.matplotlib.patches.PathPatch(
+        path,
+        edgecolor = rgba(a[Stroke].color),
+        linewidth = a[Linewidth].width,
+        linestyle = a[Linestyle].style,
+        facecolor = rgba(a[Fill].color),
+    )
+    ax.add_patch(pathpatch)
+end
+
+function draw(b::BezierPath, a::Attributes)
+    path = PyPlot.matplotlib.path.Path(b, closed=b.closed)
     ax = PyPlot.gca()
     pathpatch = PyPlot.matplotlib.patches.PathPatch(
         path,

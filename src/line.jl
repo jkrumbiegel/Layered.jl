@@ -42,6 +42,8 @@ reversed(l::Line) = Line(l.to, l.from)
 direction(l::Line) = normalize(vector(l))
 perpendicular(l::Line, reverse=false) = rotate(direction(l), reverse ? deg(-90) : deg(90))
 move(l::Line, p::Point) = Line(l.from + p, l.to + p)
+Base.:+(l::Line, p::Point) = move(l, p)
+Base.:+(p::Point, l::Line) = move(l, p)
 
 function scale(l::Line, scalar::Real)
     movement = (scalar - 1) * vector(l) / 2

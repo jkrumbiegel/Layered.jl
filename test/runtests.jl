@@ -137,17 +137,17 @@ PyPlot.close_figs()
 function test2()
     l = layer(Transform(), Markersize(20), Marker(:.), Fill("transparent"), Stroke("black"), Linewidth(1), Linestyle(:solid))
     n = 5
-    sls = layer!.(l, Transform.(1, deg(0), ((i * 50, -i * 20) for i in 0:n-1)))
+    sls = layer!.(l, Transform.(1, deg.(range(0, 10, length=n)), ((i * 50, -i * 20) for i in 0:n-1)))
 
     rs = rect!.(sls, Ref((0, 0)), 70, 50, deg(0), Fill("gray50"))
     cs = circle!.(sls, Ref((0, 0)), 2, Fill("black"))
 
     eye = circle!(l, rs[1], rs[end], Fill("white")) do r1, r2
         p = intersection(leftline(r1), bottomline(r2))
-        Circle(p, 5)
+        Circle(p, 20)
     end
 
-    iris = circle!(l, eye, Fill("turquoise"), Stroke("transparent")) do eye
+    iris = circle!(l, eye, Fill("rosybrown3"), Stroke("transparent")) do eye
         scalearea(eye, 0.3)
     end
 
@@ -155,17 +155,17 @@ function test2()
         scalearea(eye, 0.1)
     end
 
-    line!(sls[1], eye, cs[1]) do cc, c
+    line!(sls[1], pupil, cs[1]) do cc, c
         outertangents(cc, c)[1]
     end
 
-    line!(sls[1], eye, cs[1]) do cc, c
+    line!(sls[1], pupil, cs[1]) do cc, c
         outertangents(cc, c)[2]
     end
 
-    line!(l, rs[1], rs[end]) do r1, r2
-        l = Line(topright(r1), topright(r2))
-        move(l, perpendicular(l) * 5)
+    bezierpath!(l, rs[1], rs[end]) do r1, r2
+        b = bracket(topright(r1), topright(r2), 0.1, 1, 2.5)
+        move(b, perpendicular(Line(topright(r1), topright(r2))) * 5)
     end
 
     fig, ax = PyPlot.subplots(1)
