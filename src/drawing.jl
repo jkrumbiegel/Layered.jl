@@ -60,6 +60,19 @@ function PyPlot.matplotlib.path.Path(l::Line; kwargs...)
     PyPlot.matplotlib.path.Path(vertices, codes; kwargs...)
 end
 
+function PyPlot.matplotlib.path.Path(ls::LineSegments; kwargs...)
+    vertices = SVector{2, Float64}[]
+    codes = UInt8[]
+
+    for l in ls.segments
+        push!(vertices, l.from.xy)
+        push!(vertices, l.to.xy)
+        push!(codes, MOVETO)
+        push!(codes, LINETO)
+    end
+    PyPlot.matplotlib.path.Path(vertices, codes; kwargs...)
+end
+
 function PyPlot.matplotlib.path.Path(bp::BezierPath; kwargs...)
     vertices = SVector{2, Float64}[]
     codes = UInt8[]
@@ -101,6 +114,17 @@ function draw(l::Line, a::Attributes)
         linestyle = a[Linestyle].style,
     )
     ax.add_patch(pathpatch)
+end
+
+function draw(ls::LineSegments, a::Attributes)
+    path = PyPlot.matplotlib.path.Path(ls, closed=false)
+    pathpatch = PyPlot.matplotlib.patches.PathPatch(
+        path,
+        edgecolor = rgba(a[Stroke].color),
+        linewidth = a[Linewidth].width,
+        linestyle = a[Linestyle].style,
+    )
+    PyPlot.gca().add_patch(pathpatch)
 end
 
 function PyPlot.matplotlib.path.Path(b::Bezier; kwargs...)

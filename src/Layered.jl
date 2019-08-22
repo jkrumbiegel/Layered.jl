@@ -58,7 +58,11 @@ function Base.:*(t::Transform, b::Bezier)
 end
 
 function Base.:*(t::Transform, bp::BezierPath)
-    BezierPath(t.*bp.segments, bp.closed)
+    BezierPath(t .* bp.segments, bp.closed)
+end
+
+function Base.:*(t::Transform, ls::LineSegments)
+    LineSegments(t .* ls.segments)
 end
 
 end # module

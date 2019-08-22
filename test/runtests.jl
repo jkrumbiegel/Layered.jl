@@ -137,7 +137,7 @@ PyPlot.close_figs()
 function test2()
     l = layer(Transform(), Markersize(20), Marker(:.), Fill("transparent"), Stroke("black"), Linewidth(1), Linestyle(:solid))
     n = 5
-    sls = layer!.(l, Transform.(1, deg.(range(0, 10, length=n)), ((i * 50, -i * 20) for i in 0:n-1)))
+    sls = layer!.(l, Transform.(range(1, 1.3, length=n), deg.(range(0, 10, length=n)), ((i * 50, -i * 20) for i in 0:n-1)))
 
     rs = rect!.(sls, Ref((0, 0)), 70, 50, deg(0), Fill("gray50"))
     cs = circle!.(sls, Ref((0, 0)), 2, Fill("black"))
@@ -155,12 +155,8 @@ function test2()
         scalearea(eye, 0.1)
     end
 
-    line!(sls[1], pupil, cs[1]) do cc, c
-        outertangents(cc, c)[1]
-    end
-
-    line!(sls[1], pupil, cs[1]) do cc, c
-        outertangents(cc, c)[2]
+    linesegments!(sls[1], pupil, cs[1]) do cc, c
+        outertangents(cc, c)
     end
 
     bezierpath!(l, rs[1], rs[end]) do r1, r2
