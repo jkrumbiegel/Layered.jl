@@ -1,3 +1,5 @@
+export rect!
+
 struct Rect <: GeometricObject
     center::Point
     width::Float64
@@ -6,7 +8,17 @@ struct Rect <: GeometricObject
 end
 
 rect(args...) = Shape(Rect(args[1:4]...), args[5:end]...)
-rect(f::Function, args...) where N = Shape(f, Rect, args...)
+function rect!(layer::Layer, args...)
+    r = rect(args...)
+    push!(layer, r)
+    r
+end
+rect(f::Function, args...) = Shape(f, Rect, args...)
+function rect!(f::Function, layer::Layer, args...)
+    r = rect(f, args...)
+    push!(layer, r)
+    r
+end
 
 needed_attributes(::Type{Rect}) = needed_attributes(Circle)
 

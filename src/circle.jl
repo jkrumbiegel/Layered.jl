@@ -1,3 +1,5 @@
+export circle, circle!, outertangents, scale, scalearea
+
 struct Circle <: GeometricObject
     center::Point
     radius::Float64
@@ -28,8 +30,18 @@ function Circle(center::Point, p1::Point)
     Circle(center, radius)
 end
 
-circle(args...) = Shape(Circle(args...))
-circle(f::Function, args...) where N = Shape(f, Circle, args...)
+circle(args...) = Shape(Circle(args[1:2]...), args[3:end]...)
+function circle!(layer::Layer, args...)
+    r = circle(args...)
+    push!(layer, r)
+    r
+end
+circle(f::Function, args...) = Shape(f, Circle, args...)
+function circle!(f::Function, layer::Layer, args...)
+    r = circle(f, args...)
+    push!(layer, r)
+    r
+end
 
 needed_attributes(::Type{Circle}) = (Fill, Stroke, Linewidth, Linestyle)
 
@@ -120,3 +132,5 @@ end
 
 area(c::Circle) = pi * (c.radius ^ 2)
 circumference(c::Circle) = 2pi * r
+scale(c::Circle, s::Real) = Circle(c.center, c.radius * s)
+scalearea(c::Circle, s::Real) = Circle(c.center, c.radius * sqrt(s))

@@ -41,6 +41,10 @@ function Base.:*(t::Transform, p::Point)
     Point(rmat * t.scale * p.xy + t.translation)
 end
 
+function Base.:*(t::Transform, l::Line)
+    Line(t * l.from, t * l.to)
+end
+
 function Base.:*(t::Transform, c::Circle)
     Circle(t * c.center, t.scale * c.radius)
 end

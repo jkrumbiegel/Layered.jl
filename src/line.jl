@@ -1,6 +1,21 @@
+export line!, move, perpendicular
+
 struct Line <: GeometricObject
     from::Point
     to::Point
+end
+
+line(args...) = Shape(Line(args[1:fieldcount(Line)]...), args[fieldcount(Line)+1:end]...)
+function line!(layer::Layer, args...)
+    r = line(args...)
+    push!(layer, r)
+    r
+end
+line(f::Function, args...) = Shape(f, Line, args...)
+function line!(f::Function, layer::Layer, args...)
+    r = line(f, args...)
+    push!(layer, r)
+    r
 end
 
 xs(l::Line) = SVector(l.from.x, l.to.x)
@@ -21,10 +36,12 @@ end
 
 vector(l::Line) = from_to(l.from, l.to)
 angle(l::Line) = angle(vector(l))
-length(l::Line) = magnitude(vector(l))
+distance(l::Line) = magnitude(vector(l))
 fraction(l::Line, frac::Real) = between(l.from, l.to, frac)
 reversed(l::Line) = Line(l.to, l.from)
 direction(l::Line) = normalize(vector(l))
+perpendicular(l::Line, reverse=false) = rotate(direction(l), reverse ? deg(-90) : deg(90))
+move(l::Line, p::Point) = Line(l.from + p, l.to + p)
 
 function scale(l::Line, scalar::Real)
     movement = (scalar - 1) * vector(l) / 2
@@ -32,7 +49,7 @@ function scale(l::Line, scalar::Real)
 end
 
 function scaleto(l::Line, len::Real)
-    scalar = len / length(l)
+    scalar = len / distance(l)
     scale(l, scalar)
 end
 
@@ -48,8 +65,5 @@ function rotate(l::Line, angle::Angle; around::Point=Point(0, 0))
         rotate(l.to, angle, around=around)
     )
 end
-
-line(args...) = Shape(Line(args...))
-line(f::Function, args...) = Shape(f, Line, args...)
 
 needed_attributes(::Type{Line}) = (Linewidth, Stroke, Linestyle)

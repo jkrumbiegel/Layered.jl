@@ -2,6 +2,12 @@ import PyPlot
 
 export draw
 
+CLOSEPOLY = 79
+CURVE3 = 3
+CURVE4 = 4
+LINETO = 2
+MOVETO = 1
+
 function draw(l::Layer)
     for c in l.content
         draw(c)
@@ -48,20 +54,23 @@ function draw(p::Point, a::Attributes)
     )
 end
 
+function PyPlot.matplotlib.path.Path(l::Line; kwargs...)
+    vertices = [l.from.xy, l.to.xy]
+    codes = UInt8[MOVETO, LINETO]
+    PyPlot.matplotlib.path.Path(vertices, codes; kwargs...)
+end
+
 function draw(l::Line, a::Attributes)
-    PyPlot.plot(
-        [l.from, l.to],
-        color = rgba(a[Stroke].color),
+    path = PyPlot.matplotlib.path.Path(l, closed=false)
+    ax = PyPlot.gca()
+    pathpatch = PyPlot.matplotlib.patches.PathPatch(
+        path,
+        edgecolor = rgba(a[Stroke].color),
         linewidth = a[Linewidth].width,
         linestyle = a[Linestyle].style,
     )
+    ax.add_patch(pathpatch)
 end
-
-CLOSEPOLY = 79
-CURVE3 = 3
-CURVE4 = 4
-LINETO = 2
-MOVETO = 1
 
 function PyPlot.matplotlib.path.Path(b::Bezier; kwargs...)
     vertices = [b.from.xy, b.c1.xy, b.c2.xy, b.to.xy]

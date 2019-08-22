@@ -101,33 +101,27 @@ using Colors
 
 
 function test()
-    l = Layer(Transform(), Markersize(20), Marker(:.), Fill("transparent"), Stroke("black"), Linewidth(1), Linestyle(:solid))
-    l2 = Layer(Transform(2, deg(15), (2, 2)))
-    push!(l, l2)
+    l = layer(Transform(), Markersize(20), Marker(:.), Fill("transparent"), Stroke("black"), Linewidth(1), Linestyle(:solid))
+    l2 = layer!(l, Transform(2, deg(10), (2, 2)))
 
-    r1 = rect((0, 0), 10, 5, deg(0))
     n = 5
-    rs = rect.([(30, (y - (n+1)/2) * 10) for y in 1:n], 10, 5, deg(0), Fill.(LCHuv.(90, 10, range(0, 360, length=n+1)[1:end-1])))
-    bs = bezier.(
+
+    r1 = rect!(l2, (0, 0), 10, 5, deg(0))
+    rs = rect!.(l, [(30, (y - (n+1)/2) * 10) for y in 1:n], 10, 5, deg(0), Fill.(LCHuv.(90, 10, range(0, 360, length=n+1)[1:end-1])))
+    bs = bezier!.(
+        l,
         [
-            (r1, r2) -> horizontalbezier(fraction(rightline(r1), (i-1)/(n-1)), fraction(leftline(r2), 0.5))
+            (r1, r2) -> perpendicularbezier(rightline(r1), leftline(r2), (i-1)/(n-1), 0.5, reverse1=true)
         for i in 1:n],
         r1, rs)
 
-    push!(l2, r1)
-    push!.(l, rs)
-    push!.(l, bs)
-
-    c1 = circle(r1) do r1
+    c1 = circle!(l, r1) do r1
         Circle((0, 0), r1.height / 2 - 1)
     end
 
-    c2 = circle(r1) do r1
+    c2 = circle!(l2, r1) do r1
         Circle((0, 0), r1.height / 2 - 1)
     end
-
-    push!(l, c1)
-    push!(l2, c2)
 
     fig, ax = PyPlot.subplots(1)
     draw(l)
@@ -139,3 +133,46 @@ end
 test()
 
 PyPlot.close_figs()
+
+function test2()
+    l = layer(Transform(), Markersize(20), Marker(:.), Fill("transparent"), Stroke("black"), Linewidth(1), Linestyle(:solid))
+    n = 5
+    sls = layer!.(l, Transform.(1, deg(0), ((i * 50, -i * 20) for i in 0:n-1)))
+
+    rs = rect!.(sls, Ref((0, 0)), 70, 50, deg(0), Fill("gray50"))
+    cs = circle!.(sls, Ref((0, 0)), 2, Fill("black"))
+
+    eye = circle!(l, rs[1], rs[end], Fill("white")) do r1, r2
+        p = intersection(leftline(r1), bottomline(r2))
+        Circle(p, 5)
+    end
+
+    iris = circle!(l, eye, Fill("turquoise"), Stroke("transparent")) do eye
+        scalearea(eye, 0.3)
+    end
+
+    pupil = circle!(l, eye, Fill("black"), Stroke("transparent")) do eye
+        scalearea(eye, 0.1)
+    end
+
+    line!(sls[1], eye, cs[1]) do cc, c
+        outertangents(cc, c)[1]
+    end
+
+    line!(sls[1], eye, cs[1]) do cc, c
+        outertangents(cc, c)[2]
+    end
+
+    line!(l, rs[1], rs[end]) do r1, r2
+        l = Line(topright(r1), topright(r2))
+        move(l, perpendicular(l) * 5)
+    end
+
+    fig, ax = PyPlot.subplots(1)
+    draw(l)
+    ax.axis("equal")
+    display(fig)
+    nothing
+end
+
+test2()

@@ -1,3 +1,5 @@
+export layer, layer!
+
 mutable struct Layer <: LayerContent
     transform::Transform
     content::Vector{LayerContent}
@@ -7,12 +9,18 @@ end
 
 Base.Broadcast.broadcastable(l::Layer) = Ref(l)
 
-function Layer()
+function layer()
     Layer(Transform(), Vector{LayerContent}[], nothing, Attributes())
 end
 
-function Layer(t::Transform, varargs::Vararg{Attribute, N}) where N
+function layer(t::Transform, varargs::Vararg{Attribute, N}) where N
     Layer(t, Vector{LayerContent}[], nothing, Attributes(varargs...))
+end
+
+function layer!(parent::Layer, t::Transform, varargs::Vararg{Attribute, N}) where N
+    l = Layer(t, Vector{LayerContent}[], nothing, Attributes(varargs...))
+    push!(parent, l)
+    l
 end
 
 function Base.push!(l::Layer, lc::LayerContent)

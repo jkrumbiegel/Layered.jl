@@ -44,10 +44,6 @@ function solve!(s::Shape{T}) where T
         dependencies = s.content[2]
         solved_deps = solve!.(dependencies)
 
-        println(typeof(solved_deps))
-        println(typeof(dependencies))
-        println(typeof(s))
-
         # convert dependencies into own transform
         converted_deps = transform_from_to.(dependencies, s) .* solved_deps
         # converted_deps = transform_from_to(dependencies[1], s)
@@ -94,11 +90,7 @@ function lowestcommonancestorchainfromto(s1::Shape, s2::Shape)
     # all ancestors so far were the same, so the last one (i) is the common one
     part1 = reverse(ancestors1[n:end])
     part2 = ancestors2[n+1:end]
-    println("blabla")
-    println(typeof(part1))
-    println(typeof(part2))
     lca_index = Base.length(part1)
-    println(size(part1), "   ", size(part2))
     return lca_index, vcat(part1, part2)
 end
 
