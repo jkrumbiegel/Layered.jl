@@ -102,7 +102,8 @@ using Colors
 
 function test()
     l = Layer(Transform(), Markersize(20), Marker(:.), Fill("transparent"), Stroke("black"), Linewidth(1), Linestyle(:solid))
-
+    l2 = Layer(Transform(2, deg(15), (2, 2)))
+    push!(l, l2)
 
     r1 = rect((0, 0), 10, 5, deg(0))
     n = 5
@@ -113,9 +114,20 @@ function test()
         for i in 1:n],
         r1, rs)
 
-    push!(l, r1)
+    push!(l2, r1)
     push!.(l, rs)
     push!.(l, bs)
+
+    c1 = circle(r1) do r1
+        Circle((0, 0), r1.height / 2 - 1)
+    end
+
+    c2 = circle(r1) do r1
+        Circle((0, 0), r1.height / 2 - 1)
+    end
+
+    push!(l, c1)
+    push!(l2, c2)
 
     fig, ax = PyPlot.subplots(1)
     draw(l)

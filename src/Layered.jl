@@ -22,6 +22,9 @@ rad(ang::Angle) = ang.rad
 
 Base.:+(a1::Angle, a2::Angle) = Angle(a1.rad + a2.rad)
 Base.:-(a1::Angle, a2::Angle) = Angle(a1.rad - a2.rad)
+Base.:*(a::Angle, r::Real) = Angle(a.rad * r)
+Base.:*(r::Real, a::Angle) = a * r
+Base.:/(a::Angle, r::Real) = Angle(a.rad / r)
 Base.cos(a::Angle) = cos(a.rad)
 Base.sin(a::Angle) = sin(a.rad)
 Base.tan(a::Angle) = tan(a.rad)
@@ -44,6 +47,10 @@ end
 
 function Base.:*(t::Transform, r::Rect)
     Rect(t * r.center, t.scale * r.width, t.scale * r.height, r.angle + t.rotation)
+end
+
+function Base.:*(t::Transform, b::Bezier)
+    Bezier((t .* (b.from, b.c1, b.c2, b.to))...)
 end
 
 end # module

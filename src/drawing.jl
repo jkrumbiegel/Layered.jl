@@ -27,8 +27,9 @@ end
 
 function draw(s::Shape)
     geom = solve!(s)
+    transformed_to_toplevel = upward_transform(s) * geom
     attributes = getattributes(s)
-    draw(geom, attributes)
+    draw(transformed_to_toplevel, attributes)
 end
 
 import Colors
@@ -64,7 +65,6 @@ MOVETO = 1
 
 function PyPlot.matplotlib.path.Path(b::Bezier; kwargs...)
     vertices = [b.from.xy, b.c1.xy, b.c2.xy, b.to.xy]
-    println(vertices)
     codes = UInt8[MOVETO, CURVE4, CURVE4, CURVE4]
     PyPlot.matplotlib.path.Path(vertices, codes; kwargs...)
 end
