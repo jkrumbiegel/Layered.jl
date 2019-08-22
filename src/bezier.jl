@@ -10,7 +10,6 @@ struct Bezier <: GeometricObject
 end
 
 bezier(args...) = Shape(Bezier(args[1:fieldcount(Bezier)]...), args[fieldcount(Bezier)+1:end]...)
-bezier(f::Function, args...) = Shape(f, Bezier, args...)
 function bezier!(layer::Layer, args...)
     b = bezier(args...)
     push!(layer, b)
@@ -56,7 +55,6 @@ struct BezierPath <: GeometricObject
 end
 
 bezierpath(args...) = Shape(BezierPath(args[1:fieldcount(BezierPath)]...), args[fieldcount(BezierPath)+1:end]...)
-bezierpath(f::Function, args...) = Shape(f, BezierPath, args...)
 function bezierpath!(layer::Layer, args...)
     b = bezierpath(args...)
     push!(layer, b)
