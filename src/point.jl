@@ -10,6 +10,8 @@ struct Point <: GeometricObject
     end
 end
 
+Point(ang::Angle) = Point(cos(ang.rad), sin(ang.rad))
+
 Base.convert(::Type{Point}, t::Tuple{S, T}) where {S<:Real,T<:Real} = Point(t[1], t[2])
 
 point(args...) = Shape(Point(args[1:2]...), args[3:end]...)
@@ -38,6 +40,7 @@ Base.convert(::Type{SVector{2, Float64}}, p::Point) = p.xy
 
 Base.:+(p1::Point, p2::Point) = Point(p1.xy + p2.xy)
 Base.:-(p1::Point, p2::Point) = Point(p1.xy - p2.xy)
+Base.:-(p::Point) = Point(-p.xy)
 Base.:*(p::Point, factor::Real) = Point(p.xy .* factor)
 Base.:*(factor::Real, p::Point) = p * factor
 Base.:/(p::Point, r::Real) = Point(p.xy ./ r)

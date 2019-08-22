@@ -65,4 +65,8 @@ function Base.:*(t::Transform, ls::LineSegments)
     LineSegments(t .* ls.segments)
 end
 
+function Base.:*(t::Transform, p::Polygon)
+    Polygon(t .* p.points)
+end
+
 end # module
