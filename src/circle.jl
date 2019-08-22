@@ -119,7 +119,7 @@ function outertangents(c1::Circle, c2::Circle)
         big_circle.radius * sin(-pi / 2 - alpha2),
     )
 
-    return Line(small_tangent_point_1, big_tangent_point_1), Line(small_tangent_point_2, big_tangent_point_2)
+    return [Line(small_tangent_point_1, big_tangent_point_1), Line(small_tangent_point_2, big_tangent_point_2)]
 end
 
 function point_at_angle(c::Circle, angle::Angle)
