@@ -1,4 +1,4 @@
-export between
+export between, P, X, Y
 
 struct Point <: GeometricObject
     xy::SVector{2, Float64}
@@ -11,6 +11,10 @@ struct Point <: GeometricObject
         new(SVector{2, Float64}(xy...))
     end
 end
+
+const P = Point
+X(x::Real) = P(x, 0)
+Y(y::Real) = P(0, y)
 
 Point(ang::Angle) = Point(cos(ang.rad), sin(ang.rad))
 

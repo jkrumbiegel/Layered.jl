@@ -174,6 +174,7 @@ function draw(p::Polygon, a::Attributes)
         facecolor = rgba(a[Fill].color),
         antialiased = true,
         zorder=zorder(),
+        snap=false,
     )
     PyPlot.gca().add_patch(pathpatch)
 end
@@ -188,6 +189,7 @@ function draw(arc::Arc, a::Attributes)
         facecolor = "none",
         antialiased = true,
         zorder=zorder(),
+        snap=false,
     )
     PyPlot.gca().add_patch(pathpatch)
 end
@@ -214,6 +216,7 @@ function draw(t::Txt, a::Attributes)
         rotation = deg(t.angle),
         rotation_mode = "anchor",
         zorder=zorder(),
+        snap=false,
     )
 end
 
@@ -234,6 +237,7 @@ function draw(b::Bezier, a::Attributes)
         linestyle = a[Linestyle].style,
         facecolor = rgba(a[Fill].color),
         zorder=zorder(),
+        snap=false,
     )
     ax.add_patch(pathpatch)
 end
@@ -248,6 +252,7 @@ function draw(b::BezierPath, a::Attributes)
         linestyle = a[Linestyle].style,
         facecolor = rgba(a[Fill].color),
         zorder=zorder(),
+        snap=false,
     )
     ax.add_patch(pathpatch)
 end
@@ -268,6 +273,7 @@ function draw(c::Circle, a::Attributes)
         linewidth = a[Linewidth].width,
         linestyle = a[Linestyle].style,
         zorder=zorder(),
+        snap=false,
     )
     ax.add_patch(circlepatch)
 end
@@ -284,6 +290,7 @@ function draw(r::Rect, a::Attributes)
         linewidth = a[Linewidth].width,
         linestyle = a[Linestyle].style,
         zorder=zorder(),
+        snap=false,
     )
     ax.add_patch(rectpatch)
 end

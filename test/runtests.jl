@@ -143,7 +143,7 @@ function test2()
     crosses = polygon!.((r -> ncross(r.center, 4, 3, 0.3)), sls, rs, Fill("black"), Stroke("transparent"))
 
     text!.(r -> begin
-        Txt(r.center + Point(5, 0), "test", 10, :l, :c, deg(0))
+        Txt(bottomleft(r) - Y(1), "test", 10, :l, :t, deg(0))
     end, l, rs)
 
     eye = circle!(l, rs[1], rs[end], Fill("white")) do r1, r2
