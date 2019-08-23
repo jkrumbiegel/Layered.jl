@@ -8,7 +8,15 @@ CURVE4 = 4
 LINETO = 2
 MOVETO = 1
 
+z = 0
+function zorder()
+    global z
+    z += 1
+end
+
+
 function draw(l::Layer)
+    z = 0
     for c in l.content
         draw(c)
     end
@@ -84,7 +92,20 @@ function PyPlot.matplotlib.path.Path(p::Polygon; kwargs...)
         push!(vertices, po.xy)
         push!(codes, LINETO)
     end
-    PyPlot.matplotlib.path.Path(vertices, codes; kwargs...)
+
+    push!(vertices, p.points[1].xy)
+    push!(codes, LINETO)
+
+    PyPlot.matplotlib.path.Path(vertices; kwargs...)
+end
+
+function PyPlot.matplotlib.path.Path(a::Arc; kwargs...)
+    path = PyPlot.matplotlib.path.Path.arc(deg(a.start_angle), deg(a.end_angle))
+
+    # numpy broadcasting here
+    verts = path.vertices * a.radius + a.center.xy
+
+    PyPlot.matplotlib.path.Path(verts, path.codes; kwargs...)
 end
 
 function PyPlot.matplotlib.path.Path(bp::BezierPath; kwargs...)
@@ -126,6 +147,7 @@ function draw(l::Line, a::Attributes)
         edgecolor = rgba(a[Stroke].color),
         linewidth = a[Linewidth].width,
         linestyle = a[Linestyle].style,
+        zorder=zorder(),
     )
     ax.add_patch(pathpatch)
 end
@@ -137,20 +159,62 @@ function draw(ls::LineSegments, a::Attributes)
         edgecolor = rgba(a[Stroke].color),
         linewidth = a[Linewidth].width,
         linestyle = a[Linestyle].style,
+        zorder=zorder(),
     )
     PyPlot.gca().add_patch(pathpatch)
 end
 
 function draw(p::Polygon, a::Attributes)
-    path = PyPlot.matplotlib.path.Path(p, closed=true)
+    path = PyPlot.matplotlib.path.Path(p)
     pathpatch = PyPlot.matplotlib.patches.PathPatch(
         path,
         edgecolor = rgba(a[Stroke].color),
         linewidth = a[Linewidth].width,
         linestyle = a[Linestyle].style,
         facecolor = rgba(a[Fill].color),
+        antialiased = true,
+        zorder=zorder(),
     )
     PyPlot.gca().add_patch(pathpatch)
+end
+
+function draw(arc::Arc, a::Attributes)
+    path = PyPlot.matplotlib.path.Path(arc)
+    pathpatch = PyPlot.matplotlib.patches.PathPatch(
+        path,
+        edgecolor = rgba(a[Stroke].color),
+        linewidth = a[Linewidth].width,
+        linestyle = a[Linestyle].style,
+        facecolor = "none",
+        antialiased = true,
+        zorder=zorder(),
+    )
+    PyPlot.gca().add_patch(pathpatch)
+end
+
+alignments = Dict(
+    :c => "center",
+    :t => "top",
+    :b => "bottom",
+    :l => "left",
+    :r => "right",
+    :bl => "baseline",
+    :cbl => "center_baseline"
+)
+
+function draw(t::Txt, a::Attributes)
+    PyPlot.gca().text(
+        t.pos.xy...,
+        t.text,
+        fontsize = t.size,
+        fontfamily = a[Font].family,
+        color = rgba(a[Stroke].color),
+        va = alignments[t.valign],
+        ha = alignments[t.halign],
+        rotation = deg(t.angle),
+        rotation_mode = "anchor",
+        zorder=zorder(),
+    )
 end
 
 
@@ -169,6 +233,7 @@ function draw(b::Bezier, a::Attributes)
         linewidth = a[Linewidth].width,
         linestyle = a[Linestyle].style,
         facecolor = rgba(a[Fill].color),
+        zorder=zorder(),
     )
     ax.add_patch(pathpatch)
 end
@@ -182,6 +247,7 @@ function draw(b::BezierPath, a::Attributes)
         linewidth = a[Linewidth].width,
         linestyle = a[Linestyle].style,
         facecolor = rgba(a[Fill].color),
+        zorder=zorder(),
     )
     ax.add_patch(pathpatch)
 end
@@ -193,7 +259,7 @@ function PyPlot.plot(v::Vector{Point}; kwargs...)
 end
 
 function draw(c::Circle, a::Attributes)
-    vertices = point_at_angle.(c, deg.(range(0, 360, length=100)))
+    vertices = at_angle.(c, deg.(range(0, 360, length=100)))
     ax = PyPlot.gca()
     circlepatch = PyPlot.matplotlib.patches.Circle(
         (c.center.x, c.center.y), c.radius,
@@ -201,6 +267,7 @@ function draw(c::Circle, a::Attributes)
         edgecolor = rgba(a[Stroke].color),
         linewidth = a[Linewidth].width,
         linestyle = a[Linestyle].style,
+        zorder=zorder(),
     )
     ax.add_patch(circlepatch)
 end
@@ -216,6 +283,7 @@ function draw(r::Rect, a::Attributes)
         edgecolor = rgba(a[Stroke].color),
         linewidth = a[Linewidth].width,
         linestyle = a[Linestyle].style,
+        zorder=zorder(),
     )
     ax.add_patch(rectpatch)
 end

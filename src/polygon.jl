@@ -1,4 +1,4 @@
-export Polygon, polygon, polygon!, ncross
+export Polygon, polygon, polygon!, ncross, grow
 
 struct Polygon <: GeometricObject
     points::Vector{Point}
@@ -35,4 +35,14 @@ function ncross(pos::Point, n::Int, r::Real, thickness::Real, angle::Angle=deg(0
     )
     inner_points = rotate.(inner_point1, angles)
     collect(Iterators.flatten((r, l, i) for (r, l, i) in zip(routcorners, loutcorners, inner_points)))
+end
+
+function center(pol::Polygon)
+    Point(sum([p.xy for p in pol.points]) / length(pol.points))
+end
+
+function grow(p::Polygon, factor::Real; from::Union{Point, Nothing}=nothing)
+    c = isnothing(from) ? center(p) : from
+    dists = from_to.(c, p.points)
+    Polygon(dists .* factor .+ c)
 end

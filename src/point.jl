@@ -1,3 +1,5 @@
+export between
+
 struct Point <: GeometricObject
     xy::SVector{2, Float64}
 

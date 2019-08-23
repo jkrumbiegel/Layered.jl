@@ -69,4 +69,24 @@ function Base.:*(t::Transform, p::Polygon)
     Polygon(t .* p.points)
 end
 
+function Base.:*(tr::Transform, t::Txt)
+    Txt(
+        tr * t.pos,
+        t.text,
+        tr.scale * t.size,
+        t.halign,
+        t.valign,
+        tr.rotation + t.angle,
+    )
+end
+
+function Base.:*(t::Transform, a::Arc)
+    Arc(
+        t * a.center,
+        t.scale * a.radius,
+        t.rotation + a.start_angle,
+        t.rotation + a.end_angle,
+    )
+end
+
 end # module

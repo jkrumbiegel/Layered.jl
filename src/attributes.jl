@@ -1,4 +1,4 @@
-export Attribute, Attributes, Fill, Stroke, Linestyle, Linewidth, Markersize, Marker
+export Attribute, Attributes, Fill, Stroke, Linestyle, Linewidth, Markersize, Marker, Font
 
 abstract type Attribute end
 
@@ -32,6 +32,10 @@ end
 
 struct Marker <: Attribute
     marker::Symbol
+end
+
+struct Font <: Attribute
+    family::String
 end
 
 mutable struct Attributes

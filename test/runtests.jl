@@ -135,12 +135,16 @@ test()
 PyPlot.close_figs()
 
 function test2()
-    l = layer(Transform(), Markersize(20), Marker(:.), Fill("transparent"), Stroke("black"), Linewidth(1), Linestyle(:solid))
+    l = layer(Transform(), Markersize(20), Marker(:.), Fill("transparent"), Stroke("black"), Linewidth(1), Linestyle(:solid), Font("Helvetica Neue"))
     n = 5
-    sls = layer!.(l, Transform.(range(1, 1.5, length=n), deg(0), ((i * 50 + i * 10, -i * 20) for i in 0:n-1)))
+    sls = layer!.(l, Transform.(range(1, 1.5, length=n), deg(0), ((i * 20 + i * 10, -i * 10) for i in 0:n-1)))
 
-    rs = rect!.(sls, Ref((0, 0)), 70, 50, deg(0), Fill(GrayA(0.5, 0.8)))
-    crosses = polygon!.((r -> ncross(r.center, 4, 3, 0.3)), sls, rs, Fill("black"))
+    rs = rect!.(sls, Ref((0, 0)), 70, 50, deg(0), Fill(GrayA(0.5, 0.7)))
+    crosses = polygon!.((r -> ncross(r.center, 4, 3, 0.3)), sls, rs, Fill("black"), Stroke("transparent"))
+
+    text!.(r -> begin
+        Txt(r.center + Point(5, 0), "test", 10, :l, :c, deg(0))
+    end, l, rs)
 
     eye = circle!(l, rs[1], rs[end], Fill("white")) do r1, r2
         p = intersection(leftline(r1), bottomline(r2))
@@ -159,9 +163,14 @@ function test2()
     #     outertangents(cc, c)
     # end
 
-    bezierpath!(l, rs[1], rs[end]) do r1, r2
+    brk = bezierpath!(l, rs[1], rs[end]) do r1, r2
         b = bracket(topright(r1), topright(r2), 0.1, 1, 2.5)
         move(b, perpendicular(Line(topright(r1), topright(r2))) * 5)
+    end
+
+    text!(l, brk) do brk
+        p = brk.segments[1].to
+        Txt(p, "test", 10, :l, :b, deg(0))
     end
 
     fig, ax = PyPlot.subplots(1)

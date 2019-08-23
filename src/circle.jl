@@ -1,4 +1,4 @@
-export circle, circle!, outertangents, scale, scalearea
+export circle, circle!, outertangents, scale, scalearea, at_angle
 
 struct Circle <: GeometricObject
     center::Point
@@ -122,7 +122,7 @@ function outertangents(c1::Circle, c2::Circle)
     return [Line(small_tangent_point_1, big_tangent_point_1), Line(small_tangent_point_2, big_tangent_point_2)]
 end
 
-function point_at_angle(c::Circle, angle::Angle)
+function at_angle(c::Circle, angle::Angle)
     c.center + Point(cos(angle), sin(angle)) * c.radius
 end
 
