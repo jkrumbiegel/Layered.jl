@@ -39,6 +39,7 @@ include("transform.jl")
 include("layer.jl")
 include("shape.jl")
 include("geometry.jl")
+include("canvas.jl")
 include("drawing.jl")
 
 function Base.:*(t::Transform, p::Point)

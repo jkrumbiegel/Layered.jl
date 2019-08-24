@@ -135,7 +135,7 @@ test()
 PyPlot.close_figs()
 
 function test2()
-    l = layer(Transform(), Markersize(20), Marker(:.), Fill("transparent"), Stroke("black"), Linewidth(1), Linestyle(:solid), Font("Helvetica Neue"))
+    c, l = canvas(6, 4)
     n = 5
     sls = layer!.(l, Transform.(range(1, 1.5, length=n), deg(0), ((i * 20 + i * 10, -i * 10) for i in 0:n-1)))
 
@@ -147,8 +147,13 @@ function test2()
     end, l, rs)
 
     eye = circle!(l, rs[1], rs[end], Fill("white")) do r1, r2
-        p = intersection(leftline(r1), bottomline(r2))
+        # p = intersection(leftline(r1), bottomline(r2))
+        p = P(0, 0)
         Circle(p, 20)
+    end
+
+    line!(l, c.rect) do r
+        Line(bottomleft(r), topright(r))
     end
 
     iris = circle!(l, eye, Fill("rosybrown3"), Stroke("transparent")) do eye
@@ -173,23 +178,23 @@ function test2()
         Txt(p, "test", 10, :l, :b, deg(0))
     end
 
-    bgl = layerfirst!(l, Transform())
-    xs = -50:30:200
-    ys = -100:30:50
+    # bgl = layerfirst!(l, Transform())
+    # xs = -50:30:200
+    # ys = -100:30:50
     # bezierpaths!(bgl, Strokes([LCHuv(70, 50, y + 100) for x in xs for y in ys]), Fills("transparent")) do
     #     [arrow(P(x, y), P(x+8, y), 3, 3, 0.2) for x in xs for y in ys]
     # end
 
-    colors = [LCHuv(70, 50, y + 100) for x in xs for y in ys]
-    bezierpaths!(bgl, Strokes(colors), Fills("transparent"), Linewidths(2)) do
-        arros = [arcarrow(P(x, y), P(x+25, y), 1, 2, 4) for x in xs for y in ys]
+    # colors = [LCHuv(70, 50, y + 100) for x in xs for y in ys]
+    # bezierpaths!(bgl, Strokes(colors), Fills(colors), Linewidths(1)) do
+    #     arros = [arcarrow(P(x, y), P(x+25, y), 1, 2, 4) for x in xs for y in ys]
+    # end
+
+    bezierpath!(l, rs[1], rs[end]) do r1, r2
+        arcarrow(bottomleft(r1), bottomright(r2), -1, 6, 6)
     end
 
-    fig, ax = PyPlot.subplots(1)
-    draw(l)
-    ax.axis("equal")
-    display(fig)
-    nothing
+    draw(c)
 end
 
 test2()
