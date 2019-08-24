@@ -167,9 +167,8 @@ function arcarrow(from::Point, to::Point, radiusfraction::Real, tiplength::Real,
     tipconnection = fraction(arc, 1 - tiplength / alength)
     tipconnection_retracted = fraction(arc, 1 - tiplength * (1 - tipretraction) / alength)
 
-    arc_retracted = lengthen(arc, (arc.end_angle - arc.start_angle) * -tiplength / alength)
+    arc_retracted = lengthen(arc, (arc.end_angle - arc.start_angle) * -tiplength * (1 - tipretraction) / alength)
     arcbezier = Base.convert(BezierPath, arc_retracted)
-
 
     ortholeft = normalize(rotate(tipconnection → to, deg(90)))
     tipleft = tipconnection + 0.5tipwidth * ortholeft
