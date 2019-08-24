@@ -53,7 +53,7 @@ end
 needed_attributes(::Type{Arc}) = (Linewidth, Stroke, Linestyle)
 
 function arclength(a::Arc)
-    2π * a.radius / abs(rad(a.end_angle - a.start_angle))
+    a.radius * abs(rad(a.end_angle - a.start_angle))
 end
 
 function lengthen(a::Arc, ang::Angle)
