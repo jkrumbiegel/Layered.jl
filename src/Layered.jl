@@ -26,9 +26,13 @@ Base.:-(a::Angle) = Angle(-a.rad)
 Base.:*(a::Angle, r::Real) = Angle(a.rad * r)
 Base.:*(r::Real, a::Angle) = a * r
 Base.:/(a::Angle, r::Real) = Angle(a.rad / r)
+Base.:/(a1::Angle, a2::Angle) = a1.rad / a2.rad
 Base.cos(a::Angle) = cos(a.rad)
 Base.sin(a::Angle) = sin(a.rad)
 Base.tan(a::Angle) = tan(a.rad)
+Base.isless(a1::Angle, a2::Angle) = a1.rad < a2.rad
+Base.isgreater(a1::Angle, a2::Angle) = a1.rad > a2.rad
+Base.isequal(a1::Angle, a2::Angle) = a1.rad == a2.rad
 
 include("attributes.jl")
 include("transform.jl")
@@ -59,7 +63,7 @@ function Base.:*(t::Transform, b::Bezier)
 end
 
 function Base.:*(t::Transform, bp::BezierPath)
-    BezierPath(t .* bp.segments, bp.closed)
+    BezierPath(BezierSegment[t * s for s in bp.segments], bp.closed)
 end
 
 function Base.:*(t::Transform, bps::BezierPaths)

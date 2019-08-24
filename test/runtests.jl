@@ -174,10 +174,15 @@ function test2()
     end
 
     bgl = layerfirst!(l, Transform())
-    xs = -50:10:200
-    ys = -100:10:50
-    bezierpaths!(bgl, Strokes([LCHuv(70, 50, y + 100) for x in xs for y in ys]), Fills("transparent")) do
-        [arrow(P(x, y), P(x+8, y), 3, 3, 0.2) for x in xs for y in ys]
+    xs = -50:30:200
+    ys = -100:30:50
+    # bezierpaths!(bgl, Strokes([LCHuv(70, 50, y + 100) for x in xs for y in ys]), Fills("transparent")) do
+    #     [arrow(P(x, y), P(x+8, y), 3, 3, 0.2) for x in xs for y in ys]
+    # end
+
+    colors = [LCHuv(70, 50, y + 100) for x in xs for y in ys]
+    bezierpaths!(bgl, Strokes(colors), Fills("transparent"), Linewidths(2)) do
+        arros = [arcarrow(P(x, y), P(x+25, y), 1, 2, 4) for x in xs for y in ys]
     end
 
     fig, ax = PyPlot.subplots(1)

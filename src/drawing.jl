@@ -272,6 +272,7 @@ function draw(bs::BezierPaths, a::Attributes)
         paths,
         edgecolors = rgbas(a[Strokes]),
         facecolors = rgbas(a[Fills]),
+        linewidths = a[Linewidths].widths,
         zorder=zorder(),
         antialiaseds=true,
         snap=false,

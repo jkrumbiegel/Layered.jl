@@ -1,7 +1,7 @@
 export Bezier, bezier, bezier!, horizontalbezier, perpendicularbezier
 export BezierPath, bezierpath, bezierpath!
 export BezierPaths, bezierpaths, bezierpaths!
-export bracket, arrow
+export bracket, arrow, arcarrow
 
 struct Bezier <: GeometricObject
     from::Point
@@ -50,8 +50,10 @@ end
 
 needed_attributes(::Type{Bezier}) = (Linewidth, Stroke, Linestyle, Fill)
 
+const BezierSegment = Union{Bezier, Line}
+
 struct BezierPath <: GeometricObject
-    segments::Vector{<:Union{Bezier, Line}}
+    segments::Vector{<:BezierSegment}
     closed::Bool
 end
 
@@ -102,7 +104,7 @@ function bezierpaths!(f::Function, layer::Layer, args...)
     b
 end
 
-needed_attributes(::Type{BezierPaths}) = (Linewidth, Strokes, Linestyle, Fills)
+needed_attributes(::Type{BezierPaths}) = (Linewidths, Strokes, Linestyle, Fills)
 
 Base.convert(::Type{BezierPaths}, paths::Vector{BezierPath}) = BezierPaths(paths)
 
@@ -120,4 +122,66 @@ function arrow(from::Point, to::Point, tiplength, tipwidth, tipretraction=0)
         Line(to, tipleft),
         Line(tipleft, tipconnection_retracted),
     ], false)
+end
+
+
+function Base.convert(::Type{BezierPath}, a::Arc)
+    # https://stackoverflow.com/a/44829356/2279303
+
+    function uptoquarter(center, p1, p2)
+        x1, y1 = p1.xy
+        x4, y4 = p2.xy
+        xc, yc = center.xy
+
+        ax = x1 - xc
+        ay = y1 - yc
+        bx = x4 - xc
+        by = y4 - yc
+        q1 = ax * ax + ay * ay
+        q2 = q1 + ax * bx + ay * by
+        k2 = 4/3 * (√(2 * q1 * q2) - q2) / (ax * by - ay * bx)
+
+
+        x2 = xc + ax - k2 * ay
+        y2 = yc + ay + k2 * ax
+        x3 = xc + bx + k2 * by
+        y3 = yc + by - k2 * bx
+        Bezier(p1, P(x2, y2), P(x3, y3), p2)
+    end
+
+    quarterfractions = (a.end_angle - a.start_angle) / deg(90)
+    nsegments=ceil(abs(quarterfractions))
+
+    points = [fraction(a, i / nsegments) for i in 0:nsegments]
+    segments = [uptoquarter(a.center, p1, p2) for (p1, p2) in zip(points[1:end-1], points[2:end])]
+    BezierPath(segments, false)
+end
+
+reversed(b::Bezier) = Bezier(b.to, b.c2, b.c1, b.from)
+reversed(b::BezierPath) = BezierPath(reverse!(reversed.(b.segments)), b.closed)
+
+function arcarrow(from::Point, to::Point, radiusfraction::Real, tiplength::Real, tipwidth::Real, tipretraction::Real=0)
+    arc = Arc(from, to, radiusfraction)
+    alength = arclength(arc)
+
+    tipconnection = fraction(arc, 1 - tiplength / alength)
+    tipconnection_retracted = fraction(arc, 1 - tiplength * (1 - tipretraction) / alength)
+
+    arc_retracted = lengthen(arc, (arc.end_angle - arc.start_angle) * -tiplength / alength)
+    arcbezier = Base.convert(BezierPath, arc_retracted)
+
+
+    ortholeft = normalize(rotate(tipconnection → to, deg(90)))
+    tipleft = tipconnection + 0.5tipwidth * ortholeft
+    tipright = tipconnection - 0.5tipwidth * ortholeft
+
+    segments = BezierSegment[
+        arcbezier.segments...,
+        Line(tipconnection_retracted, tipright),
+        Line(tipright, to),
+        Line(to, tipleft),
+        Line(tipleft, tipconnection_retracted),
+        reversed(arcbezier).segments...
+    ]
+    BezierPath(segments, false)
 end

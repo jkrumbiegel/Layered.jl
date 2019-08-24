@@ -1,4 +1,4 @@
-export Attribute, Attributes, Fill, Fills, Stroke, Strokes, Linestyle, Linewidth, Markersize, Marker, Font
+export Attribute, Attributes, Fill, Fills, Stroke, Strokes, Linestyle, Linewidth, Linewidths, Markersize, Marker, Font
 
 abstract type Attribute end
 
@@ -31,13 +31,16 @@ end
 
 Strokes(s::String) = Strokes(parse(Colors.Colorant, s))
 
-
 struct Linestyle <: Attribute
     style::Symbol
 end
 
 struct Linewidth <: Attribute
     width::Float64
+end
+
+struct Linewidths <: Attribute
+    widths::Union{Real, Array{<:Real}} # if it's a real parametric type then the dict lookup of the type doesn't work..
 end
 
 struct Markersize <: Attribute
