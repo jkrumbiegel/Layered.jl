@@ -264,7 +264,6 @@ function PyPlot.plot(v::Vector{Point}; kwargs...)
 end
 
 function draw(c::Circle, a::Attributes)
-    vertices = at_angle.(c, deg.(range(0, 360, length=100)))
     ax = PyPlot.gca()
     circlepatch = PyPlot.matplotlib.patches.Circle(
         (c.center.x, c.center.y), c.radius,

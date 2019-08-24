@@ -1,4 +1,4 @@
-export between, P, X, Y
+export between, P, X, Y, xs, ys, magnitude
 
 struct Point <: GeometricObject
     xy::SVector{2, Float64}
@@ -15,6 +15,9 @@ end
 const P = Point
 X(x::Real) = P(x, 0)
 Y(y::Real) = P(0, y)
+
+xs(ps::Array{Point}) = [p.x for p in ps]
+ys(ps::Array{Point}) = [p.y for p in ps]
 
 Point(ang::Angle) = Point(cos(ang.rad), sin(ang.rad))
 

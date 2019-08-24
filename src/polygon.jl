@@ -1,4 +1,4 @@
-export Polygon, polygon, polygon!, ncross, grow
+export Polygon, polygon, polygon!, ncross, grow, center
 
 struct Polygon <: GeometricObject
     points::Vector{Point}

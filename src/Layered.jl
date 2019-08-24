@@ -22,6 +22,7 @@ rad(ang::Angle) = ang.rad
 
 Base.:+(a1::Angle, a2::Angle) = Angle(a1.rad + a2.rad)
 Base.:-(a1::Angle, a2::Angle) = Angle(a1.rad - a2.rad)
+Base.:-(a::Angle) = Angle(-a.rad)
 Base.:*(a::Angle, r::Real) = Angle(a.rad * r)
 Base.:*(r::Real, a::Angle) = a * r
 Base.:/(a::Angle, r::Real) = Angle(a.rad / r)
