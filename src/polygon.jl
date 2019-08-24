@@ -1,4 +1,5 @@
 export Polygon, polygon, polygon!, ncross, grow, center
+export Polygons, polygons, polygons!
 
 struct Polygon <: GeometricObject
     points::Vector{Point}
@@ -18,6 +19,26 @@ function polygon!(f::Function, layer::Layer, args...)
 end
 
 needed_attributes(::Type{Polygon}) = (Linewidth, Stroke, Linestyle, Fill)
+
+struct Polygons <: GeometricObject
+    polys::Vector{Polygon}
+end
+
+polygons(args...) = Shape(Polygons(args[1:fieldcount(Polygons)]...), args[fieldcount(Polygons)+1:end]...)
+function polygons!(layer::Layer, args...)
+    r = polygons(args...)
+    push!(layer, r)
+    r
+end
+polygons(f::Function, args...) = Shape(f, Polygons, args...)
+function polygons!(f::Function, layer::Layer, args...)
+    r = polygons(f, args...)
+    push!(layer, r)
+    r
+end
+
+needed_attributes(::Type{Polygons}) = (Linewidth, Stroke, Linestyle, Fill)
+
 
 Base.convert(::Type{Polygon}, ps::Vector{Point}) = Polygon(ps)
 

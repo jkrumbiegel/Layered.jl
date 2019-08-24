@@ -62,12 +62,20 @@ function Base.:*(t::Transform, bp::BezierPath)
     BezierPath(t .* bp.segments, bp.closed)
 end
 
+function Base.:*(t::Transform, bps::BezierPaths)
+    BezierPaths(t .* bps.paths)
+end
+
 function Base.:*(t::Transform, ls::LineSegments)
     LineSegments(t .* ls.segments)
 end
 
 function Base.:*(t::Transform, p::Polygon)
     Polygon(t .* p.points)
+end
+
+function Base.:*(t::Transform, ps::Polygons)
+    Polygons(t .* p.polys)
 end
 
 function Base.:*(tr::Transform, t::Txt)

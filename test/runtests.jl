@@ -173,6 +173,13 @@ function test2()
         Txt(p, "test", 10, :l, :b, deg(0))
     end
 
+    bgl = layerfirst!(l, Transform())
+    xs = -50:10:200
+    ys = -100:10:50
+    bezierpaths!(bgl, Strokes([LCHuv(70, 50, y + 100) for x in xs for y in ys]), Fills("transparent")) do
+        [arrow(P(x, y), P(x+8, y), 3, 3, 0.2) for x in xs for y in ys]
+    end
+
     fig, ax = PyPlot.subplots(1)
     draw(l)
     ax.axis("equal")
@@ -181,3 +188,5 @@ function test2()
 end
 
 test2()
+
+PyPlot.close_figs()

@@ -257,6 +257,28 @@ function draw(b::BezierPath, a::Attributes)
     ax.add_patch(pathpatch)
 end
 
+function rgbas(f::T) where T <: Union{Fills,Strokes}
+    c = f.colors
+    if typeof(c) <: Colors.Colorant
+        return rgba(c)
+    else
+        return rgba.(c)
+    end
+end
+
+function draw(bs::BezierPaths, a::Attributes)
+    paths = PyPlot.matplotlib.path.Path.(bs.paths)
+    collection = PyPlot.matplotlib.collections.PathCollection(
+        paths,
+        edgecolors = rgbas(a[Strokes]),
+        facecolors = rgbas(a[Fills]),
+        zorder=zorder(),
+        antialiaseds=true,
+        snap=false,
+    )
+    PyPlot.gca().add_collection(collection)
+end
+
 function PyPlot.plot(v::Vector{Point}; kwargs...)
     xx = [p.x for p in v]
     yy = [p.y for p in v]

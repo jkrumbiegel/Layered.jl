@@ -1,4 +1,4 @@
-export layer, layer!
+export layer, layer!, layerfirst!
 
 mutable struct Layer <: LayerContent
     transform::Transform
@@ -23,8 +23,19 @@ function layer!(parent::Layer, t::Transform, varargs::Vararg{Attribute, N}) wher
     l
 end
 
+function layerfirst!(parent::Layer, t::Transform, varargs::Vararg{Attribute, N}) where N
+    l = Layer(t, Vector{LayerContent}[], nothing, Attributes(varargs...))
+    pushfirst!(parent, l)
+    l
+end
+
 function Base.push!(l::Layer, lc::LayerContent)
     push!(l.content, lc)
+    lc.parent = l
+end
+
+function Base.pushfirst!(l::Layer, lc::LayerContent)
+    pushfirst!(l.content, lc)
     lc.parent = l
 end
 

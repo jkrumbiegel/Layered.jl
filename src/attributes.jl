@@ -1,4 +1,4 @@
-export Attribute, Attributes, Fill, Stroke, Linestyle, Linewidth, Markersize, Marker, Font
+export Attribute, Attributes, Fill, Fills, Stroke, Strokes, Linestyle, Linewidth, Markersize, Marker, Font
 
 abstract type Attribute end
 
@@ -12,11 +12,25 @@ end
 
 Fill(s::String) = Fill(parse(Colors.Colorant, s))
 
+struct Fills <: Attribute
+    colors::Union{Colors.Colorant, Array{<:Colors.Colorant}} # if it's a real parametric type then the dict lookup of the type doesn't work..
+end
+
+Fills(s::String) = Fills(parse(Colors.Colorant, s))
+
+
 struct Stroke <: Attribute
     color::Colors.Colorant
 end
 
 Stroke(s::String) = Stroke(parse(Colors.Colorant, s))
+
+struct Strokes <: Attribute
+    colors::Union{Colors.Colorant, Array{<:Colors.Colorant}} # if it's a real parametric type then the dict lookup of the type doesn't work..
+end
+
+Strokes(s::String) = Strokes(parse(Colors.Colorant, s))
+
 
 struct Linestyle <: Attribute
     style::Symbol
