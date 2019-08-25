@@ -135,63 +135,54 @@ test()
 PyPlot.close_figs()
 
 function test2()
-    c, l = canvas(6, 4)
+    c, l = canvas(6.14, 3.81)
     n = 5
-    sls = layer!.(l, Transform.(range(1, 1.5, length=n), deg(0), ((i * 20 + i * 10, -i * 10) for i in 0:n-1)))
+    sls = [layer!.(l, Transform()) for i in 1:n]
 
-    rs = rect!.(sls, Ref((0, 0)), 70, 50, deg(0), Fill(GrayA(0.5, 0.7)))
-    crosses = polygon!.((r -> ncross(r.center, 4, 3, 0.3)), sls, rs, Fill("black"), Stroke("transparent"))
+    rs = rect!.((r, i) -> begin
+        margin = 20
+        avail_w = (r.width - 2margin) / n
+        avail_h = (r.height - 2margin) / n
+        Rect(
+            topleft(r) + P(margin + (i+0.5) * avail_w, -margin - (i+0.5) * avail_h),
+            avail_w * 1.3, avail_h * 1.3, deg(0)
+        )
+    end, sls, c.rect, 0:n-1, Fill(Gray(0.5)))
+
+    crosses = polygon!.(r -> begin
+        ncross(r.center, 4, 3, 0.3)
+    end, sls, rs, Fill("black"), Stroke("transparent"))
+
+    circlesleft = circle!.(r -> begin
+        Circle(r.center - X(r.width/4), 10)
+    end, sls, rs, Linestyle(:dashed))
+
+    circlesright = circle!.(r -> begin
+        Circle(r.center + X(r.width/4), 10)
+    end, sls, rs, Linestyle(:dashed))
+
+    focuscircle = circle!.(r -> begin
+        Circle(bottomleft(r) + P(60, 60), 50)
+    end, l, c.rect,  Linestyle(:dashed))
+
+    textl = layer!(l, Transform())
 
     text!.(r -> begin
         Txt(bottomleft(r) - Y(1), "test", 10, :l, :t, deg(0))
-    end, l, rs)
+    end, textl, rs)
 
-    eye = circle!(l, rs[1], rs[end], Fill("white")) do r1, r2
-        # p = intersection(leftline(r1), bottomline(r2))
-        p = P(0, 0)
-        Circle(p, 20)
-    end
-
-    line!(l, c.rect) do r
-        Line(bottomleft(r), topright(r))
-    end
-
-    iris = circle!(l, eye, Fill("rosybrown3"), Stroke("transparent")) do eye
-        scalearea(eye, 0.3)
-    end
-
-    pupil = circle!(l, eye, Fill("black"), Stroke("transparent")) do eye
-        scalearea(eye, 0.1)
-    end
-
-    # linesegments!(sls[1], pupil, cs[1]) do cc, c
-    #     outertangents(cc, c)
-    # end
+    linesegments!((c1, c2) -> begin
+        outertangents(c1, c2)
+    end, l, focuscircle, circlesright[2], Linestyle(:dashed))
 
     brk = bezierpath!(l, rs[1], rs[end]) do r1, r2
-        b = bracket(topright(r1), topright(r2), 0.1, 1, 2.5)
+        b = bracket(topright(r1), topright(r2), 0.05, 1, 2.5)
         move(b, perpendicular(Line(topright(r1), topright(r2))) * 5)
     end
 
     text!(l, brk) do brk
         p = brk.segments[1].to
         Txt(p, "test", 10, :l, :b, deg(0))
-    end
-
-    # bgl = layerfirst!(l, Transform())
-    # xs = -50:30:200
-    # ys = -100:30:50
-    # bezierpaths!(bgl, Strokes([LCHuv(70, 50, y + 100) for x in xs for y in ys]), Fills("transparent")) do
-    #     [arrow(P(x, y), P(x+8, y), 3, 3, 0.2) for x in xs for y in ys]
-    # end
-
-    # colors = [LCHuv(70, 50, y + 100) for x in xs for y in ys]
-    # bezierpaths!(bgl, Strokes(colors), Fills(colors), Linewidths(1)) do
-    #     arros = [arcarrow(P(x, y), P(x+25, y), 1, 2, 4) for x in xs for y in ys]
-    # end
-
-    bezierpath!(l, rs[1], rs[end]) do r1, r2
-        arcarrow(bottomleft(r1), bottomright(r2), -1, 6, 6)
     end
 
     draw(c)

@@ -1,5 +1,6 @@
 mutable struct Shape{T <: GeometricObject} <: LayerContent
-    content::Union{Tuple{Function, Vector{Shape}}, T}
+    # make this nicer and more julian
+    content::Union{Tuple{Function, Vector}, T}
     parent::Union{Layer, Nothing}
     solved::Union{T, Nothing}
     attrs::Attributes
@@ -8,9 +9,9 @@ end
 function Shape(g::GeometricObject, varargs::Vararg{Attribute})
     Shape(g, nothing, nothing, Attributes(varargs...))
 end
-function Shape(f::Function, ::Type{T}, varargs::Vararg{Union{Shape, Attribute},N}) where {N, T}
+function Shape(f::Function, ::Type{T}, varargs...) where {N, T}
 
-    deps = Tuple(v for v in varargs if typeof(v) <: Shape)
+    deps = Tuple(v for v in varargs if !(typeof(v) <: Attribute))
 
     attributes = Attributes()
     attrs = Tuple(v for v in varargs if typeof(v) <: Attribute)
@@ -21,7 +22,7 @@ function Shape(f::Function, ::Type{T}, varargs::Vararg{Union{Shape, Attribute},N
         attributes[typeof(a)] = a
     end
 
-    Shape{T}((f, Shape[deps...]), nothing, nothing, attributes)
+    Shape{T}((f, [deps...]), nothing, nothing, attributes)
 end
 
 Base.Broadcast.broadcastable(s::Shape) = Ref(s)
@@ -42,13 +43,20 @@ function solve!(s::Shape{T}) where T
     else
         closure = s.content[1]
         dependencies = s.content[2]
-        solved_deps = solve!.(dependencies)
 
-        # convert dependencies into own transform
-        converted_deps = transform_from_to.(dependencies, s) .* solved_deps
-        # converted_deps = transform_from_to(dependencies[1], s)
+        solved_deps = []
+        for d in dependencies
+            if typeof(d) <: Shape
+                solved = solve!.(d)
+                transformed = transform_from_to.(d, s) * solved
+                push!(solved_deps, transformed)
+            else
+                # for other arguments that are not shapes
+                push!(solved_deps, d)
+            end
+        end
 
-        s.solved = closure(converted_deps...)
+        s.solved = closure(solved_deps...)
         return s.solved
     end
     # the dependencies should be converted into this shapes's transform
@@ -83,7 +91,8 @@ function lowestcommonancestorchainfromto(s1::Shape, s2::Shape)
             else
                 part1 = reverse(ancestors1[i-1:end])
                 part2 = ancestors2[i:end]
-                return hcat(part1, part2)
+                lca_index = Base.length(part1)
+                return lca_index, vcat(part1, part2)
             end
         end
     end

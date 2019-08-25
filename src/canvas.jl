@@ -22,7 +22,7 @@ function canvas(
             Stroke("black"),
             Linewidth(1),
             Linestyle(:solid),
-            Font("Helvetica Neue")
+            Font("Helvetica Neue LT Std")
         )
     else
         toplayer
