@@ -42,3 +42,11 @@ topline(r::Rect) = Line(topleft(r), topright(r))
 bottomline(r::Rect) = Line(bottomleft(r), bottomright(r))
 leftline(r::Rect) = Line(bottomleft(r), topleft(r))
 rightline(r::Rect) = Line(bottomright(r), topright(r))
+
+function Point(r::Rect, nx::Real, ny::Real, mode::Symbol=:norm)
+    if mode == :norm
+        r.center + Point(r.angle) * (nx - 0.5) * r.width + Point(r.angle + deg(90)) * (ny - 0.5) * r.height
+    else
+        error("Mode $mode is invalid")
+    end
+end
