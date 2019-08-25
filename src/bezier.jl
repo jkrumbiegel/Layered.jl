@@ -77,7 +77,7 @@ Base.:+(p::Point, b::BezierPath) = move(b, p)
 function bracket(p1::Point, p2::Point, widthscale::Real = 0.1, innerstrength=1, outerstrength=1; flip=false)
     l = Line(p1, p2)
     perp1 = perpendicular(l, flip)
-    tipdist = widthscale * distance(l)
+    tipdist = widthscale * length(l)
     tipvec = perp1 * tipdist
     tip = fraction(l, 0.5) + tipvec
     bez1 = Bezier(p1, p1 + 0.5tipvec * outerstrength, tip - 0.5tipvec * innerstrength, tip)
@@ -108,19 +108,25 @@ needed_attributes(::Type{BezierPaths}) = (Linewidths, Strokes, Linestyle, Fills)
 
 Base.convert(::Type{BezierPaths}, paths::Vector{BezierPath}) = BezierPaths(paths)
 
-function arrow(from::Point, to::Point, tiplength, tipwidth, tipretraction=0)
+function arrow(from::Point, to::Point, tiplength, tipwidth, shaftwidthback, shaftwidthfront, tipretraction)
     vector = from → to
     tipconnection = to - normalize(vector) * tiplength
     tipconnection_retracted = to - normalize(vector) * tiplength * (1-tipretraction)
     ortholeft = normalize(rotate(vector, deg(90)))
     tipleft = tipconnection + 0.5tipwidth * ortholeft
     tipright = tipconnection - 0.5tipwidth * ortholeft
+    endleft = from + 0.5shaftwidthback * ortholeft
+    endright = from - 0.5shaftwidthback * ortholeft
+    tipconnleft = tipconnection_retracted + 0.5shaftwidthfront * ortholeft
+    tipconnright = tipconnection_retracted - 0.5shaftwidthfront * ortholeft
     BezierPath([
-        Line(from, tipconnection_retracted),
-        Line(tipconnection_retracted, tipright),
-        Line(tipright, to),
-        Line(to, tipleft),
-        Line(tipleft, tipconnection_retracted),
+        Line(endleft, tipconnleft),
+        Line(tipconnleft, tipleft),
+        Line(tipleft, to),
+        Line(to, tipright),
+        Line(tipright, tipconnright),
+        Line(tipconnright, endright),
+        Line(endright, endleft),
     ], false)
 end
 

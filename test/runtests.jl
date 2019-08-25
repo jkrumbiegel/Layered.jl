@@ -137,16 +137,16 @@ PyPlot.close_figs()
 function test2()
     c, l = canvas(6.14, 3.81)
     n = 5
-    sls = [layer!.(l, Transform()) for i in 1:n]
 
-    rs = rect!.((r, i) -> begin
+    sls = layer!.((r, i) -> begin
         margin = 20
         avail_w = (r.width - 2margin) / n
         avail_h = (r.height - 2margin) / n
-        Rect(
-            topleft(r) + P(margin + (i+0.5) * avail_w, -margin - (i+0.5) * avail_h),
-            avail_w * 1.3, avail_h * 1.3, deg(0)
-        )
+        Transform(translation = topleft(r) + P(margin + (i-0.5) * avail_w, -margin - (i-0.5) * avail_h))
+    end, l, c.rect, 1:n)
+
+    rs = rect!.((r, i) -> begin
+        Rect(P(0, 0), 90, 60, deg(0))
     end, sls, c.rect, 0:n-1, Fill(Gray(0.5)))
 
     crosses = polygon!.(r -> begin
@@ -175,14 +175,14 @@ function test2()
         outertangents(c1, c2)
     end, l, focuscircle, circlesright[2], Linestyle(:dashed))
 
-    brk = bezierpath!(l, rs[1], rs[end]) do r1, r2
-        b = bracket(topright(r1), topright(r2), 0.05, 1, 2.5)
-        move(b, perpendicular(Line(topright(r1), topright(r2))) * 5)
+    arr = bezierpath!(l, rs[1], rs[end], Fill("tomato"), Stroke("transparent")) do r1, r2
+        a = arrow(topright(r1), topright(r2), 9, 9, 1, 1, 0)
+        move(a, perpendicular(Line(topright(r1), topright(r2))) * 5)
     end
 
-    text!(l, brk) do brk
-        p = brk.segments[1].to
-        Txt(p, "test", 10, :l, :b, deg(0))
+    text!(l, arr) do arr
+        p = fraction(arr.segments[1], 0.5)
+        Txt(p, "time", 10, :c, :b, angle(arr.segments[1]))
     end
 
     draw(c)

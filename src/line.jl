@@ -1,4 +1,4 @@
-export line!, move, perpendicular
+export line!, move, perpendicular, angle
 export LineSegments, linesegments, linesegments!
 
 struct Line <: GeometricObject
@@ -36,8 +36,8 @@ function intersection(l1::Line, l2::Line)
 end
 
 vector(l::Line) = from_to(l.from, l.to)
-angle(l::Line) = angle(vector(l))
-distance(l::Line) = magnitude(vector(l))
+Base.angle(l::Line) = angle(vector(l))
+Base.length(l::Line) = magnitude(vector(l))
 fraction(l::Line, frac::Real) = between(l.from, l.to, frac)
 reversed(l::Line) = Line(l.to, l.from)
 direction(l::Line) = normalize(vector(l))
@@ -52,7 +52,7 @@ function scale(l::Line, scalar::Real)
 end
 
 function scaleto(l::Line, len::Real)
-    scalar = len / distance(l)
+    scalar = len / length(l)
     scale(l, scalar)
 end
 
