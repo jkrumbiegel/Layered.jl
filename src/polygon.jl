@@ -55,7 +55,7 @@ function ncross(pos::Point, n::Int, r::Real, thickness::Real, angle::Angle=deg(0
         Line(routcorners[2], routcorners[2] - Point(angles[2]))
     )
     inner_points = rotate.(inner_point1, angles)
-    collect(Iterators.flatten((r, l, i) for (r, l, i) in zip(routcorners, loutcorners, inner_points)))
+    collect(Iterators.flatten((r, l, i) for (r, l, i) in zip(routcorners, loutcorners, inner_points))) .+ pos
 end
 
 function center(pol::Polygon)
