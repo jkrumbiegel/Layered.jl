@@ -14,8 +14,8 @@ function zorder()
     z += 1
 end
 
-function draw(c::Canvas)
-    fig = PyPlot.figure(figsize=(c.size_in))
+function draw(c::Canvas; dpi=100)
+    fig = PyPlot.figure(figsize=(c.size_in), dpi=dpi)
     ax = fig.add_axes((0, 0, 1, 1), frameon=false)
     ax.set_axis_off()
 
@@ -25,6 +25,7 @@ function draw(c::Canvas)
     ax.set_ylim(-size_pt[2]/2, size_pt[2]/2)
 
     draw(c.toplayer)
+    fig
 end
 
 function draw(l::Layer)

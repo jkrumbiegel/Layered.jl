@@ -41,6 +41,7 @@ include("shape.jl")
 include("geometry.jl")
 include("canvas.jl")
 include("drawing.jl")
+include("video.jl")
 
 function Base.:*(t::Transform, p::Point)
     rmat = rotmat(t.rotation)

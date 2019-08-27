@@ -95,8 +95,8 @@ end
 using Pkg
 pkg"activate ."
 using Revise
-using Layered
 import PyPlot
+using Layered
 using Colors
 
 
@@ -191,3 +191,33 @@ end
 test2()
 
 PyPlot.close_figs()
+
+
+function testvideo()
+
+    record("test.mp4", 30, 1:100) do t
+        c, l = canvas(3, 3)
+
+        r = solve!(c.rect)
+
+        points = [P(r, x, y) for x in range(0, 1, length=15) for y in range(0, 1, length=15)]
+
+        c1 = circle!(l, c.rect, Fill("tomato")) do r
+            Circle(between(topleft(r), bottomright(r), t / 100), 5)
+        end
+
+        bps = bezierpaths(c1, Linewidths(1), Fills("black"), Strokes("transparent")) do c
+
+            directions = normalize.(points .→ c.center) .* 10
+            arrow.(points, points .+ directions, 3, 3, 1, 1, 0)
+        end
+
+        pushfirst!(l, bps)
+
+        draw(c, dpi=300)
+    end
+end
+
+testvideo()
+
+PyPlot.pygui(false)

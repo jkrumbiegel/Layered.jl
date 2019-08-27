@@ -1,4 +1,4 @@
-export between, P, X, Y, xs, ys, magnitude
+export between, P, X, Y, xs, ys, magnitude, normalize
 
 struct Point <: GeometricObject
     xy::SVector{2, Float64}
