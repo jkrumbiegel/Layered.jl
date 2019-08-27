@@ -17,7 +17,7 @@ function rgb_array(fig)
     rgb = Colors.RGB.(rgba)
 end
 
-function record(figure_func, filename, framerate, ts)
+function record(figure_func, filename, framerate::Real, ts)
 
     nframes = length(ts)
 
@@ -36,4 +36,8 @@ function record(figure_func, filename, framerate, ts)
     VideoIO.encodevideo(filename, frames, framerate=framerate, AVCodecContextProperties=props)
 
     nothing
+end
+
+function record(figure_func, filename, framerate::Real, duration::Real)
+    record(figure_func, filename, framerate, 0:1//framerate:duration)
 end
