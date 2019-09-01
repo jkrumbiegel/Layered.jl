@@ -85,7 +85,7 @@ function bracket(p1::Point, p2::Point, widthscale::Real = 0.1, innerstrength=1, 
     BezierPath([bez1, bez2], false)
 end
 
-needed_attributes(::Type{BezierPath}) = (Linewidth, Stroke, Linestyle, Fill)
+needed_attributes(::Type{BezierPath}) = (Visible, Linewidth, Stroke, Linestyle, Fill)
 
 struct BezierPaths <: GeometricObject
     paths::Vector{BezierPath}
@@ -104,7 +104,7 @@ function bezierpaths!(f::Function, layer::Layer, args...)
     b
 end
 
-needed_attributes(::Type{BezierPaths}) = (Linewidths, Strokes, Linestyle, Fills)
+needed_attributes(::Type{BezierPaths}) = (Visible, Linewidths, Strokes, Linestyle, Fills)
 
 Base.convert(::Type{BezierPaths}, paths::Vector{BezierPath}) = BezierPaths(paths)
 

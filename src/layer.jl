@@ -143,3 +143,10 @@ function gettransform!(l::Layer)
         l.transform = closure(solved_deps...)
     end
 end
+
+
+# function scale!(l::Layer, s::Real)
+#     trans = gettransform!(l)
+#     tnew = Transform(trans.scale * s, trans.rotation, trans.translation)
+#     l.transform = tnew
+# end

@@ -99,41 +99,6 @@ import PyPlot
 using Layered
 using Colors
 
-
-function test()
-    l = layer(Transform(), Markersize(20), Marker(:.), Fill("transparent"), Stroke("black"), Linewidth(1), Linestyle(:solid))
-    l2 = layer!(l, Transform(2, deg(10), (2, 2)))
-
-    n = 5
-
-    r1 = rect!(l2, (0, 0), 10, 5, deg(0))
-    rs = rect!.(l, [(30, (y - (n+1)/2) * 10) for y in 1:n], 10, 5, deg(0), Fill.(LCHuv.(90, 10, range(0, 360, length=n+1)[1:end-1])))
-    bs = bezier!.(
-        l,
-        [
-            (r1, r2) -> perpendicularbezier(rightline(r1), leftline(r2), (i-1)/(n-1), 0.5, reverse1=true)
-        for i in 1:n],
-        r1, rs)
-
-    c1 = circle!(l, r1) do r1
-        Circle((0, 0), r1.height / 2 - 1)
-    end
-
-    c2 = circle!(l2, r1) do r1
-        Circle((0, 0), r1.height / 2 - 1)
-    end
-
-    fig, ax = PyPlot.subplots(1)
-    draw(l)
-    ax.axis("equal")
-    display(fig)
-    nothing
-end
-
-test()
-
-PyPlot.close_figs()
-
 function test2()
     c, l = canvas(6.14, 3.81)
     n = 5
@@ -147,7 +112,7 @@ function test2()
 
     rs = rect!.((r, i) -> begin
         Rect(P(0, 0), 90, 60, deg(0))
-    end, sls, c.rect, 0:n-1, Fill(Gray(0.5)))
+    end, sls, c.rect, 0:n-1, Fill(Gray(0.5)), Visible(true))
 
     crosses = polygon!.(r -> begin
         ncross(r.center, 4, 3, 0.3)
@@ -192,32 +157,51 @@ test2()
 
 PyPlot.close_figs()
 
+using Animations
 
 function testvideo()
 
-    record("test.mp4", 30, 1:100) do t
+    duration = 2.0
+
+    a_fill = Animation(range(0, duration, length=4), [RGB(1, 0, 0), RGB(0, 1, 0), RGB(0, 0, 1), RGB(1, 0, 0)])
+    a_ang = Animation([0, duration], [deg(0), deg(360)], sineio())
+    a_zoom = Animation([0, duration], [1, 1.5], sineio(yoyo=true, n=2))
+
+    record("test.mp4", 60, duration; excludelast=true) do t
         c, l = canvas(3, 3)
 
-        r = solve!(c.rect)
-
-        points = [P(r, x, y) for x in range(0, 1, length=15) for y in range(0, 1, length=15)]
-
-        c1 = circle!(l, c.rect, Fill("tomato")) do r
-            Circle(between(topleft(r), bottomright(r), t / 100), 5)
+        bigcirc = circle!(l, c.rect, Visible(false)) do r
+            Circle(r.center, r.height * 0.3)
         end
 
-        bps = bezierpaths(c1, Linewidths(1), Fills("black"), Strokes("transparent")) do c
+        c1 = circle!(l, bigcirc, Fill(a_fill(t))) do c
+            Circle(at_angle(c, a_ang(t)), 5)
+        end
 
-            directions = normalize.(points .→ c.center) .* 10
-            arrow.(points, points .+ directions, 3, 3, 1, 1, 0)
+        ps = points!(l, c.rect, c1, Visible(true)) do r, c
+            points = [P(r, x, y) for x in range(0, 1, length=15) for y in range(0, 1, length=15)]
+            directions = directions = normalize.(points .→ c.center) .* 10
+            colors = LCHuv.(70, 50, deg.(angle.(directions)))
+            (points, Strokes(colors))
+        end
+
+        # colors = [LCHuv(60, magnitude(p), deg(angle(p))) for p in points]
+
+        bps = bezierpaths(c1, ps, Linewidths(1), Strokes("transparent")) do c, ps
+
+            directions = normalize.(ps.points .→ c.center) .* 10
+            arros = arrow.(ps.points, ps.points .+ directions, 3, 3, 1, 1, 0)
+            colors = LCHuv.(70, 50, deg.(angle.(directions)))
+            (arros, Fills(colors))
         end
 
         pushfirst!(l, bps)
 
-        draw(c, dpi=300)
+        draw(c, dpi=256)
     end
 end
 
+PyPlot.pygui(false)
 testvideo()
 
-PyPlot.pygui(false)
+PyPlot.close_figs()

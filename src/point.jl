@@ -1,4 +1,5 @@
 export between, P, X, Y, xs, ys, magnitude, normalize
+export Points, points, points!
 
 struct Point <: GeometricObject
     xy::SVector{2, Float64}
@@ -29,7 +30,7 @@ point(f::Function, args...) = Shape(f, Point, args...)
 Base.show(io::IO, p::Point) = print(io, "Point($(p.xy[1]), $(p.xy[2]))")
 
 function needed_attributes(::Type{Point})
-    (Stroke, Markersize, Marker)
+    (Visible, Stroke, Markersize, Marker)
 end
 
 magnitude(p::Point) = sqrt(sum(p.xy .^ 2))
@@ -61,7 +62,7 @@ between(p1::Point, p2::Point, fraction::Real) = p1 + (p2 - p1) * fraction
 cross(p1::Point, p2::Point) = p1.x * p2.y - p1.y * p2.x
 dot(p1::Point, p2::Point) = p1.x * p2.x + p1.y * p2.y
 
-function angle(p::Point)
+function Base.angle(p::Point)
     Angle(atan(p.y, p.x))
 end
 
@@ -80,3 +81,24 @@ function rotate(p::Point, angle::Angle; around::Point=Point(0, 0))
     rotated_vector = Point(_rotation_matrix(angle) * vector.xy)
     rotated_vector + around
 end
+
+struct Points <: GeometricObject
+    points::Vector{Point}
+end
+
+points(args...) = Shape(Points(args[1:fieldcount(Points)]...), args[fieldcount(Points)+1:end]...)
+function points!(layer::Layer, args...)
+    r = points(args...)
+    push!(layer, r)
+    r
+end
+points(f::Function, args...) = Shape(f, Points, args...)
+function points!(f::Function, layer::Layer, args...)
+    r = points(f, args...)
+    push!(layer, r)
+    r
+end
+
+needed_attributes(::Type{Points}) = (Visible, Strokes, Markersizes, Marker)
+
+Base.convert(::Type{Points}, ps::Vector{Point}) = Points(ps)

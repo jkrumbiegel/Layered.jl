@@ -17,7 +17,7 @@ function rgb_array(fig)
     rgb = Colors.RGB.(rgba)
 end
 
-function record(figure_func, filename, framerate::Real, ts)
+function record(figure_func, filename, framerate::Real, ts; quality=:medium)
 
     nframes = length(ts)
 
@@ -28,16 +28,31 @@ function record(figure_func, filename, framerate::Real, ts)
     full_buffer[1, :, :, :] = first_frame
 
     @showprogress 1/3 "Rendering frames..." for (i, t) in enumerate(ts[2:end])
-        full_buffer[i, :, :, :] = rgb_array(figure_func(t))
+        fig = figure_func(t)
+        full_buffer[i, :, :, :] = rgb_array(fig)
+        PyPlot.matplotlib.pyplot.close(fig)
     end
 
-    props = [:priv_data => ("crf"=>"22","preset"=>"medium")]
+    codec_name, props = if quality == :medium
+        ("libx264", [:priv_data => ("crf"=>"22","pix_fmt"=>"yuv420p", "profile:v"=>"baseline", "level"=>"3")])
+    elseif quality == :fastbig
+        ("libx264rgb", [:priv_data => ("crf"=>"0","preset"=>"ultrafast")])
+    elseif quality == :slowsmall
+        ("libx264rgb", [:priv_data => ("crf"=>"0","preset"=>"ultraslow")])
+    # elseif quality == :bitrate
+    #     ("libx264", [:bit_rate => 400000,:gop_size => 0,:max_b_frames=>1])
+    end
+
     frames = [view(full_buffer, i, :, :) for i in 1:nframes]
-    VideoIO.encodevideo(filename, frames, framerate=framerate, AVCodecContextProperties=props)
+    VideoIO.encodevideo(filename, frames, framerate=framerate, AVCodecContextProperties=props, codec_name=codec_name)
 
     nothing
 end
 
-function record(figure_func, filename, framerate::Real, duration::Real)
-    record(figure_func, filename, framerate, 0:1//framerate:duration)
+function record(figure_func, filename, framerate::Real, duration::Real; excludelast=false, kwargs...)
+    frames = 0:1//framerate:duration
+    if excludelast
+        frames = frames[1:end-1]
+    end
+    record(figure_func, filename, framerate, frames; kwargs...)
 end

@@ -1,4 +1,4 @@
-export Attribute, Attributes, Fill, Fills, Stroke, Strokes, Linestyle, Linewidth, Linewidths, Markersize, Marker, Font
+export Attribute, Attributes, Fill, Fills, Stroke, Strokes, Linestyle, Linewidth, Linewidths, Markersize, Markersizes, Marker, Font, Visible
 
 abstract type Attribute end
 
@@ -47,12 +47,20 @@ struct Markersize <: Attribute
     size::Float64
 end
 
+struct Markersizes <: Attribute
+    sizes::Union{Real, Array{<:Real}}
+end
+
 struct Marker <: Attribute
     marker::Symbol
 end
 
 struct Font <: Attribute
     family::String
+end
+
+struct Visible <: Attribute
+    visible::Bool
 end
 
 mutable struct Attributes

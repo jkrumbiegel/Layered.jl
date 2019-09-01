@@ -48,6 +48,11 @@ function Base.:*(t::Transform, p::Point)
     Point(rmat * t.scale * p.xy + t.translation)
 end
 
+function Base.:*(t::Transform, ps::Points)
+    mat = rotmat(t.rotation) * t.scale
+    Points([Point(mat * p.xy + t.translation) for p in ps.points])
+end
+
 function Base.:*(t::Transform, l::Line)
     Line(t * l.from, t * l.to)
 end

@@ -16,10 +16,14 @@ function canvas(
     l = if isnothing(toplayer)
         layer(
             Transform(1, rad(0), (0, 0)),
+            Visible(true),
             Markersize(20),
+            Markersizes(20),
             Marker(:.),
             Fill("transparent"),
+            Fills("transparent"),
             Stroke("black"),
+            Strokes("black"),
             Linewidth(1),
             Linestyle(:solid),
             Font("Helvetica Neue LT Std")
@@ -27,6 +31,6 @@ function canvas(
     else
         toplayer
     end
-    r = rect!(l, (0, 0), size_pt..., deg(0), Fill("transparent"), Stroke("transparent"), Linewidth(0), Linestyle(:solid))
+    r = rect!(l, (0, 0), size_pt..., deg(0), Visible(false))
     Canvas((width, height), l, r), l
 end

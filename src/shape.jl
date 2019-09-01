@@ -56,7 +56,20 @@ function solve!(s::Shape{T}) where T
             end
         end
 
-        s.solved = closure(solved_deps...)
+        return_values = closure(solved_deps...)
+
+        if typeof(return_values) <: Tuple
+            s.solved = return_values[1]
+            for a in return_values[2:end]
+                if !(typeof(a) <: Attribute)
+                    error("You can't return a non-attribute with type $(typeof(a)) in a tuple from a closure.")
+                end
+                s.attrs[typeof(a)] = a
+            end
+        else
+            s.solved = return_values
+        end
+
         return s.solved
     end
     # the dependencies should be converted into this shapes's transform

@@ -18,7 +18,7 @@ function polygon!(f::Function, layer::Layer, args...)
     r
 end
 
-needed_attributes(::Type{Polygon}) = (Linewidth, Stroke, Linestyle, Fill)
+needed_attributes(::Type{Polygon}) = (Visible, Linewidth, Stroke, Linestyle, Fill)
 
 struct Polygons <: GeometricObject
     polys::Vector{Polygon}
@@ -37,7 +37,7 @@ function polygons!(f::Function, layer::Layer, args...)
     r
 end
 
-needed_attributes(::Type{Polygons}) = (Linewidth, Stroke, Linestyle, Fill)
+needed_attributes(::Type{Polygons}) = (Visible, Linewidth, Stroke, Linestyle, Fill)
 
 
 Base.convert(::Type{Polygon}, ps::Vector{Point}) = Polygon(ps)

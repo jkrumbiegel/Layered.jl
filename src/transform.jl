@@ -1,3 +1,5 @@
+export scaleby
+
 struct Transform
     scale::Float64
     rotation::Angle
@@ -33,4 +35,8 @@ end
 
 function from_to(t1::Transform, t2::Transform)
     t2 * inverse(t1)
+end
+
+function scaleby(t::Transform, s::Real)
+    Transform(t.scale * s, t.rotation, t.translation)
 end

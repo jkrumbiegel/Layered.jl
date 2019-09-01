@@ -50,7 +50,7 @@ function fractionangle(a::Arc, f::Real)
     angle = a.start_angle + (a.end_angle - a.start_angle) * f
 end
 
-needed_attributes(::Type{Arc}) = (Linewidth, Stroke, Linestyle)
+needed_attributes(::Type{Arc}) = (Visible, Linewidth, Stroke, Linestyle)
 
 function arclength(a::Arc)
     a.radius * abs(rad(a.end_angle - a.start_angle))

@@ -22,4 +22,4 @@ function text!(f::Function, layer::Layer, args...)
     r
 end
 
-needed_attributes(::Type{Txt}) = (Stroke, Font)
+needed_attributes(::Type{Txt}) = (Visible, Stroke, Font)

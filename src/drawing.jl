@@ -54,8 +54,11 @@ end
 
 function draw(s::Shape)
     geom = solve!(s)
-    transformed_to_toplevel = upward_transform(s) * geom
     attributes = getattributes(s)
+    if !attributes[Visible].visible
+        return
+    end
+    transformed_to_toplevel = upward_transform(s) * geom
     draw(transformed_to_toplevel, attributes)
 end
 
@@ -71,6 +74,15 @@ function draw(p::Point, a::Attributes)
         p.x, p.y,
         s = a[Markersize].size,
         color = rgba(a[Stroke].color),
+        marker = a[Marker].marker,
+    )
+end
+
+function draw(ps::Points, a::Attributes)
+    PyPlot.scatter(
+        xs(ps.points), ys(ps.points),
+        s = a[Markersizes].sizes,
+        color = rgba.(a[Strokes].colors),
         marker = a[Marker].marker,
     )
 end

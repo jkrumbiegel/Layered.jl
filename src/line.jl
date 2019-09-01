@@ -1,4 +1,4 @@
-export line!, move, perpendicular, angle
+export line!, move, perpendicular
 export LineSegments, linesegments, linesegments!
 
 struct Line <: GeometricObject
@@ -69,7 +69,7 @@ function rotate(l::Line, angle::Angle; around::Point=Point(0, 0))
     )
 end
 
-needed_attributes(::Type{Line}) = (Linewidth, Stroke, Linestyle)
+needed_attributes(::Type{Line}) = (Visible, Linewidth, Stroke, Linestyle)
 
 
 struct LineSegments <: GeometricObject
@@ -89,6 +89,6 @@ function linesegments!(f::Function, layer::Layer, args...)
     r
 end
 
-needed_attributes(::Type{LineSegments}) = (Linewidth, Stroke, Linestyle)
+needed_attributes(::Type{LineSegments}) = (Visible, Linewidth, Stroke, Linestyle)
 
 Base.convert(::Type{LineSegments}, ls::Vector{Line}) = LineSegments(ls)
