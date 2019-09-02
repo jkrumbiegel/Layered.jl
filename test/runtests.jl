@@ -236,3 +236,38 @@ function weirdlines()
 end
 
 weirdlines()
+
+
+using Pkg
+pkg"activate ."
+using Revise
+using Layered
+using Colors
+
+function cairotest()
+    c, l = canvas(3, 3)
+
+    p1 = point!(l, c.rect, Fill("blue")) do r
+        r.center
+    end
+
+    c1 = circle!(l, c.rect, Fill("red"), Linewidth(3), Linestyle(:dashed)) do r
+        Circle(P(r, 0.3, 0.3), r.width / 5)
+    end
+
+    line!(l, p1, c1, Linewidth(3)) do p, c
+        Line(p, c.center)
+    end
+
+    polygon!(l, c.rect, Fill("green")) do r
+        ncross(P(r, 0.8, 0.8), 5, 10, 0.2)
+    end
+
+    arc!(l, c.rect, c1) do r, c
+        Arc(topright(r), c.center, -0.4)
+    end
+
+    draw(c, dpi=300)
+end
+
+cairotest()

@@ -23,19 +23,19 @@ end
 needed_attributes(::Type{Rect}) = needed_attributes(Circle)
 
 function bottomleft(r::Rect)
-    r.center + rotate(Point(-r.width * 0.5, -r.height * 0.5), r.angle)
+    r.center + rotate(Point(-r.width * 0.5, r.height * 0.5), r.angle)
 end
 
 function bottomright(r::Rect)
-    r.center + rotate(Point( r.width * 0.5, -r.height * 0.5), r.angle)
+    r.center + rotate(Point( r.width * 0.5, r.height * 0.5), r.angle)
 end
 
 function topleft(r::Rect)
-    r.center + rotate(Point(-r.width * 0.5,  r.height * 0.5), r.angle)
+    r.center + rotate(Point(-r.width * 0.5,  -r.height * 0.5), r.angle)
 end
 
 function topright(r::Rect)
-    r.center + rotate(Point( r.width * 0.5,  r.height * 0.5), r.angle)
+    r.center + rotate(Point( r.width * 0.5,  -r.height * 0.5), r.angle)
 end
 
 topline(r::Rect) = Line(topleft(r), topright(r))

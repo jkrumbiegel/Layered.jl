@@ -40,7 +40,7 @@ end
 Base.show(io::IO, p::Point) = print(io, "Point($(p.xy[1]), $(p.xy[2]))")
 
 function needed_attributes(::Type{Point})
-    (Visible, Stroke, Markersize, Marker)
+    (Visible, Fill, Stroke, Markersize, Marker)
 end
 
 magnitude(p::Point) = sqrt(sum(p.xy .^ 2))
@@ -109,6 +109,6 @@ function points!(f::Function, layer::Layer, args...)
     r
 end
 
-needed_attributes(::Type{Points}) = (Visible, Strokes, Markersizes, Marker)
+needed_attributes(::Type{Points}) = (Visible, Fills, Strokes, Markersizes, Marker)
 
 Base.convert(::Type{Points}, ps::Vector{Point}) = Points(ps)

@@ -8,7 +8,7 @@ end
 
 
 function canvas(
-    width::Real, height::Real, toplayer::Union{Layer,Nothing}=nothing)
+    width::Real, height::Real, toplayer::Union{Layer,Nothing}=nothing; bgcolor="white")
     pt_per_in = 72
     size_in = (width, height)
     size_pt = size_in .* pt_per_in
@@ -17,8 +17,8 @@ function canvas(
         layer(
             Transform(1, rad(0), (0, 0)),
             Visible(true),
-            Markersize(20),
-            Markersizes(20),
+            Markersize(3),
+            Markersizes(3),
             Marker(:.),
             Fill("transparent"),
             Fills("transparent"),
@@ -31,6 +31,6 @@ function canvas(
     else
         toplayer
     end
-    r = rect!(l, (0, 0), size_pt..., deg(0), Visible(false))
+    r = rect!(l, (0, 0), size_pt..., deg(0), Fill(bgcolor), Stroke("transparent"))
     Canvas((width, height), l, r), l
 end
