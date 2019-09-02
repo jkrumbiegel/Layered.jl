@@ -2,6 +2,7 @@ export Bezier, bezier, bezier!, horizontalbezier, perpendicularbezier
 export BezierPath, bezierpath, bezierpath!
 export BezierPaths, bezierpaths, bezierpaths!
 export bracket, arrow, arcarrow
+export reversed, concat
 
 struct Bezier <: GeometricObject
     from::Point
@@ -189,4 +190,12 @@ function arcarrow(from::Point, to::Point, radiusfraction::Real, tiplength::Real,
         reversed(arcbezier).segments...
     ]
     BezierPath(segments, false)
+end
+
+function concat(bp::BezierPath, paths...)
+    segments = vcat((b.segments for b in (bp, paths...))...)
+    BezierPath(
+        segments,
+        false
+    )
 end

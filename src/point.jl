@@ -1,4 +1,4 @@
-export between, P, X, Y, xs, ys, magnitude, normalize
+export between, P, X, Y, xs, ys, magnitude, normalize, point, point!
 export Points, points, points!
 
 struct Point <: GeometricObject
@@ -24,8 +24,18 @@ Point(ang::Angle) = Point(cos(ang.rad), sin(ang.rad))
 
 Base.convert(::Type{Point}, t::Tuple{S, T}) where {S<:Real,T<:Real} = Point(t[1], t[2])
 
-point(args...) = Shape(Point(args[1:2]...), args[3:end]...)
+point(args...) = Shape(Point(args[1:fieldcount(Point)]...), args[fieldcount(Point)+1:end]...)
+function point!(layer::Layer, args...)
+    r = point(args...)
+    push!(layer, r)
+    r
+end
 point(f::Function, args...) = Shape(f, Point, args...)
+function point!(f::Function, layer::Layer, args...)
+    r = point(f, args...)
+    push!(layer, r)
+    r
+end
 
 Base.show(io::IO, p::Point) = print(io, "Point($(p.xy[1]), $(p.xy[2]))")
 

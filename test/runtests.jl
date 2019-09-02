@@ -170,6 +170,8 @@ function testvideo()
     record("test.mp4", 60, duration; excludelast=true) do t
         c, l = canvas(3, 3)
 
+        l.transform = scaleby(l.transform, a_zoom(t))
+
         bigcirc = circle!(l, c.rect, Visible(false)) do r
             Circle(r.center, r.height * 0.3)
         end
@@ -178,11 +180,8 @@ function testvideo()
             Circle(at_angle(c, a_ang(t)), 5)
         end
 
-        ps = points!(l, c.rect, c1, Visible(true)) do r, c
+        ps = points!(l, c.rect, c1, Visible(false)) do r, c
             points = [P(r, x, y) for x in range(0, 1, length=15) for y in range(0, 1, length=15)]
-            directions = directions = normalize.(points .→ c.center) .* 10
-            colors = LCHuv.(70, 50, deg.(angle.(directions)))
-            (points, Strokes(colors))
         end
 
         # colors = [LCHuv(60, magnitude(p), deg(angle(p))) for p in points]
@@ -205,3 +204,35 @@ PyPlot.pygui(false)
 testvideo()
 
 PyPlot.close_figs()
+
+
+function weirdlines()
+
+    duration = 3
+    a_trans = Animation([0, duration], [P(0, 0), P(50, 50)], sineio(n=2, yoyo=true))
+    a_scale = Animation([0, duration], [1.0, 0], sineio(n=2, yoyo=true))
+
+    record("weirdlines.mp4", 60, duration; excludelast=true) do t
+        c, l = canvas(3, 3)
+
+        ps = points!(l, c.rect, Visible(false)) do r
+            [P(r, x, y) for x in 0:0.1:1 for y in 0:0.1:1]
+        end
+
+        ps2 = points!(l, c.rect, Visible(false)) do r
+            rotated = Transform(translation=a_trans(t), scale=a_scale(t)) * r
+            [P(rotated, x, y) for x in 0:0.1:1 for y in 0:0.1:1]
+        end
+
+        bezierpath!(l, ps, ps2) do ps, ps2
+            paths = BezierPath([Line(p, p2) for (p, p2) in zip(ps.points, ps2.points)], false)
+            # println(typeof(paths))
+            # BezierPaths()
+        end
+
+        draw(c, dpi=200)
+    end
+
+end
+
+weirdlines()

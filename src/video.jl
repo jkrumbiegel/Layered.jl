@@ -30,7 +30,7 @@ function record(figure_func, filename, framerate::Real, ts; quality=:medium)
     @showprogress 1/3 "Rendering frames..." for (i, t) in enumerate(ts[2:end])
         fig = figure_func(t)
         full_buffer[i, :, :, :] = rgb_array(fig)
-        PyPlot.matplotlib.pyplot.close(fig)
+        PyPlot.close_figs()
     end
 
     codec_name, props = if quality == :medium
