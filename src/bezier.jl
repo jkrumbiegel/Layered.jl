@@ -1,6 +1,6 @@
 export Bezier, bezier, bezier!, horizontalbezier, perpendicularbezier
-export BezierPath, bezierpath, bezierpath!
-export BezierPaths, bezierpaths, bezierpaths!
+export Path, path, path!
+export Paths, paths, paths!
 export bracket, arrow, arcarrow
 export reversed, concat
 
@@ -51,29 +51,29 @@ end
 
 needed_attributes(::Type{Bezier}) = (Linewidth, Stroke, Linestyle, Fill)
 
-const BezierSegment = Union{Bezier, Line}
+const BezierSegment = Union{Bezier, Line, Arc}
 
-struct BezierPath <: GeometricObject
+struct Path <: GeometricObject
     segments::Vector{<:BezierSegment}
     closed::Bool
 end
 
-bezierpath(args...) = Shape(BezierPath(args[1:fieldcount(BezierPath)]...), args[fieldcount(BezierPath)+1:end]...)
-function bezierpath!(layer::Layer, args...)
-    b = bezierpath(args...)
+path(args...) = Shape(Path(args[1:fieldcount(Path)]...), args[fieldcount(Path)+1:end]...)
+function path!(layer::Layer, args...)
+    b = path(args...)
     push!(layer, b)
     b
 end
-bezierpath(f::Function, args...) = Shape(f, BezierPath, args...)
-function bezierpath!(f::Function, layer::Layer, args...)
-    b = bezierpath(f, args...)
+path(f::Function, args...) = Shape(f, Path, args...)
+function path!(f::Function, layer::Layer, args...)
+    b = path(f, args...)
     push!(layer, b)
     b
 end
 
-move(b::BezierPath, p::Point) = BezierPath(move.(b.segments, p), b.closed)
-Base.:+(b::BezierPath, p::Point) = move(b, p)
-Base.:+(p::Point, b::BezierPath) = move(b, p)
+move(b::Path, p::Point) = Path(move.(b.segments, p), b.closed)
+Base.:+(b::Path, p::Point) = move(b, p)
+Base.:+(p::Point, b::Path) = move(b, p)
 
 function bracket(p1::Point, p2::Point, widthscale::Real = 0.1, innerstrength=1, outerstrength=1; flip=false)
     l = Line(p1, p2)
@@ -83,31 +83,31 @@ function bracket(p1::Point, p2::Point, widthscale::Real = 0.1, innerstrength=1, 
     tip = fraction(l, 0.5) + tipvec
     bez1 = Bezier(p1, p1 + 0.5tipvec * outerstrength, tip - 0.5tipvec * innerstrength, tip)
     bez2 = Bezier(tip, tip - 0.5tipvec * innerstrength, p2 + 0.5tipvec * outerstrength, p2)
-    BezierPath([bez1, bez2], false)
+    Path([bez1, bez2], false)
 end
 
-needed_attributes(::Type{BezierPath}) = (Visible, Linewidth, Stroke, Linestyle, Fill)
+needed_attributes(::Type{Path}) = (Visible, Linewidth, Stroke, Linestyle, Fill)
 
-struct BezierPaths <: GeometricObject
-    paths::Vector{BezierPath}
+struct Paths <: GeometricObject
+    paths::Vector{Path}
 end
 
-bezierpaths(args...) = Shape(BezierPaths(args[1:fieldcount(BezierPaths)]...), args[fieldcount(BezierPaths)+1:end]...)
-function bezierpaths!(layer::Layer, args...)
-    b = bezierpaths(args...)
+paths(args...) = Shape(Paths(args[1:fieldcount(Paths)]...), args[fieldcount(Paths)+1:end]...)
+function paths!(layer::Layer, args...)
+    b = paths(args...)
     push!(layer, b)
     b
 end
-bezierpaths(f::Function, args...) = Shape(f, BezierPaths, args...)
-function bezierpaths!(f::Function, layer::Layer, args...)
-    b = bezierpaths(f, args...)
+paths(f::Function, args...) = Shape(f, Paths, args...)
+function paths!(f::Function, layer::Layer, args...)
+    b = paths(f, args...)
     push!(layer, b)
     b
 end
 
-needed_attributes(::Type{BezierPaths}) = (Visible, Linewidths, Strokes, Linestyle, Fills)
+needed_attributes(::Type{Paths}) = (Visible, Linewidths, Strokes, Linestyle, Fills)
 
-Base.convert(::Type{BezierPaths}, paths::Vector{BezierPath}) = BezierPaths(paths)
+Base.convert(::Type{Paths}, paths::Vector{Path}) = Paths(paths)
 
 function arrow(from::Point, to::Point, tiplength, tipwidth, shaftwidthback, shaftwidthfront, tipretraction)
     vector = from → to
@@ -120,7 +120,7 @@ function arrow(from::Point, to::Point, tiplength, tipwidth, shaftwidthback, shaf
     endright = from - 0.5shaftwidthback * ortholeft
     tipconnleft = tipconnection_retracted + 0.5shaftwidthfront * ortholeft
     tipconnright = tipconnection_retracted - 0.5shaftwidthfront * ortholeft
-    BezierPath([
+    Path([
         Line(endleft, tipconnleft),
         Line(tipconnleft, tipleft),
         Line(tipleft, to),
@@ -132,7 +132,7 @@ function arrow(from::Point, to::Point, tiplength, tipwidth, shaftwidthback, shaf
 end
 
 
-function Base.convert(::Type{BezierPath}, a::Arc)
+function Base.convert(::Type{Path}, a::Arc)
     # https://stackoverflow.com/a/44829356/2279303
 
     function uptoquarter(center, p1, p2)
@@ -161,11 +161,11 @@ function Base.convert(::Type{BezierPath}, a::Arc)
 
     points = [fraction(a, i / nsegments) for i in 0:nsegments]
     segments = [uptoquarter(a.center, p1, p2) for (p1, p2) in zip(points[1:end-1], points[2:end])]
-    BezierPath(segments, false)
+    Path(segments, false)
 end
 
 reversed(b::Bezier) = Bezier(b.to, b.c2, b.c1, b.from)
-reversed(b::BezierPath) = BezierPath(reverse!(reversed.(b.segments)), b.closed)
+reversed(b::Path) = Path(reverse!(reversed.(b.segments)), b.closed)
 
 function arcarrow(from::Point, to::Point, radiusfraction::Real, tiplength::Real, tipwidth::Real, tipretraction::Real=0)
     arc = Arc(from, to, radiusfraction)
@@ -175,7 +175,7 @@ function arcarrow(from::Point, to::Point, radiusfraction::Real, tiplength::Real,
     tipconnection_retracted = fraction(arc, 1 - tiplength * (1 - tipretraction) / alength)
 
     arc_retracted = lengthen(arc, (arc.end_angle - arc.start_angle) * -tiplength * (1 - tipretraction) / alength)
-    arcbezier = Base.convert(BezierPath, arc_retracted)
+    arcbezier = Base.convert(Path, arc_retracted)
 
     ortholeft = normalize(rotate(tipconnection → to, deg(90)))
     tipleft = tipconnection + 0.5tipwidth * ortholeft
@@ -189,12 +189,12 @@ function arcarrow(from::Point, to::Point, radiusfraction::Real, tiplength::Real,
         Line(tipleft, tipconnection_retracted),
         reversed(arcbezier).segments...
     ]
-    BezierPath(segments, false)
+    Path(segments, false)
 end
 
-function concat(bp::BezierPath, paths...)
+function concat(bp::Path, paths...)
     segments = vcat((b.segments for b in (bp, paths...))...)
-    BezierPath(
+    Path(
         segments,
         false
     )

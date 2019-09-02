@@ -1,11 +1,4 @@
-export rect!
-
-struct Rect <: GeometricObject
-    center::Point
-    width::Float64
-    height::Float64
-    angle::Angle
-end
+export Rect, rect, rect!, topright, topleft, bottomright, bottomleft, topline, rightline, bottomline, leftline
 
 rect(args...) = Shape(Rect(args[1:4]...), args[5:end]...)
 function rect!(layer::Layer, args...)

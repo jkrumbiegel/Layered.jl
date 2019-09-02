@@ -1,11 +1,3 @@
-mutable struct Shape{T <: GeometricObject} <: LayerContent
-    # make this nicer and more julian
-    content::Union{Tuple{Function, Vector}, T}
-    parent::Union{Layer, Nothing}
-    solved::Union{T, Nothing}
-    attrs::Attributes
-end
-
 function Shape(g::GeometricObject, varargs::Vararg{Attribute})
     Shape(g, nothing, nothing, Attributes(varargs...))
 end

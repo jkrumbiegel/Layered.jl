@@ -1,4 +1,4 @@
-export line!, move, perpendicular
+export Line, line, line!, move, perpendicular
 export LineSegments, linesegments, linesegments!
 
 struct Line <: GeometricObject

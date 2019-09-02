@@ -15,9 +15,23 @@ function zorder()
     z += 1
 end
 
-function fillstroke!(cc, a::Attributes)
-    C.set_source_rgba(cc, rgba(a[Fill].color)...)
+function fill!(cc, g::Gradient)
+    pat = C.pattern_create_linear(g.from.xy..., g.to.xy...);
+    for (stop, col) in zip(g.stops, g.colors)
+        C.pattern_add_color_stop_rgba(pat, stop, rgba(col)...);
+    end
+    C.set_source(cc, pat);
+    C.fill_preserve(cc);
+    C.destroy(pat);
+end
+
+function fill!(cc, c::Colors.Colorant)
+    C.set_source_rgba(cc, rgba(c)...)
     C.fill_preserve(cc)
+end
+
+function fillstroke!(cc, a::Attributes)
+    fill!(cc, a[Fill].content)
     C.set_source_rgba(cc, rgba(a[Stroke].color)...)
     C.stroke(cc)
 end
@@ -27,7 +41,7 @@ function stroke!(cc, a::Attributes)
     C.stroke(cc)
 end
 
-function linestyle!(cc, a::Attributes)
+function lineattrs!(cc, a::Attributes)
     style = a[Linestyle].style
     lw = a[Linewidth].width
     if style == :solid
@@ -39,9 +53,8 @@ function linestyle!(cc, a::Attributes)
     else
         error("$style not implemented")
     end
+    C.set_line_width(cc, lw)
 end
-
-import Colors
 
 function rgba(c::Colors.Colorant)
     rgba = Colors.RGBA(c)
@@ -179,7 +192,7 @@ end
 #     PyPlot.matplotlib.path.Path(verts, path.codes; kwargs...)
 # end
 #
-# function PyPlot.matplotlib.path.Path(bp::BezierPath; kwargs...)
+# function PyPlot.matplotlib.path.Path(bp::Path; kwargs...)
 #     vertices = SVector{2, Float64}[]
 #     codes = UInt8[]
 #
@@ -210,16 +223,16 @@ end
 #     PyPlot.matplotlib.path.Path(vertices, codes; kwargs...)
 # end
 
-function path!(cc, l::Line)
+function makepath!(cc, l::Line)
     C.move_to(cc, l.from.xy...)
     C.line_to(cc, l.to.xy...)
 end
 
 function draw!(cc, l::Line, a::Attributes)
-    path!(cc, l)
+    makepath!(cc, l)
     C.set_source_rgba(cc, rgba(a[Stroke].color)...)
     C.set_line_width(cc, a[Linewidth].width)
-    linestyle!(cc, a)
+    lineattrs!(cc, a)
     C.stroke(cc)
 end
 
@@ -229,13 +242,13 @@ function draw(ls::LineSegments, a::Attributes)
         path,
         edgecolor = rgba(a[Stroke].color),
         linewidth = a[Linewidth].width,
-        linestyle = a[Linestyle].style,
+        lineattrs = a[Linestyle].style,
         zorder=zorder(),
     )
     PyPlot.gca().add_patch(pathpatch)
 end
 
-function path!(cc, p::Polygon)
+function makepath!(cc, p::Polygon)
     C.move_to(cc, p.points[1].xy...)
 
     for po in p.points[2:end]
@@ -246,18 +259,26 @@ function path!(cc, p::Polygon)
 end
 
 function draw!(cc, p::Polygon, a::Attributes)
-    path!(cc, p)
-    linestyle!(cc, a)
+    makepath!(cc, p)
+    lineattrs!(cc, a)
     fillstroke!(cc, a)
 end
 
-function path!(cc, a::Arc)
-    C.arc(cc, a.center.xy..., a.radius, rad(a.start_angle), rad(a.end_angle))
+function makepath!(cc, a::Arc)
+    pstart = fraction(a, 0)
+    C.move_to(cc, pstart.xy...)
+
+    if a.end_angle - a.start_angle >= rad(0)
+        C.arc(cc, a.center.xy..., a.radius, rad(a.start_angle), rad(a.end_angle))
+    else
+        C.arc_negative(cc, a.center.xy..., a.radius, rad(a.start_angle), rad(a.end_angle))
+    end
+
 end
 
 function draw!(cc, arc::Arc, a::Attributes)
-    path!(cc, arc)
-    linestyle!(cc, a)
+    makepath!(cc, arc)
+    lineattrs!(cc, a)
     stroke!(cc, a)
 end
 
@@ -287,44 +308,30 @@ function draw(t::Txt, a::Attributes)
     )
 end
 
-
-# function PyPlot.matplotlib.path.Path(b::Bezier; kwargs...)
-#     vertices = [b.from.xy, b.c1.xy, b.c2.xy, b.to.xy]
-#     codes = UInt8[MOVETO, CURVE4, CURVE4, CURVE4]
-#     PyPlot.matplotlib.path.Path(vertices, codes; kwargs...)
-# end
-
-function draw(b::Bezier, a::Attributes)
-    path = PyPlot.matplotlib.path.Path(b, closed=false)
-    ax = PyPlot.gca()
-    pathpatch = PyPlot.matplotlib.patches.PathPatch(
-        path,
-        edgecolor = rgba(a[Stroke].color),
-        linewidth = a[Linewidth].width,
-        linestyle = a[Linestyle].style,
-        facecolor = rgba(a[Fill].color),
-        zorder=zorder(),
-        snap=false,
-    )
-    ax.add_patch(pathpatch)
+function makepath!(cc, b::Bezier)
+    C.move_to(cc, b.from.xy...)
+    C.curve_to(cc, b.c1.xy..., b.c2.xy..., b.to.xy...)
 end
 
-function draw(b::BezierPath, a::Attributes)
-    path = PyPlot.matplotlib.path.Path(b, closed=b.closed)
-    ax = PyPlot.gca()
-    pathpatch = PyPlot.matplotlib.patches.PathPatch(
-        path,
-        edgecolor = rgba(a[Stroke].color),
-        linewidth = a[Linewidth].width,
-        linestyle = a[Linestyle].style,
-        facecolor = rgba(a[Fill].color),
-        zorder=zorder(),
-        snap=false,
-    )
-    ax.add_patch(pathpatch)
+function draw!(cc, b::Bezier, a::Attributes)
+    makepath!(cc, b)
+    lineattrs!(cc, b)
+    stroke!(cc, b)
 end
 
-function draw(bs::BezierPaths, a::Attributes)
+function makepath!(cc, p::Path)
+    for s in p.segments
+        makepath!(cc, s)
+    end
+end
+
+function draw!(cc, p::Path, a::Attributes)
+    makepath!(cc, p)
+    lineattrs!(cc, a)
+    fillstroke!(cc, a)
+end
+
+function draw(bs::Paths, a::Attributes)
     paths = PyPlot.matplotlib.path.Path.(bs.paths)
     collection = PyPlot.matplotlib.collections.PathCollection(
         paths,
@@ -344,25 +351,13 @@ end
 #     PyPlot.plot(xx, yy; kwargs...)
 # end
 
-function path!(cc, c::Circle)
+function makepath!(cc, c::Circle)
     C.arc(cc, c.center.xy..., c.radius, 0, 2pi)
 end
 
 function draw!(cc, c::Circle, a::Attributes)
-    # ax = PyPlot.gca()
-    # circlepatch = PyPlot.matplotlib.patches.Circle(
-    #     (c.center.x, c.center.y), c.radius,
-    #     facecolor = rgba(a[Fill].color),
-    #     edgecolor = rgba(a[Stroke].color),
-    #     linewidth = a[Linewidth].width,
-    #     linestyle = a[Linestyle].style,
-    #     zorder=zorder(),
-    #     snap=false,
-    # )
-    # ax.add_patch(circlepatch)
-    path!(cc, c)
-    linestyle!(cc, a)
-    C.set_line_width(cc, a[Linewidth].width)
+    makepath!(cc, c)
+    lineattrs!(cc, a)
     fillstroke!(cc, a)
 end
 
@@ -376,18 +371,17 @@ function draw!(cc, r::Rect, a::Attributes)
     #     facecolor = rgba(a[Fill].color),
     #     edgecolor = rgba(a[Stroke].color),
     #     linewidth = a[Linewidth].width,
-    #     linestyle = a[Linestyle].style,
+    #     lineattrs = a[Linestyle].style,
     #     zorder=zorder(),
     #     snap=false,
     # )
     # ax.add_patch(rectpatch)
-    path!(cc, r)
-    linestyle!(cc, a)
-    C.set_line_width(cc, a[Linewidth].width)
+    makepath!(cc, r)
+    lineattrs!(cc, a)
     fillstroke!(cc, a)
 end
 
-function path!(cc, r::Rect)
+function makepath!(cc, r::Rect)
     C.move_to(cc, bottomleft(r).xy...)
     C.line_to(cc, bottomright(r).xy...)
     C.line_to(cc, topright(r).xy...)

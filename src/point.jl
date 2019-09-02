@@ -1,19 +1,6 @@
 export between, P, X, Y, xs, ys, magnitude, normalize, point, point!
 export Points, points, points!
 
-struct Point <: GeometricObject
-    xy::SVector{2, Float64}
-
-    Point(x::Real, y::Real) = new(SVector(convert(Float64, x), convert(Float64, y)))
-    function Point(xy)
-        if Base.length(xy) != 2
-            error("need 2 elements")
-        end
-        new(SVector{2, Float64}(xy...))
-    end
-end
-
-const P = Point
 X(x::Real) = P(x, 0)
 Y(y::Real) = P(0, y)
 

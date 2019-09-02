@@ -1,12 +1,5 @@
 export layer, layer!, layerfirst!
 
-mutable struct Layer <: LayerContent
-    transform::Union{Tuple{Function, Vector}, Transform}
-    content::Vector{LayerContent}
-    parent::Union{Layer, Nothing}
-    attrs::Attributes
-end
-
 Base.Broadcast.broadcastable(l::Layer) = Ref(l)
 
 function layer()

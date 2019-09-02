@@ -1,12 +1,5 @@
 export Arc, arc, arc!, fraction, arclength
 
-struct Arc <: GeometricObject
-    center::Point
-    radius::Float64
-    start_angle::Angle
-    end_angle::Angle
-end
-
 function Arc(from::Point, through::Point, to::Point)
     circle = Circle(from, through, to)
     start_angle = angle(from_to(circle.center, from))

@@ -1,4 +1,4 @@
-export circle, circle!, outertangents, scale, scalearea, at_angle
+export Circle, circle, circle!, outertangents, scale, scalearea, at_angle
 
 struct Circle <: GeometricObject
     center::Point

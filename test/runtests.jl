@@ -140,7 +140,7 @@ function test2()
         outertangents(c1, c2)
     end, l, focuscircle, circlesright[2], Linestyle(:dashed))
 
-    arr = bezierpath!(l, rs[1], rs[end], Fill("tomato"), Stroke("transparent")) do r1, r2
+    arr = path!(l, rs[1], rs[end], Fill("tomato"), Stroke("transparent")) do r1, r2
         a = arrow(topright(r1), topright(r2), 9, 9, 1, 1, 0)
         move(a, perpendicular(Line(topright(r1), topright(r2))) * 5)
     end
@@ -186,7 +186,7 @@ function testvideo()
 
         # colors = [LCHuv(60, magnitude(p), deg(angle(p))) for p in points]
 
-        bps = bezierpaths(c1, ps, Linewidths(1), Strokes("transparent")) do c, ps
+        bps = paths(c1, ps, Linewidths(1), Strokes("transparent")) do c, ps
 
             directions = normalize.(ps.points .→ c.center) .* 10
             arros = arrow.(ps.points, ps.points .+ directions, 3, 3, 1, 1, 0)
@@ -224,10 +224,10 @@ function weirdlines()
             [P(rotated, x, y) for x in 0:0.1:1 for y in 0:0.1:1]
         end
 
-        bezierpath!(l, ps, ps2) do ps, ps2
-            paths = BezierPath([Line(p, p2) for (p, p2) in zip(ps.points, ps2.points)], false)
+        path!(l, ps, ps2) do ps, ps2
+            paths = Path([Line(p, p2) for (p, p2) in zip(ps.points, ps2.points)], false)
             # println(typeof(paths))
-            # BezierPaths()
+            # Paths()
         end
 
         draw(c, dpi=200)
@@ -251,7 +251,7 @@ function cairotest()
         r.center
     end
 
-    c1 = circle!(l, c.rect, Fill("red"), Linewidth(3), Linestyle(:dashed)) do r
+    c1 = circle!(l, c.rect, Fill("tomato"), Linewidth(3), Linestyle(:dashed)) do r
         Circle(P(r, 0.3, 0.3), r.width / 5)
     end
 
@@ -259,12 +259,33 @@ function cairotest()
         Line(p, c.center)
     end
 
-    polygon!(l, c.rect, Fill("green")) do r
+    pol = polygon!(l, c.rect, Fill("green")) do r
         ncross(P(r, 0.8, 0.8), 5, 10, 0.2)
     end
 
-    arc!(l, c.rect, c1) do r, c
-        Arc(topright(r), c.center, -0.4)
+    path!(l, c.rect, c1) do r, c
+        right = topright(r) + P(-20, 20)
+        a1 = Arc(right, c.center, -0.4)
+        a2 = Arc(c.center, right, 0.2)
+        p = Path([a1, a2], false)
+        g = Gradient(fraction.(a1, [0, 1])..., LCHuvA(50, 60, 240, 0.6), LCHuvA(90, 30, 240, 0.6))
+        (p, Fill(g))
+    end
+
+    path!(l, c.rect, Fill(LCHuvA(70, 30, 30, 0.6))) do r
+        right = topright(r) + P(-20, 20)
+        Path([Arc(r.center, 10, deg(0), deg(360)), Arc(r.center, 20, deg(0), deg(-360))], false)
+    end
+
+    path!(l, c.rect, pol) do r, p
+        Path([horizontalbezier(topright(r), center(p))], false)
+    end
+
+    circle!(l, c.rect, Stroke("transparent")) do r
+        c = Circle(P(r, 0.3, 0.7), 30)
+        g = Gradient(at_angle(c, deg(180)), at_angle(c, deg(0)), "tomato", "bisque")
+        # (c, Fill())
+        (c, Fill(g))
     end
 
     draw(c, dpi=300)

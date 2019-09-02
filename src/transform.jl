@@ -1,11 +1,5 @@
 export scaleby
 
-struct Transform
-    scale::Float64
-    rotation::Angle
-    translation::SVector{2, Float64}
-end
-
 function Transform(;scale=1, rotation=rad(0), translation=(0, 0))
     Transform(scale, rotation, translation)
 end
