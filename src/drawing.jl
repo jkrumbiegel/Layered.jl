@@ -25,6 +25,16 @@ function fill!(cc, g::Gradient)
     C.destroy(pat);
 end
 
+function fill!(cc, rg::RadialGradient)
+    pat = C.pattern_create_radial(rg.from.center.xy..., rg.from.radius, rg.to.center.xy..., rg.to.radius);
+    for (stop, col) in zip(rg.stops, rg.colors)
+        C.pattern_add_color_stop_rgba(pat, stop, rgba(col)...);
+    end
+    C.set_source(cc, pat);
+    C.fill_preserve(cc);
+    C.destroy(pat);
+end
+
 function fill!(cc, c::Colors.Colorant)
     C.set_source_rgba(cc, rgba(c)...)
     C.fill_preserve(cc)
@@ -220,6 +230,10 @@ function makepath!(cc, l::Line)
     C.line_to(cc, l.to.xy...)
 end
 
+function continuepath!(cc, l::Line)
+    C.line_to(cc, l.to.xy...)
+end
+
 function draw!(cc, l::Line, a::Attributes)
     makepath!(cc, l)
     C.set_source_rgba(cc, rgba(a[Stroke].color)...)
@@ -265,7 +279,14 @@ function makepath!(cc, a::Arc)
     else
         C.arc_negative(cc, a.center.xy..., a.radius, rad(a.start_angle), rad(a.end_angle))
     end
+end
 
+function continuepath!(cc, a::Arc)
+    if a.end_angle - a.start_angle >= rad(0)
+        C.arc(cc, a.center.xy..., a.radius, rad(a.start_angle), rad(a.end_angle))
+    else
+        C.arc_negative(cc, a.center.xy..., a.radius, rad(a.start_angle), rad(a.end_angle))
+    end
 end
 
 function draw!(cc, arc::Arc, a::Attributes)
@@ -354,15 +375,33 @@ function makepath!(cc, b::Bezier)
     C.curve_to(cc, b.c1.xy..., b.c2.xy..., b.to.xy...)
 end
 
+function continuepath!(cc, b::Bezier)
+    C.curve_to(cc, b.c1.xy..., b.c2.xy..., b.to.xy...)
+end
+
 function draw!(cc, b::Bezier, a::Attributes)
     makepath!(cc, b)
     lineattrs!(cc, b)
     stroke!(cc, b)
 end
 
+start(a::Arc) = fraction(a, 0)
+stop(a::Arc) = fraction(a, 1)
+start(b::Bezier) = b.from
+stop(b::Bezier) = b.to
+start(l::Line) = l.from
+stop(l::Line) = l.to
+
 function makepath!(cc, p::Path)
-    for s in p.segments
-        makepath!(cc, s)
+    makepath!(cc, p.segments[1])
+    for i in 2:length(p.segments)
+        news = p.segments[i]
+        olds = p.segments[i-1]
+        if isapprox(start(news), stop(olds))
+            continuepath!(cc, news)
+        else
+            makepath!(cc, news)
+        end
     end
 end
 

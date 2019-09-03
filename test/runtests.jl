@@ -320,8 +320,6 @@ function cairovideo()
 
         path!(l, ps, ps2, Stroke("tomato"), Linewidth(3)) do ps, ps2
             paths = Path([Line(p, p2) for (p, p2) in zip(ps.points, ps2.points)], false)
-            # println(typeof(paths))
-            # Paths()
         end
 
         text!(l, c.rect, Fill("bisque")) do r
@@ -333,3 +331,52 @@ function cairovideo()
 end
 
 cairovideo()
+import Cairo
+
+function gabors()
+
+    c, l = canvas(3, 3)
+
+    c.rect.attrs[Fill] = Fill(Gray(0.5))
+
+    circ = circle!(l, c.rect, Stroke("transparent")) do r
+        c = Circle(P(r, 0.5, 0.5), r.width * 0.4)
+        g = Gradient(at_angle.(c, deg.([0, 180]))..., Gray.(sin.(range(0, 8pi, length=100)) .* 0.5 .+ 0.5)...)
+        (c, Fill(g))
+    end
+
+    circ2 = circle!(l, circ, Stroke("transparent")) do c
+        c = Circle(c.center, c.radius + 1)
+        g = RadialGradient(
+                Circle(c.center, 0),
+                Circle(c.center, c.radius-20),
+                GrayA.(0.5, range(0, 1, length=100))...)
+        (c, Fill(g))
+    end
+
+    cc = draw(c, dpi=200)
+    Cairo.write_to_png(cc, "gabors.png");
+end
+
+display(gabors())
+
+
+function grads()
+    c, l = canvas(3, 3)
+
+    bgcolor = LCHuv(15, 30, 240)
+    c.rect.attrs[Fill] = Fill(bgcolor)
+
+    circ = circle!(l, c.rect, Stroke("transparent")) do r
+        c = Circle(P(r, 0.5, 0.5), r.width * 0.4)
+        g = Gradient(at_angle.(c, deg.([-30, 150]))..., LCHuv(17, 40, 220), LCHuv(13, 20, 260))
+        (c, Fill(g))
+    end
+
+    circ2 = circle!(l, circ, Stroke("transparent"), Fill(bgcolor)) do c
+        Circle(c.center + Point(deg(-30)) * c.radius * 0.5, c.radius * 0.7)
+    end
+
+    cc = draw(c, dpi=200)
+    Cairo.write_to_png(cc, "grads.png");
+end; grads()

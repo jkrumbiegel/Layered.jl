@@ -58,6 +58,8 @@ function ncross(pos::Point, n::Int, r::Real, thickness::Real, angle::Angle=deg(0
     collect(Iterators.flatten((r, l, i) for (r, l, i) in zip(routcorners, loutcorners, inner_points))) .+ pos
 end
 
+# function nstar(pos::Point)
+
 function center(pol::Polygon)
     Point(sum([p.xy for p in pol.points]) / length(pol.points))
 end

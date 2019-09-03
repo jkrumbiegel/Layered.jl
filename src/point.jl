@@ -59,6 +59,8 @@ between(p1::Point, p2::Point, fraction::Real) = p1 + (p2 - p1) * fraction
 cross(p1::Point, p2::Point) = p1.x * p2.y - p1.y * p2.x
 dot(p1::Point, p2::Point) = p1.x * p2.x + p1.y * p2.y
 
+Base.isapprox(p1::Point, p2::Point) = Base.isapprox(magnitude(p1 → p2), 0; atol=6)
+
 function Base.angle(p::Point)
     Angle(atan(p.y, p.x))
 end

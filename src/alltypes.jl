@@ -39,6 +39,11 @@ struct Rect <: GeometricObject
     angle::Angle
 end
 
+struct Circle <: GeometricObject
+    center::Point
+    radius::Float64
+end
+
 abstract type Attribute end
 
 struct Gradient
@@ -48,8 +53,15 @@ struct Gradient
     colors::Vector{<:Colors.Colorant}
 end
 
+struct RadialGradient
+    from::Circle
+    to::Circle
+    stops::Vector{Float64}
+    colors::Vector{<:Colors.Colorant}
+end
+
 struct Fill <: Attribute
-    content::Union{Colors.Colorant, Gradient}
+    content::Union{Colors.Colorant, Gradient, RadialGradient}
 end
 
 struct Fills <: Attribute

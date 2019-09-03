@@ -3,6 +3,8 @@ export Path, path, path!
 export Paths, paths, paths!
 export bracket, arrow, arcarrow
 export reversed, concat
+export scaleby
+export rotate
 
 struct Bezier <: GeometricObject
     from::Point
@@ -25,7 +27,10 @@ function bezier!(f::Function, layer::Layer, args...)
 end
 
 move(b::Bezier, p::Point) = Bezier(b.from + p, b.c1 + p, b.c2 + p, b.to + p)
+scaleby(b::Bezier, by::Real) = Bezier(by * b.from, by * b.c1, by * b.c2, by * b.to)
+rotate(b::Bezier, ang::Angle) = Bezier(rotate.([b.from, b.c1, b.c2, b.to], ang)...)
 Base.:+(b::Bezier, p::Point) = move(b, p)
+Base.:-(b::Bezier, p::Point) = move(b, -p)
 Base.:+(p::Point, b::Bezier) = move(b, p)
 
 function horizontalbezier(p1::Point, p2::Point, strength=1)
@@ -198,4 +203,30 @@ function concat(bp::Path, paths...)
         segments,
         false
     )
+end
+
+function center(bp::Path)
+    com = centerofmass(bp)
+    Path([s - com for s in bp.segments], false)
+end
+
+function centerofmass(bp::Path)
+    p = P(0, 0)
+
+    for s in bp.segments
+        p += start(s)
+        p += stop(s)
+    end
+
+    p /= 2 * length(bp.segments)
+end
+
+function scaleby(bp::Path, by::Real)
+
+    Path([scaleby(s, by) for s in bp.segments], false)
+
+end
+
+function rotate(p::Path, ang::Angle)
+    Path([rotate(s, ang) for s in p.segments], false)
 end

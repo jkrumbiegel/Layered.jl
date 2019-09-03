@@ -1,10 +1,5 @@
 export Circle, circle, circle!, outertangents, scale, scalearea, at_angle
 
-struct Circle <: GeometricObject
-    center::Point
-    radius::Float64
-end
-
 function Circle(p1::Point, p2::Point, p3::Point)
     circlethrough(p1, p2, p3)
 end
