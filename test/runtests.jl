@@ -288,7 +288,48 @@ function cairotest()
         (c, Fill(g))
     end
 
+    text!(l, c.rect, Fill("red")) do r
+        Txt(P(r, 0.5, 0.9), "HgIchT", 12, :c, :b, deg(0), "Helvetica Neue LT Std 45 Light")
+    end
+
+    point!(l, c.rect) do r
+        P(r, 0.5, 0.9)
+    end
+
     draw(c, dpi=300)
 end
 
-cairotest()
+using Animations
+
+function cairovideo()
+    duration = 6
+    a_trans = Animation([0, duration], [P(0, 0), P(50, 50)], sineio(n=2, yoyo=true))
+    a_scale = Animation([0, duration], [1.0, 0], sineio(n=2, yoyo=true))
+
+    record("weirdlines.mp4", 60, duration; excludelast=true) do t
+        c, l = canvas(3, 3)
+
+        ps = points!(l, c.rect, Visible(false)) do r
+            [P(r, x, y) for x in 0:0.1:1 for y in 0:0.1:1]
+        end
+
+        ps2 = points!(l, c.rect, Visible(false)) do r
+            rotated = Transform(translation=a_trans(t), scale=a_scale(t)) * r
+            [P(rotated, x, y) for x in 0:0.1:1 for y in 0:0.1:1]
+        end
+
+        path!(l, ps, ps2, Stroke("tomato"), Linewidth(3)) do ps, ps2
+            paths = Path([Line(p, p2) for (p, p2) in zip(ps.points, ps2.points)], false)
+            # println(typeof(paths))
+            # Paths()
+        end
+
+        text!(l, c.rect, Fill("bisque")) do r
+            Txt(r.center, "hello", 20, :c, :c, deg(0), "Helvetica Neue LT Std")
+        end
+
+        draw(c, dpi=200)
+    end
+end
+
+cairovideo()

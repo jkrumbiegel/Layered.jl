@@ -72,11 +72,6 @@ end
 
 function draw(canvas::Canvas; dpi=100)
 
-
-    # fig = PyPlot.figure(figsize=(c.size_in), dpi=dpi)
-    # ax = fig.add_axes((0, 0, 1, 1), frameon=false)
-    # ax.set_axis_off()
-
     pt_per_in = 72
     size_pt = canvas.size_in .* pt_per_in
     size_pixel = canvas.size_in .* dpi
@@ -87,12 +82,8 @@ function draw(canvas::Canvas; dpi=100)
     C.scale(cc, dpi / pt_per_in, dpi / pt_per_in)
     C.translate(cc, (size_pt./2)...)
 
-    # ax.set_xlim(-size_pt[1]/2, size_pt[1]/2)
-    # ax.set_ylim(-size_pt[2]/2, size_pt[2]/2)
-
     draw!(cc, canvas.toplayer)
-    C.write_to_png(c, "cairotest.png");
-    # fig
+    c
 end
 
 function draw!(cc::C.CairoContext, l::Layer)
@@ -133,7 +124,8 @@ function draw!(cc, s::Shape)
 end
 
 function draw!(cc, p::Point, a::Attributes)
-    C.arc(cc, p.x, p.y, a[Markersize].size, 0, 2pi)
+    C.move_to(cc, (p + 0.5 * a[Markersize].size * X(1)).xy...)
+    C.arc(cc, p.x, p.y, 0.5 * a[Markersize].size, 0, 2pi)
     fillstroke!(cc, a)
 end
 
@@ -292,20 +284,69 @@ alignments = Dict(
     :cbl => "center_baseline"
 )
 
-function draw(t::Txt, a::Attributes)
-    PyPlot.gca().text(
-        t.pos.xy...,
-        t.text,
-        fontsize = t.size,
-        fontfamily = a[Font].family,
-        color = rgba(a[Stroke].color),
-        va = alignments[t.valign],
-        ha = alignments[t.halign],
-        rotation = deg(t.angle),
-        rotation_mode = "anchor",
-        zorder=zorder(),
-        snap=false,
-    )
+struct TextExtent
+    xbearing::Float64
+    ybearing::Float64
+    width::Float64
+    height::Float64
+    xadvance::Float64
+    yadvance::Float64
+end
+
+function TextExtent(cc, t::Txt)
+    C.save(cc)
+    C.select_font_face(cc, t.font, Cairo.FONT_SLANT_NORMAL, Cairo.FONT_WEIGHT_NORMAL)
+    C.set_font_size(cc, t.size)
+    e = C.text_extents(cc, t.text);
+    C.restore(cc)
+    TextExtent(e...)
+    # typedef struct {
+    #     double x_bearing;
+    #     double y_bearing;
+    #     double width;
+    #     double height;
+    #     double x_advance;
+    #     double y_advance;
+    # } cairo_text_extents_t;
+end
+
+function draw!(cc, t::Txt, a::Attributes)
+    # PyPlot.gca().text(
+    #     t.pos.xy...,
+    #     t.text,
+    #     fontsize = t.size,
+    #     fontfamily = a[Font].family,
+    #     color = rgba(a[Stroke].color),
+    #     va = alignments[t.valign],
+    #     ha = alignments[t.halign],
+    #     rotation = deg(t.angle),
+    #     rotation_mode = "anchor",
+    #     zorder=zorder(),
+    #     snap=false,
+    # )
+    C.set_source_rgba(cc, rgba(a[Fill].content)...)
+    C.select_font_face(cc, t.font, Cairo.FONT_SLANT_NORMAL, Cairo.FONT_WEIGHT_NORMAL)
+    C.set_font_size(cc, t.size)
+
+    ex = TextExtent(cc, t)
+
+    shiftx = @match t.halign begin
+        :l => 0
+        :c => -ex.width/2
+        :r => -width
+    end
+
+    shifty = @match t.valign begin
+        :t => ex.height
+        :c => ex.height/2
+        :bl => 0
+        :b => -(ex.ybearing + ex.height)
+    end
+
+    pos = t.pos + P(shiftx, shifty)
+
+    C.move_to(cc, pos.xy...)
+    C.show_text(cc, t.text)
 end
 
 function makepath!(cc, b::Bezier)

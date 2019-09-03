@@ -7,6 +7,7 @@ struct Txt <: GeometricObject
     halign::Symbol
     valign::Symbol
     angle::Angle
+    font::String
 end
 
 text(args...) = Shape(Txt(args[1:fieldcount(Txt)]...), args[fieldcount(Txt)+1:end]...)
@@ -22,4 +23,4 @@ function text!(f::Function, layer::Layer, args...)
     r
 end
 
-needed_attributes(::Type{Txt}) = (Visible, Stroke, Font)
+needed_attributes(::Type{Txt}) = (Visible, Fill, Font)

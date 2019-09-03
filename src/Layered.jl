@@ -2,6 +2,7 @@ module Layered
 
 using StaticArrays
 import Colors
+using Match
 
 export Point, Transform, Layer, Shape, upward_transform, solve!, →, point, line, Angle, rad, deg, needed_attributes
 
@@ -73,6 +74,7 @@ function Base.:*(tr::Transform, t::Txt)
         t.halign,
         t.valign,
         tr.rotation + t.angle,
+        t.font
     )
 end
 

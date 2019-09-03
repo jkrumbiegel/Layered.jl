@@ -4,17 +4,19 @@ using ProgressMeter
 
 export record
 
-function rgba_array(fig)
-    fig.canvas.draw()
-    arr = Vector{UInt8}(fig.canvas.buffer_rgba())
-    arr_rgba = reinterpret(Colors.RGBA{Colors.N0f8}, arr)
-    l, b, w, h = Int.(fig.bbox.bounds)
-    permutedims(reshape(arr_rgba, h, w), [2, 1])
+function bgra_array(c::Cairo.CairoSurfaceBase{UInt32})
+    bgra_buffer_ptr = ccall((:cairo_image_surface_get_data, Cairo.libcairo), Ptr{UInt8}, (Ptr{Nothing},), c.ptr)
+    w = Int(c.width)
+    h = Int(c.height)
+    arr = unsafe_wrap(Array{UInt8, 3}, bgra_buffer_ptr, (h, w, 4))
+    arr_bgra = reinterpret(Colors.BGRA{Colors.N0f8}, arr)
+    reshaped = reshape(arr_bgra, h, w)
+    permutedims(reshaped, [2, 1])
 end
 
-function rgb_array(fig)
-    rgba = rgba_array(fig)
-    rgb = Colors.RGB.(rgba)
+function rgb_array(c)
+    bgra = bgra_array(c)
+    rgb = Colors.RGB.(bgra)
 end
 
 function record(figure_func, filename, framerate::Real, ts; quality=:medium)
@@ -30,7 +32,6 @@ function record(figure_func, filename, framerate::Real, ts; quality=:medium)
     @showprogress 1/3 "Rendering frames..." for (i, t) in enumerate(ts[2:end])
         fig = figure_func(t)
         full_buffer[i, :, :, :] = rgb_array(fig)
-        PyPlot.close_figs()
     end
 
     codec_name, props = if quality == :medium
