@@ -373,9 +373,11 @@ function grads()
         (c, Fill(g))
     end
 
-    circ2 = circle!(l, circ, Stroke("transparent"), Fill(bgcolor)) do c
+    circ2 = circle!(l, circ, Visible(false)) do c
         Circle(c.center + Point(deg(-30)) * c.radius * 0.5, c.radius * 0.7)
     end
+
+    circ.attrs[Clip] = Clip(circ2)
 
     cc = draw(c, dpi=200)
     Cairo.write_to_png(cc, "grads.png");

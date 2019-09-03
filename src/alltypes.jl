@@ -60,6 +60,10 @@ struct RadialGradient
     colors::Vector{<:Colors.Colorant}
 end
 
+struct Clip <: Attribute
+    shape::Union{Nothing, Shape}
+end
+
 struct Fill <: Attribute
     content::Union{Colors.Colorant, Gradient, RadialGradient}
 end

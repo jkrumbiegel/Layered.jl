@@ -38,7 +38,7 @@ function circle!(f::Function, layer::Layer, args...)
     r
 end
 
-needed_attributes(::Type{Circle}) = (Visible, Fill, Stroke, Linewidth, Linestyle)
+needed_attributes(::Type{Circle}) = (Clip, Visible, Fill, Stroke, Linewidth, Linestyle)
 
 function intersection(c::Circle, l::Line)
     # algorithm works for circle at (0, 0)

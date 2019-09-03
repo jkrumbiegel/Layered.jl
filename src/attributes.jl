@@ -1,8 +1,7 @@
 export Attribute, Attributes, Fill, Fills, Stroke, Strokes, Linestyle, Linewidth, Linewidths, Markersize, Markersizes, Marker, Font, Visible
+export Clip
 
 Base.Broadcast.broadcastable(a::Attribute) = Ref(a)
-
-import Colors
 
 Fill(s::String) = Fill(parse(Colors.Colorant, s))
 

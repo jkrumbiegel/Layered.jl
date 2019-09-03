@@ -435,10 +435,22 @@ function makepath!(cc, c::Circle)
     C.arc(cc, c.center.xy..., c.radius, 0, 2pi)
 end
 
+function setclippath!(cc, a::Attributes)
+    sh = a[Clip].shape
+    if isnothing(sh)
+        return
+    end
+    makepath!(cc, solve!(sh))
+    C.clip(cc)
+end
+
 function draw!(cc, c::Circle, a::Attributes)
+    C.save(cc)
+    setclippath!(cc, a)
     makepath!(cc, c)
     lineattrs!(cc, a)
     fillstroke!(cc, a)
+    C.restore(cc)
 end
 
 function draw!(cc, r::Rect, a::Attributes)
