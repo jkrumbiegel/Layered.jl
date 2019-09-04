@@ -257,19 +257,7 @@ function TextExtent(cc, t::Txt)
 end
 
 function draw!(cc, t::Txt, a::Attributes)
-    # PyPlot.gca().text(
-    #     t.pos.xy...,
-    #     t.text,
-    #     fontsize = t.size,
-    #     fontfamily = a[Font].family,
-    #     color = rgba(a[Stroke].color),
-    #     va = alignments[t.valign],
-    #     ha = alignments[t.halign],
-    #     rotation = deg(t.angle),
-    #     rotation_mode = "anchor",
-    #     zorder=zorder(),
-    #     snap=false,
-    # )
+
     C.set_source_rgba(cc, rgba(a[Fill].content)...)
     C.select_font_face(cc, t.font, Cairo.FONT_SLANT_NORMAL, Cairo.FONT_WEIGHT_NORMAL)
     C.set_font_size(cc, t.size)
@@ -279,7 +267,7 @@ function draw!(cc, t::Txt, a::Attributes)
     shiftx = @match t.halign begin
         :l => 0
         :c => -ex.width/2
-        :r => -width
+        :r => -ex.width
     end
 
     shifty = @match t.valign begin
@@ -289,9 +277,14 @@ function draw!(cc, t::Txt, a::Attributes)
         :b => -(ex.ybearing + ex.height)
     end
 
-    pos = t.pos + P(shiftx, shifty)
+    shift = rotate(P(shiftx, shifty), t.angle)
+
+    pos = t.pos + shift
+
 
     C.move_to(cc, pos.xy...)
+    C.rotate(cc, rad(t.angle))
+
     C.show_text(cc, t.text)
 end
 
