@@ -25,7 +25,8 @@ function Circle(center::Point, p1::Point)
     Circle(center, radius)
 end
 
-circle(args...) = Shape(Circle(args[1:2]...), args[3:end]...)
+
+circle(args...) = Shape(Circle, args...)
 function circle!(layer::Layer, args...)
     r = circle(args...)
     push!(layer, r)
@@ -38,7 +39,7 @@ function circle!(f::Function, layer::Layer, args...)
     r
 end
 
-needed_attributes(::Type{Circle}) = (Clip, Visible, Fill, Stroke, Linewidth, Linestyle)
+needed_attributes(::Type{Circle}) = (Visible, Fill, Stroke, Linewidth, Linestyle)
 
 function intersection(c::Circle, l::Line)
     # algorithm works for circle at (0, 0)

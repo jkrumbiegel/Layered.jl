@@ -1,14 +1,15 @@
-export Canvas, canvas
+export Canvas, canvas, write_to_png
 
 mutable struct Canvas
     size_in::Tuple{Float64, Float64}
     toplayer::Layer
     rect::Shape{Rect}
+    bgcolor::Colors.Colorant
 end
 
 
 function canvas(
-    width::Real, height::Real, toplayer::Union{Layer,Nothing}=nothing; bgcolor="white")
+    width::Real, height::Real, toplayer::Union{Layer,Nothing}=nothing; bgcolor::Union{String, Colors.Colorant}="white")
     pt_per_in = 72
     size_in = (width, height)
     size_pt = size_in .* pt_per_in
@@ -27,11 +28,16 @@ function canvas(
             Linewidth(1),
             Linestyle(:solid),
             Font("Helvetica Neue LT Std"),
-            Clip(nothing)
         )
     else
         toplayer
     end
-    r = rect!(l, (0, 0), size_pt..., deg(0), Fill(bgcolor), Stroke("transparent"))
-    Canvas((width, height), l, r), l
+    r = rect!(l, (0, 0), size_pt..., deg(0)) + Visible(false)
+    bgcolor = typeof(bgcolor) <: String ? parse(Colors.Colorant, bgcolor) : bgcolor
+    Canvas((width, height), l, r, bgcolor), l
+end
+
+function write_to_png(c::Canvas, filename::String; dpi=200)
+    cc = draw(c; dpi=dpi)
+    Cairo.write_to_png(cc, filename);
 end

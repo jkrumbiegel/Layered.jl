@@ -9,11 +9,6 @@ CURVE4 = 4
 LINETO = 2
 MOVETO = 1
 
-z = 0
-function zorder()
-    global z
-    z += 1
-end
 
 function fill!(cc, g::Gradient)
     pat = C.pattern_create_linear(g.from.xy..., g.to.xy...);
@@ -86,8 +81,12 @@ function draw(canvas::Canvas; dpi=100)
     size_pt = canvas.size_in .* pt_per_in
     size_pixel = canvas.size_in .* dpi
 
-    c = C.CairoRGBSurface(size_pixel...);
+    c = C.CairoARGBSurface(size_pixel...);
     cc = C.CairoContext(c);
+
+    C.rectangle(cc, 0, 0, size_pixel...)
+    C.set_source_rgba(cc, rgba(canvas.bgcolor)...)
+    C.fill(cc)
 
     C.scale(cc, dpi / pt_per_in, dpi / pt_per_in)
     C.translate(cc, (size_pt./2)...)
@@ -97,10 +96,12 @@ function draw(canvas::Canvas; dpi=100)
 end
 
 function draw!(cc::C.CairoContext, l::Layer)
-    z = 0
+    C.save(cc)
+    setclippath!(cc, l.clip)
     for content in l.content
         draw!(cc, content)
     end
+    C.restore(cc)
 end
 
 function getattributes(s::Shape{T}) where T
@@ -129,6 +130,7 @@ function draw!(cc, s::Shape)
     transformed_to_toplevel = upward_transform(s) * geom
 
     C.save(cc)
+    setclippath!(cc, s.clip)
     draw!(cc, transformed_to_toplevel, attributes)
     C.restore(cc)
 end
@@ -147,83 +149,6 @@ function draw(ps::Points, a::Attributes)
         marker = a[Marker].marker,
     )
 end
-
-# function PyPlot.matplotlib.path.Path(l::Line; kwargs...)
-#     vertices = [l.from.xy, l.to.xy]
-#     codes = UInt8[MOVETO, LINETO]
-#     PyPlot.matplotlib.path.Path(vertices, codes; kwargs...)
-# end
-#
-# function PyPlot.matplotlib.path.Path(ls::LineSegments; kwargs...)
-#     vertices = SVector{2, Float64}[]
-#     codes = UInt8[]
-#
-#     for l in ls.segments
-#         push!(vertices, l.from.xy)
-#         push!(vertices, l.to.xy)
-#         push!(codes, MOVETO)
-#         push!(codes, LINETO)
-#     end
-#     PyPlot.matplotlib.path.Path(vertices, codes; kwargs...)
-# end
-#
-# function PyPlot.matplotlib.path.Path(p::Polygon; kwargs...)
-#     vertices = SVector{2, Float64}[]
-#     codes = UInt8[]
-#
-#     push!(vertices, p.points[1].xy)
-#     push!(codes, MOVETO)
-#
-#     for po in p.points[2:end]
-#         push!(vertices, po.xy)
-#         push!(codes, LINETO)
-#     end
-#
-#     push!(vertices, p.points[1].xy)
-#     push!(codes, LINETO)
-#
-#     PyPlot.matplotlib.path.Path(vertices; kwargs...)
-# end
-#
-# function PyPlot.matplotlib.path.Path(a::Arc; kwargs...)
-#     path = PyPlot.matplotlib.path.Path.arc(deg(a.start_angle), deg(a.end_angle))
-#
-#     # numpy broadcasting here
-#     verts = path.vertices * a.radius + a.center.xy
-#
-#     PyPlot.matplotlib.path.Path(verts, path.codes; kwargs...)
-# end
-#
-# function PyPlot.matplotlib.path.Path(bp::Path; kwargs...)
-#     vertices = SVector{2, Float64}[]
-#     codes = UInt8[]
-#
-#     n = length(bp.segments)
-#     for i in 1:n
-#         s = bp.segments[i]
-#         if i == 1
-#             push!(vertices, s.from)
-#             push!(codes, MOVETO)
-#         else
-#             if s.from != bp.segments[i-1].to
-#                 push!(vertices, s.from)
-#                 push!(codes, MOVETO)
-#             end
-#         end
-#         if typeof(s) <: Bezier
-#             push!(vertices, s.c1)
-#             push!(vertices, s.c2)
-#             push!(vertices, s.to)
-#             push!(codes, CURVE4)
-#             push!(codes, CURVE4)
-#             push!(codes, CURVE4)
-#         elseif typeof(s) <: Line
-#             push!(vertices, s.to)
-#             push!(codes, LINETO)
-#         end
-#     end
-#     PyPlot.matplotlib.path.Path(vertices, codes; kwargs...)
-# end
 
 function makepath!(cc, l::Line)
     C.move_to(cc, l.from.xy...)
@@ -435,18 +360,22 @@ function makepath!(cc, c::Circle)
     C.arc(cc, c.center.xy..., c.radius, 0, 2pi)
 end
 
-function setclippath!(cc, a::Attributes)
-    sh = a[Clip].shape
+function setclippath!(cc, c::Clip)
+    sh = c.shape
     if isnothing(sh)
         return
     end
-    makepath!(cc, solve!(sh))
+    if typeof(sh) <: Shape
+        makepath!(cc, solve!(sh))
+    else
+        makepath!(cc, solve!(sh[1]))
+        makepath!(cc, solve!(sh[2]))
+    end
     C.clip(cc)
 end
 
 function draw!(cc, c::Circle, a::Attributes)
     C.save(cc)
-    setclippath!(cc, a)
     makepath!(cc, c)
     lineattrs!(cc, a)
     fillstroke!(cc, a)

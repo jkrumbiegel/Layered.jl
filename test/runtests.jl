@@ -245,23 +245,29 @@ using Layered
 using Colors
 
 function cairotest()
-    c, l = canvas(3, 3)
+    c, l = canvas(3, 3, bgcolor="white")
 
-    p1 = point!(l, c.rect, Fill("blue")) do r
+    bigcirc = circle!(l, c.rect) do r
+        Circle(r.center, r.width * 0.4)
+    end + Visible(false)
+
+    l + Clip(bigcirc)
+
+    p1 = point!(l, c.rect) do r
         r.center
-    end
+    end + Fill("blue")
 
-    c1 = circle!(l, c.rect, Fill("tomato"), Linewidth(3), Linestyle(:dashed)) do r
+    c1 = circle!(l, c.rect) do r
         Circle(P(r, 0.3, 0.3), r.width / 5)
-    end
+    end + Fill("tomato") + Linewidth(3) + Linestyle(:dashed)
 
-    line!(l, p1, c1, Linewidth(3)) do p, c
+    line!(l, p1, c1) do p, c
         Line(p, c.center)
-    end
+    end + Linewidth(3)
 
-    pol = polygon!(l, c.rect, Fill("green")) do r
+    pol = polygon!(l, c.rect) do r
         ncross(P(r, 0.8, 0.8), 5, 10, 0.2)
-    end
+    end + Fill("green")
 
     path!(l, c.rect, c1) do r, c
         right = topright(r) + P(-20, 20)
@@ -272,32 +278,32 @@ function cairotest()
         (p, Fill(g))
     end
 
-    path!(l, c.rect, Fill(LCHuvA(70, 30, 30, 0.6))) do r
+    path!(l, c.rect) do r
         right = topright(r) + P(-20, 20)
         Path([Arc(r.center, 10, deg(0), deg(360)), Arc(r.center, 20, deg(0), deg(-360))], false)
-    end
+    end + Fill(LCHuvA(70, 30, 30, 0.6))
 
     path!(l, c.rect, pol) do r, p
         Path([horizontalbezier(topright(r), center(p))], false)
     end
 
-    circle!(l, c.rect, Stroke("transparent")) do r
+    circle!(l, c.rect) do r
         c = Circle(P(r, 0.3, 0.7), 30)
         g = Gradient(at_angle(c, deg(180)), at_angle(c, deg(0)), "tomato", "bisque")
         # (c, Fill())
         (c, Fill(g))
-    end
+    end + Stroke("transparent")
 
-    text!(l, c.rect, Fill("red")) do r
+    text!(l, c.rect) do r
         Txt(P(r, 0.5, 0.9), "HgIchT", 12, :c, :b, deg(0), "Helvetica Neue LT Std 45 Light")
-    end
+    end + Fill("red")
 
     point!(l, c.rect) do r
         P(r, 0.5, 0.9)
     end
 
-    draw(c, dpi=300)
-end
+    write_to_png(c, "cairotest.png")
+end; cairotest()
 
 using Animations
 
@@ -365,20 +371,20 @@ function grads()
     c, l = canvas(3, 3)
 
     bgcolor = LCHuv(15, 30, 240)
-    c.rect.attrs[Fill] = Fill(bgcolor)
+    c.rect + Fill(bgcolor)
 
-    circ = circle!(l, c.rect, Stroke("transparent")) do r
+    circ = circle!(l, c.rect) do r
         c = Circle(P(r, 0.5, 0.5), r.width * 0.4)
         g = Gradient(at_angle.(c, deg.([-30, 150]))..., LCHuv(17, 40, 220), LCHuv(13, 20, 260))
-        (c, Fill(g))
-    end
+        (c, Fill("yellow"))
+    end + Stroke("transparent")
 
-    circ2 = circle!(l, circ, Visible(false)) do c
+    circ2 = circle!(l, circ) do c
         Circle(c.center + Point(deg(-30)) * c.radius * 0.5, c.radius * 0.7)
-    end
+    end + Visible(false)
 
-    circ.attrs[Clip] = Clip(circ2)
+    circ + Clip(circ2, c.rect)
 
-    cc = draw(c, dpi=200)
-    Cairo.write_to_png(cc, "grads.png");
+    write_to_png(c, "test.png")
+
 end; grads()

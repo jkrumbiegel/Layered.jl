@@ -6,7 +6,7 @@ struct Line <: GeometricObject
     to::Point
 end
 
-line(args...) = Shape(Line(args[1:fieldcount(Line)]...), args[fieldcount(Line)+1:end]...)
+line(args...) = Shape(Line, args...)
 function line!(layer::Layer, args...)
     r = line(args...)
     push!(layer, r)
@@ -78,7 +78,7 @@ struct LineSegments <: GeometricObject
     segments::Vector{Line}
 end
 
-linesegments(args...) = Shape(LineSegments(args[1:fieldcount(LineSegments)]...), args[fieldcount(LineSegments)+1:end]...)
+linesegments(args...) = Shape(LineSegments, args...)
 function linesegments!(layer::Layer, args...)
     r = linesegments(args...)
     push!(layer, r)

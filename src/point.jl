@@ -11,7 +11,7 @@ Point(ang::Angle) = Point(cos(ang.rad), sin(ang.rad))
 
 Base.convert(::Type{Point}, t::Tuple{S, T}) where {S<:Real,T<:Real} = Point(t[1], t[2])
 
-point(args...) = Shape(Point(args[1:fieldcount(Point)]...), args[fieldcount(Point)+1:end]...)
+point(args...) = Shape(Point, args...)
 function point!(layer::Layer, args...)
     r = point(args...)
     push!(layer, r)

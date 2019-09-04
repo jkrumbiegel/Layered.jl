@@ -39,12 +39,46 @@ struct Rect <: GeometricObject
     angle::Angle
 end
 
+struct Polygon <: GeometricObject
+    points::Vector{Point}
+end
+
+struct Polygons <: GeometricObject
+    polys::Vector{Polygon}
+end
+
 struct Circle <: GeometricObject
     center::Point
     radius::Float64
 end
 
 abstract type Attribute end
+
+mutable struct Attributes
+    attrs::Dict{Type{<:Attribute}, Union{Function, Attribute}}
+end
+
+struct Clip
+    shape
+    # shape::Union{Nothing, Shape, Tuple{Shape, Shape}}
+end
+
+mutable struct Layer <: LayerContent
+    transform::Union{Tuple{Function, Vector}, Transform}
+    content::Vector{LayerContent}
+    parent::Union{Layer, Nothing}
+    attrs::Attributes
+    clip::Clip
+end
+
+mutable struct Shape{T <: GeometricObject} <: LayerContent
+    # make this nicer and more julian
+    content::Union{Tuple{Function, Vector}, T}
+    parent::Union{Layer, Nothing}
+    solved::Union{T, Nothing}
+    attrs::Attributes
+    clip::Clip
+end
 
 struct Gradient
     from::Point
@@ -60,9 +94,7 @@ struct RadialGradient
     colors::Vector{<:Colors.Colorant}
 end
 
-struct Clip <: Attribute
-    shape::Union{Nothing, Shape}
-end
+Clip(s1::Shape, s2::Shape) = Clip((s1, s2))
 
 struct Fill <: Attribute
     content::Union{Colors.Colorant, Gradient, RadialGradient}
@@ -110,23 +142,4 @@ end
 
 struct Visible <: Attribute
     visible::Bool
-end
-
-mutable struct Attributes
-    attrs::Dict{Type{<:Attribute}, Union{Function, Attribute}}
-end
-
-mutable struct Layer <: LayerContent
-    transform::Union{Tuple{Function, Vector}, Transform}
-    content::Vector{LayerContent}
-    parent::Union{Layer, Nothing}
-    attrs::Attributes
-end
-
-mutable struct Shape{T <: GeometricObject} <: LayerContent
-    # make this nicer and more julian
-    content::Union{Tuple{Function, Vector}, T}
-    parent::Union{Layer, Nothing}
-    solved::Union{T, Nothing}
-    attrs::Attributes
 end

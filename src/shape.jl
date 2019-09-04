@@ -1,23 +1,32 @@
-function Shape(g::GeometricObject, varargs::Vararg{Attribute})
-    Shape(g, nothing, nothing, Attributes(varargs...))
+function Shape(g::GeometricObject)
+    Shape(g, nothing, nothing, Attributes(), Clip(nothing))
 end
-function Shape(f::Function, ::Type{T}, varargs...) where {N, T}
 
-    deps = Tuple(v for v in varargs if !(typeof(v) <: Attribute))
+function Shape(::Type{T}, args...) where T <: GeometricObject
+    Shape(T(args...), nothing, nothing, Attributes(), Clip(nothing))
+end
 
-    attributes = Attributes()
-    attrs = Tuple(v for v in varargs if typeof(v) <: Attribute)
-    for a in attrs
-        if haskey(attributes, typeof(a))
-            error("Attribute of type $(typeof(a)) was added more than once.")
-        end
-        attributes[typeof(a)] = a
-    end
-
-    Shape{T}((f, [deps...]), nothing, nothing, attributes)
+function Shape(f::Function, ::Type{T}, deps...) where T
+    Shape{T}((f, [deps...]), nothing, nothing, Attributes(), Clip(nothing))
 end
 
 Base.Broadcast.broadcastable(s::Shape) = Ref(s)
+
+
+
+# function Base.:+(s::Shape, c::Clip)
+#     s.clip = c
+#     s
+# end
+
+function Base.copy!(l::Layer, s::Shape{T}) where T
+    news = Shape{T}(s.content, nothing, nothing, Attributes(), s.clip)
+    for (Ta, attr) in s.attrs.attrs
+        news + attr
+    end
+    push!(l, news)
+    news
+end
 
 function upward_transform(s::Shape)
     return upward_transform(s.parent)

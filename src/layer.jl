@@ -2,22 +2,32 @@ export layer, layer!, layerfirst!
 
 Base.Broadcast.broadcastable(l::Layer) = Ref(l)
 
+function Base.:+(l::LayerContent, c::Clip)
+    l.clip = c
+    l
+end
+
+function Base.:+(l::LayerContent, a::T) where T <: Attribute
+    l.attrs[T] = a
+    l
+end
+
 function layer()
-    Layer(Transform(), Vector{LayerContent}[], nothing, Attributes())
+    Layer(Transform(), Vector{LayerContent}[], nothing, Attributes(), Clip(nothing))
 end
 
 function layer(t::Transform, varargs::Vararg{Attribute, N}) where N
-    Layer(t, Vector{LayerContent}[], nothing, Attributes(varargs...))
+    Layer(t, Vector{LayerContent}[], nothing, Attributes(varargs...), Clip(nothing))
 end
 
 function layer!(parent::Layer, t::Transform, varargs::Vararg{Attribute, N}) where N
-    l = Layer(t, Vector{LayerContent}[], nothing, Attributes(varargs...))
+    l = Layer(t, Vector{LayerContent}[], nothing, Attributes(varargs...), Clip(nothing))
     push!(parent, l)
     l
 end
 
 function layerfirst!(parent::Layer, t::Transform, varargs::Vararg{Attribute, N}) where N
-    l = Layer(t, Vector{LayerContent}[], nothing, Attributes(varargs...))
+    l = Layer(t, Vector{LayerContent}[], nothing, Attributes(varargs...), Clip(nothing))
     pushfirst!(parent, l)
     l
 end
@@ -35,7 +45,7 @@ function layer!(f::Function, parent::Layer, varargs...)
         attributes[typeof(a)] = a
     end
 
-    l = Layer((f, [deps...]), Vector{LayerContent}[], nothing, attributes)
+    l = Layer((f, [deps...]), Vector{LayerContent}[], nothing, attributes, Clip(nothing))
     push!(parent, l)
     l
 end

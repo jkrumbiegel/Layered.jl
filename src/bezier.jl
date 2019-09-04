@@ -13,17 +13,17 @@ struct Bezier <: GeometricObject
     to::Point
 end
 
-bezier(args...) = Shape(Bezier(args[1:fieldcount(Bezier)]...), args[fieldcount(Bezier)+1:end]...)
+bezier(args...) = Shape(Bezier, args...)
 function bezier!(layer::Layer, args...)
-    b = bezier(args...)
-    push!(layer, b)
-    b
+    r = bezier(args...)
+    push!(layer, r)
+    r
 end
 bezier(f::Function, args...) = Shape(f, Bezier, args...)
 function bezier!(f::Function, layer::Layer, args...)
-    b = bezier(f, args...)
-    push!(layer, b)
-    b
+    r = bezier(f, args...)
+    push!(layer, r)
+    r
 end
 
 move(b::Bezier, p::Point) = Bezier(b.from + p, b.c1 + p, b.c2 + p, b.to + p)
@@ -63,17 +63,17 @@ struct Path <: GeometricObject
     closed::Bool
 end
 
-path(args...) = Shape(Path(args[1:fieldcount(Path)]...), args[fieldcount(Path)+1:end]...)
+path(args...) = Shape(Path, args...)
 function path!(layer::Layer, args...)
-    b = path(args...)
-    push!(layer, b)
-    b
+    r = path(args...)
+    push!(layer, r)
+    r
 end
 path(f::Function, args...) = Shape(f, Path, args...)
 function path!(f::Function, layer::Layer, args...)
-    b = path(f, args...)
-    push!(layer, b)
-    b
+    r = path(f, args...)
+    push!(layer, r)
+    r
 end
 
 move(b::Path, p::Point) = Path(move.(b.segments, p), b.closed)
@@ -97,17 +97,17 @@ struct Paths <: GeometricObject
     paths::Vector{Path}
 end
 
-paths(args...) = Shape(Paths(args[1:fieldcount(Paths)]...), args[fieldcount(Paths)+1:end]...)
+paths(args...) = Shape(Paths, args...)
 function paths!(layer::Layer, args...)
-    b = paths(args...)
-    push!(layer, b)
-    b
+    r = paths(args...)
+    push!(layer, r)
+    r
 end
 paths(f::Function, args...) = Shape(f, Paths, args...)
 function paths!(f::Function, layer::Layer, args...)
-    b = paths(f, args...)
-    push!(layer, b)
-    b
+    r = paths(f, args...)
+    push!(layer, r)
+    r
 end
 
 needed_attributes(::Type{Paths}) = (Visible, Linewidths, Strokes, Linestyle, Fills)

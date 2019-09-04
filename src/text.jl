@@ -10,7 +10,7 @@ struct Txt <: GeometricObject
     font::String
 end
 
-text(args...) = Shape(Txt(args[1:fieldcount(Txt)]...), args[fieldcount(Txt)+1:end]...)
+text(args...) = Shape(Txt, args...)
 function text!(layer::Layer, args...)
     r = text(args...)
     push!(layer, r)
