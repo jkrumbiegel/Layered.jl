@@ -243,6 +243,7 @@ pkg"activate ."
 using Revise
 using Layered
 using Colors
+using Animations
 
 function cairotest()
     c, l = canvas(3, 3, bgcolor="white")
@@ -305,8 +306,6 @@ function cairotest()
     write_to_png(c, "cairotest.png")
 end; cairotest()
 
-using Animations
-
 function cairovideo()
     duration = 6
     a_trans = Animation([0, duration], [P(0, 0), P(50, 50)], sineio(n=2, yoyo=true))
@@ -368,19 +367,16 @@ display(gabors())
 
 
 function grads()
-    c, l = canvas(3, 3)
-
-    bgcolor = LCHuv(15, 30, 240)
-    c.rect + Fill(bgcolor)
+    c, l = canvas(3, 3, bgcolor = LCHuv(15, 30, 240))
 
     circ = circle!(l, c.rect) do r
         c = Circle(P(r, 0.5, 0.5), r.width * 0.4)
-        g = Gradient(at_angle.(c, deg.([-30, 150]))..., LCHuv(17, 40, 220), LCHuv(13, 20, 260))
+        g = Gradient(P.(c, deg.([-30, 150]))..., LCHuv(17, 40, 220), LCHuv(13, 20, 260))
         (c, Fill("yellow"))
     end + Stroke("transparent")
 
     circ2 = circle!(l, circ) do c
-        Circle(c.center + Point(deg(-30)) * c.radius * 0.5, c.radius * 0.7)
+        Circle(c.center + P(deg(-30)) * c.radius * 0.5, c.radius * 0.7)
     end + Visible(false)
 
     circ + Clip(circ2, c.rect)
@@ -388,3 +384,48 @@ function grads()
     write_to_png(c, "test.png")
 
 end; grads()
+
+function eyetest()
+
+    duration = 6
+    a_eye = Animation([0, duration], [-1, 1], sineio(n=6, yoyo=true, prewait=0.9))
+
+    record("eye.mp4", 60, duration; excludelast=true) do t
+        bg = LCHuv(20, 20, 240)
+        c, l = canvas(3, 3, bgcolor=bg)
+
+        eye = circle!(l, c.rect) do r
+            Circle(r.center, r.width * 0.4)
+        end + Fill("white") + Stroke("transparent")
+
+        iris = circle!(l, eye) do e
+            Circle(e.center + X(a_eye(t) * 10), e.radius * 0.5)
+        end + Fill(bg) + Stroke("transparent") + Clip(eye)
+
+        pupil = circle!(l, iris) do i
+            Circle(i.center, i.radius * 0.6)
+        end + Fill("black") + Clip(eye)
+
+        reflex = circle!(l, eye) do e
+            Circle(e.center + P(deg(-30)) * e.radius * 0.5, e.radius * 0.2)
+        end + Fill(GrayA(1, 0.4)) + Stroke("transparent")
+
+        draw(c)
+        # write_to_png(c, "eye.png")
+    end
+
+end; eyetest()
+
+function texttest()
+
+    c, l = canvas(3, 3)
+
+    point!(l, 0, 0) + Fill("blue")
+    p = point!(l, 50, 0) + Fill("blue")
+
+    text!(l, p) do p
+        Txt(p, "Hello", 10, :r, :bl, deg(-10), "Helvetica")
+    end + Fill("black")
+
+    write_to_png(c, "texttest.png")
+end; texttest()
