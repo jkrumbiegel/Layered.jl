@@ -1,4 +1,4 @@
-export Circle, circle, circle!, outertangents, scale, scalearea, at_angle
+export Circle, circle, circle!, outertangents, scale, scalearea
 
 function Circle(p1::Point, p2::Point, p3::Point)
     circlethrough(p1, p2, p3)
@@ -118,7 +118,7 @@ function outertangents(c1::Circle, c2::Circle)
     return [Line(small_tangent_point_1, big_tangent_point_1), Line(small_tangent_point_2, big_tangent_point_2)]
 end
 
-function at_angle(c::Circle, angle::Angle)
+function Point(c::Circle, angle::Angle)
     c.center + Point(cos(angle), sin(angle)) * c.radius
 end
 
