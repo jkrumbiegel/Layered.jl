@@ -427,5 +427,32 @@ function texttest()
         Txt(p, "Hello", 10, :r, :bl, deg(-10), "Helvetica")
     end + Fill("black")
 
-    write_to_png(c, "texttest.png")
+    write_to_png(c, "texttest.png", dpi=300)
 end; texttest()
+
+function transformtest()
+
+    c, tl = canvas(4, 3)
+
+    l = layer!(tl, c.rect) do r
+        d = min(r.width, r.height)
+        Transform(translation=r.center, scale=(d-20)/2, rotation=r.angle)
+    end
+
+    line!(tl, P(0, 0), P(100, 0))
+
+    circ = circle!(l, P(0, 0), 1) + Fill(Gradient(X(-1), X(1), "green", "yellow"))
+
+    polygon!(l, circ) do c
+        poly = Polygon(P.(c, deg.([0, 50, 150])))
+        f = Fill(Gradient(poly.points[1:2:3]..., "red", "blue"))
+        (poly, f)
+    end
+
+    text!(tl, circ) do c
+        Txt(P(c, deg(-90), 0.5), "Hello", 20, :c, :c, deg(0), "Helvetica Neue Light")
+    end + Fill("black")
+
+    write_to_png(c, "transformtest.png")
+
+end; transformtest()

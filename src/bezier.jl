@@ -63,6 +63,10 @@ struct Path <: GeometricObject
     closed::Bool
 end
 
+function Path(closed::Bool, segments::Vararg{<: BezierSegment, N}) where N
+    Path([segments...], closed)
+end
+
 path(args...) = Shape(Path, args...)
 function path!(layer::Layer, args...)
     r = path(args...)

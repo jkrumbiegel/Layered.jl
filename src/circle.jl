@@ -122,6 +122,10 @@ function Point(c::Circle, angle::Angle)
     c.center + Point(cos(angle), sin(angle)) * c.radius
 end
 
+function Point(c::Circle, angle::Angle, fraction::Real)
+    c.center + Point(cos(angle), sin(angle)) * c.radius * fraction
+end
+
 function closestto(c::Circle, p::Point)
     normalize(from_to(c.center, p)) * c.radius
 end

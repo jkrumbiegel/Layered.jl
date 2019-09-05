@@ -35,15 +35,21 @@ function fill!(cc, c::Colors.Colorant)
     C.fill_preserve(cc)
 end
 
-function fillstroke!(cc, a::Attributes)
+function fillstroke!(cc, canvasmatrix, a::Attributes)
     fill!(cc, a[Fill].content)
     C.set_source_rgba(cc, rgba(a[Stroke].color)...)
-    C.stroke(cc)
+    C.save(cc)
+    C.set_matrix(cc, canvasmatrix)
+    C.stroke_transformed(cc)
+    C.restore(cc)
 end
 
-function stroke!(cc, a::Attributes)
+function stroke!(cc, canvasmatrix, a::Attributes)
     C.set_source_rgba(cc, rgba(a[Stroke].color)...)
-    C.stroke(cc)
+    C.save(cc)
+    C.set_matrix(cc, canvasmatrix)
+    C.stroke_transformed(cc)
+    C.restore(cc)
 end
 
 function lineattrs!(cc, a::Attributes)
@@ -91,15 +97,21 @@ function draw(canvas::Canvas; dpi=100)
     C.scale(cc, dpi / pt_per_in, dpi / pt_per_in)
     C.translate(cc, (size_pt./2)...)
 
-    draw!(cc, canvas.toplayer)
+    canvasmatrix = C.get_matrix(cc)
+
+    draw!(cc, canvasmatrix, canvas.toplayer)
     c
 end
 
-function draw!(cc::C.CairoContext, l::Layer)
+function draw!(cc::C.CairoContext, canvasmatrix, l::Layer)
     C.save(cc)
+    t = gettransform!(l)
+    C.scale(cc, t.scale, t.scale)
+    C.rotate(cc, rad(t.rotation))
+    C.translate(cc, t.translation...)
     setclippath!(cc, l.clip)
     for content in l.content
-        draw!(cc, content)
+        draw!(cc, canvasmatrix, content)
     end
     C.restore(cc)
 end
@@ -121,21 +133,22 @@ function getattribute(l::LayerContent, attr)
     end
 end
 
-function draw!(cc, s::Shape)
+function draw!(cc, canvasmatrix, s::Shape)
     geom = solve!(s)
     attributes = getattributes(s)
     if !attributes[Visible].visible
         return
     end
-    transformed_to_toplevel = upward_transform(s) * geom
+    # transformed_to_toplevel = upward_transform(s) * geom
 
     C.save(cc)
     setclippath!(cc, s.clip)
-    draw!(cc, transformed_to_toplevel, attributes)
+    # draw!(cc, transformed_to_toplevel, attributes)
+    draw!(cc, canvasmatrix, geom, attributes)
     C.restore(cc)
 end
 
-function draw!(cc, p::Point, a::Attributes)
+function draw!(cc, canvasmatrix, p::Point, a::Attributes)
     C.move_to(cc, (p + 0.5 * a[Markersize].size * X(1)).xy...)
     C.arc(cc, p.x, p.y, 0.5 * a[Markersize].size, 0, 2pi)
     fillstroke!(cc, a)
@@ -159,25 +172,24 @@ function continuepath!(cc, l::Line)
     C.line_to(cc, l.to.xy...)
 end
 
-function draw!(cc, l::Line, a::Attributes)
+function draw!(cc, canvasmatrix, l::Line, a::Attributes)
     makepath!(cc, l)
     C.set_source_rgba(cc, rgba(a[Stroke].color)...)
-    C.set_line_width(cc, a[Linewidth].width)
     lineattrs!(cc, a)
-    C.stroke(cc)
+    C.stroke_transformed(cc)
 end
 
-function draw(ls::LineSegments, a::Attributes)
-    path = PyPlot.matplotlib.path.Path(ls, closed=false)
-    pathpatch = PyPlot.matplotlib.patches.PathPatch(
-        path,
-        edgecolor = rgba(a[Stroke].color),
-        linewidth = a[Linewidth].width,
-        lineattrs = a[Linestyle].style,
-        zorder=zorder(),
-    )
-    PyPlot.gca().add_patch(pathpatch)
-end
+# function draw(ls::LineSegments, a::Attributes)
+#     path = PyPlot.matplotlib.path.Path(ls, closed=false)
+#     pathpatch = PyPlot.matplotlib.patches.PathPatch(
+#         path,
+#         edgecolor = rgba(a[Stroke].color),
+#         linewidth = a[Linewidth].width,
+#         lineattrs = a[Linestyle].style,
+#         zorder=zorder(),
+#     )
+#     PyPlot.gca().add_patch(pathpatch)
+# end
 
 function makepath!(cc, p::Polygon)
     C.move_to(cc, p.points[1].xy...)
@@ -189,10 +201,10 @@ function makepath!(cc, p::Polygon)
     C.line_to(cc, p.points[1].xy...)
 end
 
-function draw!(cc, p::Polygon, a::Attributes)
+function draw!(cc, canvasmatrix, p::Polygon, a::Attributes)
     makepath!(cc, p)
     lineattrs!(cc, a)
-    fillstroke!(cc, a)
+    fillstroke!(cc, canvasmatrix, a)
 end
 
 function makepath!(cc, a::Arc)
@@ -214,7 +226,7 @@ function continuepath!(cc, a::Arc)
     end
 end
 
-function draw!(cc, arc::Arc, a::Attributes)
+function draw!(cc, canvasmatrix, arc::Arc, a::Attributes)
     makepath!(cc, arc)
     lineattrs!(cc, a)
     stroke!(cc, a)
@@ -256,7 +268,7 @@ function TextExtent(cc, t::Txt)
     # } cairo_text_extents_t;
 end
 
-function draw!(cc, t::Txt, a::Attributes)
+function draw!(cc, canvasmatrix, t::Txt, a::Attributes)
 
     C.set_source_rgba(cc, rgba(a[Fill].content)...)
     C.select_font_face(cc, t.font, Cairo.FONT_SLANT_NORMAL, Cairo.FONT_WEIGHT_NORMAL)
@@ -297,7 +309,7 @@ function continuepath!(cc, b::Bezier)
     C.curve_to(cc, b.c1.xy..., b.c2.xy..., b.to.xy...)
 end
 
-function draw!(cc, b::Bezier, a::Attributes)
+function draw!(cc, canvasmatrix, b::Bezier, a::Attributes)
     makepath!(cc, b)
     lineattrs!(cc, b)
     stroke!(cc, b)
@@ -321,27 +333,30 @@ function makepath!(cc, p::Path)
             makepath!(cc, news)
         end
     end
+    if p.closed
+        C.close_path(cc)
+    end
 end
 
-function draw!(cc, p::Path, a::Attributes)
+function draw!(cc, canvasmatrix, p::Path, a::Attributes)
     makepath!(cc, p)
     lineattrs!(cc, a)
-    fillstroke!(cc, a)
+    fillstroke!(cc, canvasmatrix, a)
 end
 
-function draw(bs::Paths, a::Attributes)
-    paths = PyPlot.matplotlib.path.Path.(bs.paths)
-    collection = PyPlot.matplotlib.collections.PathCollection(
-        paths,
-        edgecolors = rgbas(a[Strokes]),
-        facecolors = rgbas(a[Fills]),
-        linewidths = a[Linewidths].widths,
-        zorder=zorder(),
-        antialiaseds=true,
-        snap=false,
-    )
-    PyPlot.gca().add_collection(collection)
-end
+# function draw(bs::Paths, a::Attributes)
+#     paths = PyPlot.matplotlib.path.Path.(bs.paths)
+#     collection = PyPlot.matplotlib.collections.PathCollection(
+#         paths,
+#         edgecolors = rgbas(a[Strokes]),
+#         facecolors = rgbas(a[Fills]),
+#         linewidths = a[Linewidths].widths,
+#         zorder=zorder(),
+#         antialiaseds=true,
+#         snap=false,
+#     )
+#     PyPlot.gca().add_collection(collection)
+# end
 
 # function PyPlot.plot(v::Vector{Point}; kwargs...)
 #     xx = [p.x for p in v]
@@ -367,15 +382,15 @@ function setclippath!(cc, c::Clip)
     C.clip(cc)
 end
 
-function draw!(cc, c::Circle, a::Attributes)
+function draw!(cc, canvasmatrix, c::Circle, a::Attributes)
     C.save(cc)
     makepath!(cc, c)
     lineattrs!(cc, a)
-    fillstroke!(cc, a)
+    fillstroke!(cc, canvasmatrix, a)
     C.restore(cc)
 end
 
-function draw!(cc, r::Rect, a::Attributes)
+function draw!(cc, canvasmatrix, r::Rect, a::Attributes)
     # ax = PyPlot.gca()
     # rectpatch = PyPlot.matplotlib.patches.Rectangle(
     #     (bottomleft(r).xy...,),
@@ -392,7 +407,7 @@ function draw!(cc, r::Rect, a::Attributes)
     # ax.add_patch(rectpatch)
     makepath!(cc, r)
     lineattrs!(cc, a)
-    fillstroke!(cc, a)
+    fillstroke!(cc, canvasmatrix, a)
 end
 
 function makepath!(cc, r::Rect)
@@ -400,4 +415,5 @@ function makepath!(cc, r::Rect)
     C.line_to(cc, bottomright(r).xy...)
     C.line_to(cc, topright(r).xy...)
     C.line_to(cc, topleft(r).xy...)
+    C.close_path(cc)
 end

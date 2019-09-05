@@ -49,7 +49,9 @@ function solve!(s::Shape{T}) where T
         for d in dependencies
             if typeof(d) <: Shape
                 solved = solve!(d)
-                transformed = transform_from_to(d, s) * solved
+                println("transform $(typeof(solved))")
+                @show t = transform_from_to(d, s)
+                transformed = t * solved
                 push!(solved_deps, transformed)
             else
                 # for other arguments that are not shapes

@@ -1,4 +1,4 @@
-export layer, layer!, layerfirst!
+export layer, layer!, layerfirst!, rectlayer!
 
 Base.Broadcast.broadcastable(l::Layer) = Ref(l)
 
@@ -50,6 +50,17 @@ function layer!(f::Function, parent::Layer, varargs...)
     l
 end
 
+function rectlayer!(l::Layer, sr::Shape{Rect}, wh::Symbol; margin=0)
+    layer!(l, sr) do r
+        d = @match wh begin
+            :w => r.width
+            :h => r.height
+            _ => error("Symbol not allowed")
+        end
+        Transform(translation=r.center, scale=(d - margin)/2, rotation=r.angle)
+    end
+end
+
 function Base.push!(l::Layer, lc::LayerContent)
     push!(l.content, lc)
     lc.parent = l
@@ -62,9 +73,9 @@ end
 
 function upward_transform(l::Layer)
     if isnothing(l.parent)
-        return l.transform
+        return gettransform!(l)
     else
-        return upward_transform(l.parent) * l.transform
+        return upward_transform(l.parent) * gettransform!(l)
     end
 end
 

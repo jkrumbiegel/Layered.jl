@@ -1,4 +1,4 @@
-export Arc, arc, arc!, fraction, arclength
+export Arc, arc, arc!, fraction, arclength, intersection
 
 function Arc(from::Point, through::Point, to::Point)
     circle = Circle(from, through, to)
@@ -51,4 +51,12 @@ end
 
 function lengthen(a::Arc, ang::Angle)
     Arc(a.center, a.radius, a.start_angle, a.end_angle + ang)
+end
+
+function intersection(a::Arc, l::Line)
+    c = Circle(a.center, a.radius)
+    @show c
+    points = intersection(c, l)
+    angles = deg.(points .- a.center)
+    [p for (a, p) in zip(angles, points) if a.start_angle <= a <= a.end_angle]
 end

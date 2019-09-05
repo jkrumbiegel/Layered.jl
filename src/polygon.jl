@@ -1,6 +1,8 @@
 export Polygon, polygon, polygon!, ncross, grow, center
 export Polygons, polygons, polygons!
 
+Polygon(points::Vararg{T, N}) where {T <: Point, N} = Polygon([points...])
+
 
 polygon(args...) = Shape(Polygon, args...)
 function polygon!(layer::Layer, args...)
