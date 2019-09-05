@@ -456,3 +456,30 @@ function transformtest()
     write_to_png(c, "transformtest.png")
 
 end; transformtest()
+
+function transtest()
+
+    c, l1 = canvas(3, 3)
+
+    # l = rectlayer!(tl, c.rect, :h)
+
+    circle!(l1, P(0, 0), 0.01)
+
+    pinky = circle!(l1, P(50, 0), 10) + Fill("pink") + Stroke("transparent")
+
+    l2 = layer!(l1, Transform(rotation=deg(-45), translation=P(-10, 0)))
+
+    l3 = layer!(l2, Transform(scale=2))
+
+    pinkyclone = circle!(l3, pinky) do pin
+        pin
+    end + Fill("transparent") + Stroke("black")
+
+    #@show solve!(pinkyclone)
+
+    @show upward_transform(l3) * solve!(pinkyclone)
+    @show upward_transform(l1) * solve!(pinky)
+
+    write_to_png(c, "transtest.png")
+
+end; transtest()

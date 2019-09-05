@@ -103,12 +103,22 @@ function draw(canvas::Canvas; dpi=100)
     c
 end
 
-function draw!(cc::C.CairoContext, canvasmatrix, l::Layer)
-    C.save(cc)
-    t = gettransform!(l)
+function applytransform!(cc, t::Transform)
     C.scale(cc, t.scale, t.scale)
     C.rotate(cc, rad(t.rotation))
     C.translate(cc, t.translation...)
+end
+
+function draw!(cc::C.CairoContext, canvasmatrix, l::Layer)
+    C.save(cc)
+
+    t = upward_transform(l)
+
+    C.set_matrix(cc, canvasmatrix)
+    applytransform!(cc, t)
+
+    println("DRAWING")
+
     setclippath!(cc, l.clip)
     for content in l.content
         draw!(cc, canvasmatrix, content)
@@ -151,7 +161,7 @@ end
 function draw!(cc, canvasmatrix, p::Point, a::Attributes)
     C.move_to(cc, (p + 0.5 * a[Markersize].size * X(1)).xy...)
     C.arc(cc, p.x, p.y, 0.5 * a[Markersize].size, 0, 2pi)
-    fillstroke!(cc, a)
+    fillstroke!(cc, canvasmatrix, a)
 end
 
 function draw(ps::Points, a::Attributes)
@@ -174,9 +184,8 @@ end
 
 function draw!(cc, canvasmatrix, l::Line, a::Attributes)
     makepath!(cc, l)
-    C.set_source_rgba(cc, rgba(a[Stroke].color)...)
     lineattrs!(cc, a)
-    C.stroke_transformed(cc)
+    stroke!(cc, canvasmatrix, a)
 end
 
 # function draw(ls::LineSegments, a::Attributes)

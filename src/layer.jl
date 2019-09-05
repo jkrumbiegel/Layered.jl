@@ -1,4 +1,4 @@
-export layer, layer!, layerfirst!, rectlayer!
+export layer, layer!, layerfirst!, rectlayer!, upward_transform
 
 Base.Broadcast.broadcastable(l::Layer) = Ref(l)
 
@@ -83,11 +83,11 @@ function ancestorchain(l::LayerContent)
     chain = LayerContent[]
     current = l
     while true
-        if !isnothing(current.parent)
+        if isnothing(current.parent)
+            break
+        else
             pushfirst!(chain, current.parent)
             current = current.parent
-        else
-            break
         end
     end
     chain
@@ -105,35 +105,31 @@ function lowestcommonancestorchainfromto(s1::LayerContent, s2::LayerContent)
             if i == 1
                 error("No common ancestor")
             else
-                part1 = reverse(ancestors1[i-1:end])
-                part2 = ancestors2[i:end]
-                lca_index = Base.length(part1)
-                return lca_index, vcat(part1, part2)
+                return ancestors1[i:end], ancestors2[i:end]
             end
         end
     end
     # all ancestors so far were the same, so the last one (i) is the common one
-    part1 = reverse(ancestors1[n:end])
-    part2 = ancestors2[n+1:end]
-    lca_index = Base.length(part1)
-    return lca_index, vcat(part1, part2)
+    return ancestors1[n+1:end], ancestors2[n+1:end]
 end
 
 function gettransform! end
 
-function transform_from_to(s1::LayerContent, s2::LayerContent)
-    lca_index, chain = lowestcommonancestorchainfromto(s1, s2)
+function transform_from_to(from::LayerContent, to::LayerContent)
+    from_ancestors, to_ancestors = lowestcommonancestorchainfromto(from, to)
 
-    if Base.length(chain) == 1
-        return Transform()
-    else
-        t = Transform()
-        for i in 1:Base.length(chain)
-            trans = gettransform!(chain[i])
-            t = i <= lca_index ? trans * t : inverse(trans) * t
-        end
-        return t
+    #start with identity
+    t = Transform()
+
+    for a in reverse(from_ancestors)
+        t = gettransform!(a) * t
     end
+
+    for a in reverse(to_ancestors)
+        t = inverse(gettransform!(a)) * t
+    end
+
+    t
 end
 
 function gettransform!(l::Layer)
@@ -146,7 +142,8 @@ function gettransform!(l::Layer)
         for d in deps
             if typeof(d) <: Shape
                 solved = solve!(d)
-                transformed = transform_from_to(d, l) * solved
+                t = transform_from_to(d, l)
+                transformed = t * solved
                 push!(solved_deps, transformed)
             else
                 # for other arguments that are not shapes

@@ -57,6 +57,6 @@ function intersection(a::Arc, l::Line)
     c = Circle(a.center, a.radius)
     @show c
     points = intersection(c, l)
-    angles = deg.(points .- a.center)
-    [p for (a, p) in zip(angles, points) if a.start_angle <= a <= a.end_angle]
+    angles = angle.(points .- a.center)
+    [p for (an, p) in zip(angles, points) if a.start_angle <= an <= a.end_angle]
 end

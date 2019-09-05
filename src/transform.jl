@@ -1,4 +1,4 @@
-export scaleby
+export scaleby, inverse, from_to, gettransform!
 
 function Transform(;scale=1, rotation=rad(0), translation=(0, 0))
     Transform(scale, rotation, translation)
