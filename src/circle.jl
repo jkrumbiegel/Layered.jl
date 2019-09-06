@@ -134,3 +134,4 @@ area(c::Circle) = pi * (c.radius ^ 2)
 circumference(c::Circle) = 2pi * r
 scale(c::Circle, s::Real) = Circle(c.center, c.radius * s)
 scalearea(c::Circle, s::Real) = Circle(c.center, c.radius * sqrt(s))
+grow(c::Circle, radius::Real) = Circle(c.center, c.radius + radius)
