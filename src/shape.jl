@@ -1,13 +1,13 @@
 function Shape(g::GeometricObject)
-    Shape(g, nothing, nothing, Attributes(), Clip(nothing))
+    Shape(g, nothing, nothing, Attributes(), Clip(nothing), Opacity(1), Operator())
 end
 
 function Shape(::Type{T}, args...) where T <: GeometricObject
-    Shape(T(args...), nothing, nothing, Attributes(), Clip(nothing))
+    Shape(T(args...), nothing, nothing, Attributes(), Clip(nothing), Opacity(1), Operator())
 end
 
 function Shape(f::Function, ::Type{T}, deps...) where T
-    Shape{T}((f, [deps...]), nothing, nothing, Attributes(), Clip(nothing))
+    Shape{T}((f, [deps...]), nothing, nothing, Attributes(), Clip(nothing), Opacity(1), Operator())
 end
 
 Base.Broadcast.broadcastable(s::Shape) = Ref(s)
@@ -20,7 +20,7 @@ Base.Broadcast.broadcastable(s::Shape) = Ref(s)
 # end
 
 function Base.copy!(l::Layer, s::Shape{T}) where T
-    news = Shape{T}(s.content, nothing, nothing, Attributes(), s.clip)
+    news = Shape{T}(s.content, nothing, nothing, Attributes(), s.clip, s.opacity, s.operator)
     for (Ta, attr) in s.attrs.attrs
         news + attr
     end

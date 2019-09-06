@@ -6,6 +6,7 @@ using Match
 import Juno
 
 export Point, Transform, Layer, Shape, upward_transform, solve!, →, point, line, Angle, rad, deg, needed_attributes
+export Opacity, Operator
 
 include("alltypes.jl")
 include("angles.jl")

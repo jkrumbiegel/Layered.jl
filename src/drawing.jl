@@ -170,16 +170,38 @@ function applytransform!(cc, t::Transform)
     C.rotate(cc, rad(t.rotation))
 end
 
-function draw!(cc::C.CairoContext, canvasmatrix, l::Layer)
-    C.save(cc)
+function Base.convert(::Type{Int32}, op::Operator)
+    @match op.operator begin
+        :over => C.OPERATOR_OVER
+        :add => C.OPERATOR_ADD
+        :mult => C.OPERATOR_MULTIPLY
+        :screen => C.OPERATOR_SCREEN
+        :sat => C.OPERATOR_SATURATE
+        :darken => C.OPERATOR_DARKEN
+    end
+end
 
+function draw!(cc::C.CairoContext, canvasmatrix, l::Layer)
+
+    C.push_group(cc)
     applytransform!(cc, gettransform!(l))
 
-    setclippath!(cc, l.clip)
     for content in l.content
         draw!(cc, canvasmatrix, content)
     end
-    C.restore(cc)
+
+    gr = C.pop_group(cc)
+    C.set_source(cc, gr);
+
+    # I guess this should go here so it only takes effect on the layer after
+    # that is drawn, so there will be better fringes than if two antialiased clips
+    # are applied on perfectly overlapping objects
+    setclippath!(cc, l.clip)
+
+    C.set_operator(cc, Base.convert(Int32, l.operator))
+
+    C.paint_with_alpha(cc, l.opacity.opacity)
+
 end
 
 function getattributes(s::Shape{T}) where T
@@ -207,11 +229,18 @@ function draw!(cc, canvasmatrix, s::Shape)
     end
     # transformed_to_toplevel = upward_transform(s) * geom
 
-    C.save(cc)
-    setclippath!(cc, s.clip)
-    # draw!(cc, transformed_to_toplevel, attributes)
+    C.push_group(cc)
     draw!(cc, canvasmatrix, geom, attributes)
-    C.restore(cc)
+    gr = C.pop_group(cc)
+
+    C.set_source(cc, gr);
+    setclippath!(cc, s.clip)
+
+    C.set_operator(cc, Base.convert(Int32, s.operator))
+
+    C.paint_with_alpha(cc, s.opacity.opacity)
+
+    # C.restore(cc)
 end
 
 function draw!(cc, canvasmatrix, p::Point, a::Attributes)
@@ -335,6 +364,17 @@ end
 
 function draw!(cc, canvasmatrix, t::Txt, a::Attributes)
 
+    # if typeof(a[Fill]) <: Gradient
+    #     g = a[Fill]
+    #     pat = C.pattern_create_linear(g.from.xy..., g.to.xy...);
+    #     for (stop, col) in zip(g.stops, g.colors)
+    #         C.pattern_add_color_stop_rgba(pat, stop, rgba(col)...);
+    #     end
+    #     C.set_source(cc, pat);
+    #     C.fill_preserve(cc);
+    #     C.destroy(pat);
+    #     end
+    # end
     C.set_source_rgba(cc, rgba(a[Fill].content)...)
     C.select_font_face(cc, t.font, Cairo.FONT_SLANT_NORMAL, Cairo.FONT_WEIGHT_NORMAL)
     C.set_font_size(cc, t.size)

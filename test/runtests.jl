@@ -95,7 +95,6 @@ end
 using Pkg
 pkg"activate ."
 using Revise
-import PyPlot
 using Layered
 using Colors
 
@@ -108,7 +107,7 @@ function test2()
         avail_w = (r.width - 2margin) / n
         avail_h = (r.height - 2margin) / n
         Transform(translation = topleft(r) + P(margin + (i-0.5) * avail_w, margin + (i-0.5) * avail_h))
-    end, l, c.rect, 1:n)
+    end, l, c.rect, 1:n) .+ Opacity.(0.6:0.1:1)
 
     rs = rect!.((r, i) -> begin
         Rect(P(0, 0), 80, 50, deg(0))
@@ -270,3 +269,15 @@ function fontaliasing()
     C.finish(c)
 
 end; fontaliasing()
+
+
+function theresa()
+
+    c, l = canvas(3, 3, bgcolor=LCHuv(20, 30, 240))
+
+    text!(l, P(0, 0), "Morning", 40, :c, :c, deg(0), "Helvetica") +
+        Fill(LCHuv(18, 30, 240))
+
+    c
+
+end; theresa()

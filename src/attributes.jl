@@ -13,6 +13,8 @@ Strokes(s::String) = Strokes(parse(Colors.Colorant, s))
 
 Attributes() = Attributes(Dict{Type{<:Attribute}, Union{Function, Attribute}}())
 
+Operator() = Operator(:over)
+
 function Attributes(att::Attribute, varargs::Vararg{Attribute, N}) where N
     attributes = Attributes()
     for a in (att, varargs...)

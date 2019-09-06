@@ -63,12 +63,24 @@ struct Clip
     # shape::Union{Nothing, Shape, Tuple{Shape, Shape}}
 end
 
+struct Opacity
+    opacity::Float64
+end
+
+struct Operator
+    operator::Symbol
+end
+
+Base.Broadcast.broadcastable(o::Operator) = Ref(o)
+
 mutable struct Layer <: LayerContent
     transform::Union{Tuple{Function, Vector}, Transform}
     content::Vector{LayerContent}
     parent::Union{Layer, Nothing}
     attrs::Attributes
     clip::Clip
+    opacity::Opacity
+    operator::Operator
 end
 
 mutable struct Shape{T <: GeometricObject} <: LayerContent
@@ -78,6 +90,8 @@ mutable struct Shape{T <: GeometricObject} <: LayerContent
     solved::Union{T, Nothing}
     attrs::Attributes
     clip::Clip
+    opacity::Opacity
+    operator::Operator
 end
 
 struct Gradient
