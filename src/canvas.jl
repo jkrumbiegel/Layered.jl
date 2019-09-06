@@ -38,6 +38,11 @@ function canvas(
 end
 
 function write_to_png(c::Canvas, filename::String; dpi=200)
-    cc = draw(c; dpi=dpi)
+    cc = draw(c, :rgba; dpi=dpi)
     Cairo.write_to_png(cc, filename);
+end
+
+function Base.show(io::IO, ::MIME"image/svg+xml", c::Canvas)
+    csurf, svgbuffer = draw_svg(c)
+    print(io, String(take!(svgbuffer)))
 end

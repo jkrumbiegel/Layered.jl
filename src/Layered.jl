@@ -3,6 +3,7 @@ module Layered
 using StaticArrays
 import Colors
 using Match
+import Juno
 
 export Point, Transform, Layer, Shape, upward_transform, solve!, →, point, line, Angle, rad, deg, needed_attributes
 
