@@ -459,27 +459,106 @@ end; transformtest()
 
 function transtest()
 
+    Juno.clearconsole()
+
     c, l1 = canvas(3, 3)
 
     # l = rectlayer!(tl, c.rect, :h)
 
-    circle!(l1, P(0, 0), 0.01)
+    circle!(l1, P(0, 0), 1)
 
-    pinky = circle!(l1, P(50, 0), 10) + Fill("pink") + Stroke("transparent")
+    pinky = line!(l1, P(-40, 0), P(-50, 0)) + Stroke("red") + Linewidth(0.5)
 
-    l2 = layer!(l1, Transform(rotation=deg(-45), translation=P(-10, 0)))
+    l2 = layer!(l1, Transform(rotation=deg(-45), translation=X(100)))
 
-    l3 = layer!(l2, Transform(scale=2))
+    l3 = layer!(l2, Transform(scale=2, translation=Y(-50)))
 
-    pinkyclone = circle!(l3, pinky) do pin
-        pin
-    end + Fill("transparent") + Stroke("black")
+    # pinkyclone = circle!(l3, pinky) do pin
+    #     pin
+    # end + Fill("transparent") + Stroke("black")
+
+    line!(l3, 0) do _
+        # inverse(upward_transform(l3)) * solve!(pinky)
+        # @show transform_from_to(l3, l2)
+        # @show inverse(gettransform!(l3))
+        # transform_from_to(l2, l3) * solve!(pinky)
+        @show t = inverse(gettransform!(l3)) * inverse(gettransform!(l2))
+        t * solve!(pinky)
+    end + Stroke("black") + Linestyle(:dotted)
+
+    line!(l3, pinky) do pinky
+        @show pinky
+        pinky
+    end + Stroke("black")
 
     #@show solve!(pinkyclone)
 
-    @show upward_transform(l3) * solve!(pinkyclone)
+    # @show upward_transform(l3) * solve!(pinkyclone)
     @show upward_transform(l1) * solve!(pinky)
 
     write_to_png(c, "transtest.png")
 
 end; transtest()
+
+
+using Pkg
+pkg"activate ."
+using Revise
+using Layered
+import Cairo
+const C = Cairo
+
+function Transform(cm::Cairo.CairoMatrix)
+    trans = P(cm.x0, cm.y0)
+    x = P(cm.xx, cm.yx)
+    y = P(cm.xy, cm.yy)
+    rot = signed_angle_to(X(1), x)
+    scale = magnitude(x)
+    Transform(scale, rot, trans)
+end
+
+function transinvestigation()
+
+    c = C.CairoARGBSurface(100, 100);
+    cc = C.CairoContext(c);
+
+    l1 = layer(Transform())
+    l2 = layer!(l1, Transform(scale=2, rotation=deg(90), translation=P(1, 1)))
+    l3 = layer!(l2, Transform(scale=0.5, rotation=deg(-50), translation=P(-0.5, 0.5)))
+    l4 = layer!(l3, Transform(scale=3, rotation=deg(40), translation=P(3, 0)))
+
+    # p = point!()
+
+    applytransform!(cc, l1.transform)
+    applytransform!(cc, l2.transform)
+    applytransform!(cc, l3.transform)
+    applytransform!(cc, l4.transform)
+
+    Juno.clearconsole()
+
+    m = C.get_matrix(cc)
+    @show Transform(m)
+    @show upward_transform(l4)
+
+    C.finish(c)
+
+end; transinvestigation()
+
+
+function fontaliasing()
+
+    c = C.CairoARGBSurface(100, 100);
+    cc = C.CairoContext(c);
+
+    font_options_ptr = ccall((:cairo_font_options_create, C.libcairo), Ptr{Nothing}, ())
+
+    CAIRO_HINT_STYLE_NONE = 1
+    ccall((:cairo_font_options_set_hint_style, C.libcairo), Nothing, (Ptr{Nothing}, Int32), font_options_ptr, CAIRO_HINT_STYLE_NONE)
+
+    ccall((:cairo_set_font_options, C.libcairo), Nothing, (Ptr{Nothing}, Ptr{Nothing}), cc.ptr, font_options_ptr)
+
+    ccall((:cairo_font_options_destroy, C.libcairo), Nothing, (Ptr{Nothing},), font_options_ptr)
+
+    C.finish(c)
+
+end; fontaliasing()

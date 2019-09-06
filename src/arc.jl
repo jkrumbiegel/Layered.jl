@@ -53,10 +53,19 @@ function lengthen(a::Arc, ang::Angle)
     Arc(a.center, a.radius, a.start_angle, a.end_angle + ang)
 end
 
+function between(v, a, b)
+    if b > a
+        a <= v <= b
+    else
+        b <= v <= a
+    end
+end
+
 function intersection(a::Arc, l::Line)
     c = Circle(a.center, a.radius)
-    @show c
+
     points = intersection(c, l)
     angles = angle.(points .- a.center)
-    [p for (an, p) in zip(angles, points) if a.start_angle <= an <= a.end_angle]
+
+    [p for (an, p) in zip(angles, points) if between(an, a.start_angle, a.end_angle)]
 end

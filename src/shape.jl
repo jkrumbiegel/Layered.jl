@@ -50,7 +50,7 @@ function solve!(s::Shape{T}) where T
             if typeof(d) <: Shape
                 solved = solve!(d)
 
-                @show t = transform_from_to(d, s)
+                t = transform_from_to(d, s)
                 transformed = t * solved
                 push!(solved_deps, transformed)
             else

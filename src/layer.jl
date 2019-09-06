@@ -1,4 +1,4 @@
-export layer, layer!, layerfirst!, rectlayer!, upward_transform
+export layer, layer!, layerfirst!, rectlayer!, upward_transform, transform_from_to
 
 Base.Broadcast.broadcastable(l::Layer) = Ref(l)
 
@@ -125,7 +125,7 @@ function transform_from_to(from::LayerContent, to::LayerContent)
         t = gettransform!(a) * t
     end
 
-    for a in reverse(to_ancestors)
+    for a in to_ancestors
         t = inverse(gettransform!(a)) * t
     end
 

@@ -1,7 +1,7 @@
 import Cairo
 const C = Cairo
 
-export draw
+export draw, applytransform!
 
 CLOSEPOLY = 79
 CURVE3 = 3
@@ -90,6 +90,35 @@ function draw(canvas::Canvas; dpi=100)
     c = C.CairoARGBSurface(size_pixel...);
     cc = C.CairoContext(c);
 
+    begin
+        font_options_ptr = ccall((:cairo_font_options_create, C.libcairo), Ptr{Nothing}, ())
+
+        CAIRO_HINT_STYLE_NONE = 1
+        CAIRO_HINT_STYLE_FULL = 4
+        ccall(
+            (:cairo_font_options_set_hint_style, C.libcairo), Nothing,
+            (Ptr{Nothing}, Int32),
+            font_options_ptr, CAIRO_HINT_STYLE_NONE)
+
+        CAIRO_HINT_METRICS_DEFAULT = 0
+        CAIRO_HINT_METRICS_OFF = 1
+        CAIRO_HINT_METRICS_ON = 2
+        ccall(
+            (:cairo_font_options_set_hint_metrics, C.libcairo), Nothing,
+            (Ptr{Nothing}, Int32),
+            font_options_ptr, CAIRO_HINT_METRICS_OFF)
+
+        ccall(
+            (:cairo_set_font_options, C.libcairo), Nothing,
+            (Ptr{Nothing}, Ptr{Nothing}),
+            cc.ptr, font_options_ptr)
+
+        ccall(
+            (:cairo_font_options_destroy, C.libcairo), Nothing,
+            (Ptr{Nothing},),
+            font_options_ptr)
+    end
+
     C.rectangle(cc, 0, 0, size_pixel...)
     C.set_source_rgba(cc, rgba(canvas.bgcolor)...)
     C.fill(cc)
@@ -104,20 +133,15 @@ function draw(canvas::Canvas; dpi=100)
 end
 
 function applytransform!(cc, t::Transform)
+    C.translate(cc, t.translation...)
     C.scale(cc, t.scale, t.scale)
     C.rotate(cc, rad(t.rotation))
-    C.translate(cc, t.translation...)
 end
 
 function draw!(cc::C.CairoContext, canvasmatrix, l::Layer)
     C.save(cc)
 
-    t = upward_transform(l)
-
-    C.set_matrix(cc, canvasmatrix)
-    applytransform!(cc, t)
-
-    println("DRAWING")
+    applytransform!(cc, gettransform!(l))
 
     setclippath!(cc, l.clip)
     for content in l.content

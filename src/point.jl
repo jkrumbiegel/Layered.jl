@@ -1,4 +1,4 @@
-export between, P, X, Y, xs, ys, magnitude, normalize, point, point!
+export between, P, X, Y, xs, ys, magnitude, normalize, point, point!, signed_angle_to
 export Points, points, points!
 
 X(x::Real) = P(x, 0)

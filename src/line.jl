@@ -1,4 +1,4 @@
-export Line, line, line!, move, perpendicular
+export Line, line, line!, move, perpendicular, normfraction
 export LineSegments, linesegments, linesegments!
 
 struct Line <: GeometricObject
@@ -42,6 +42,8 @@ fraction(l::Line, frac::Real) = between(l.from, l.to, frac)
 reversed(l::Line) = Line(l.to, l.from)
 direction(l::Line) = normalize(vector(l))
 perpendicular(l::Line, reverse=false) = rotate(direction(l), reverse ? deg(-90) : deg(90))
+perpendicular(l::Line, length::Real, reverse=false) = rotate(direction(l), reverse ? deg(-90) : deg(90)) * length
+normfraction(l::Line, frac::Real, length::Real, reverse=false) = fraction(l, frac) + perpendicular(l, length, reverse)
 move(l::Line, p::Point) = Line(l.from + p, l.to + p)
 Base.:+(l::Line, p::Point) = move(l, p)
 Base.:+(p::Point, l::Line) = move(l, p)
