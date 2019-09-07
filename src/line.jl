@@ -60,7 +60,7 @@ function scaleto(l::Line, len::Real)
     scale(l, scalar)
 end
 
-function addlength(l::Line, len::Real)
+function extend(l::Line, len::Real)
     dir = direction(l)
     movement = len / 2 * dir
     Line(l.from - movement, l.to + movement)
