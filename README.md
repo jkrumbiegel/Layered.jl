@@ -38,3 +38,5 @@ it's supposed to be below everything. So you can just add it to the lowest layer
 You can also add a shape as a clipping mask on any layer, or any shape living in a different layer, it doesn't matter.
 
 This library is very much a work in progress, so if you find it's lacking some vital functionality, I'm open to suggestions.
+
+![Example](https://raw.githubusercontent.com/jkrumbiegel/Layered.jl/master/examples/example.svg?sanitize=true)
