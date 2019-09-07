@@ -387,7 +387,7 @@ function draw!(cc, canvasmatrix, t::Txt, a::Attributes)
     #     C.destroy(pat);
     #     end
     # end
-    C.set_source_rgba(cc, rgba(a[Fill].content)...)
+    C.set_source_rgba(cc, rgba(a[Textfill].content)...)
     C.select_font_face(cc, t.font, Cairo.FONT_SLANT_NORMAL, Cairo.FONT_WEIGHT_NORMAL)
     C.set_font_size(cc, t.size)
 
