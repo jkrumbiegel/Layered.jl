@@ -1,5 +1,4 @@
-export between, P, O, X, Y, xs, ys, magnitude, normalize, point, point!, signed_angle_to
-export Points, points, points!
+export between, P, O, X, Y, xs, ys, magnitude, normalize, signed_angle_to
 
 X(x::Real) = P(x, 0)
 Y(y::Real) = P(0, y)
@@ -11,19 +10,6 @@ ys(ps::Array{Point}) = [p.y for p in ps]
 Point(ang::Angle) = Point(cos(ang.rad), sin(ang.rad))
 
 Base.convert(::Type{Point}, t::Tuple{S, T}) where {S<:Real,T<:Real} = Point(t[1], t[2])
-
-point(args...) = Shape(Point, args...)
-function point!(layer::Layer, args...)
-    r = point(args...)
-    push!(layer, r)
-    r
-end
-point(f::Function, args...) = Shape(f, Point, args...)
-function point!(f::Function, layer::Layer, args...)
-    r = point(f, args...)
-    push!(layer, r)
-    r
-end
 
 Base.show(io::IO, p::Point) = print(io, "Point($(p.xy[1]), $(p.xy[2]))")
 
@@ -82,19 +68,6 @@ function rotate(p::Point, angle::Angle; around::Point=Point(0, 0))
     rotated_vector + around
 end
 
-
-points(args...) = Shape(Points(args[1:fieldcount(Points)]...), args[fieldcount(Points)+1:end]...)
-function points!(layer::Layer, args...)
-    r = points(args...)
-    push!(layer, r)
-    r
-end
-points(f::Function, args...) = Shape(f, Points, args...)
-function points!(f::Function, layer::Layer, args...)
-    r = points(f, args...)
-    push!(layer, r)
-    r
-end
 
 needed_attributes(::Type{Points}) = (Visible, Fills, Strokes, Markersizes, Marker)
 

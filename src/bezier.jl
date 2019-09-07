@@ -1,24 +1,9 @@
-export Bezier, bezier, bezier!, horizontalbezier, perpendicularbezier
-export Path, path, path!
-export Paths, paths, paths!
+export horizontalbezier, perpendicularbezier
 export bracket, arrow, arcarrow
 export reversed, concat
 export scaleby
 export rotate
 
-
-bezier(args...) = Shape(Bezier, args...)
-function bezier!(layer::Layer, args...)
-    r = bezier(args...)
-    push!(layer, r)
-    r
-end
-bezier(f::Function, args...) = Shape(f, Bezier, args...)
-function bezier!(f::Function, layer::Layer, args...)
-    r = bezier(f, args...)
-    push!(layer, r)
-    r
-end
 
 move(b::Bezier, p::Point) = Bezier(b.from + p, b.c1 + p, b.c2 + p, b.to + p)
 scaleby(b::Bezier, by::Real) = Bezier(by * b.from, by * b.c1, by * b.c2, by * b.to)
@@ -54,19 +39,6 @@ function Path(closed::Bool, segments::Vararg{<: BezierSegment, N}) where N
     Path([segments...], closed)
 end
 
-path(args...) = Shape(Path, args...)
-function path!(layer::Layer, args...)
-    r = path(args...)
-    push!(layer, r)
-    r
-end
-path(f::Function, args...) = Shape(f, Path, args...)
-function path!(f::Function, layer::Layer, args...)
-    r = path(f, args...)
-    push!(layer, r)
-    r
-end
-
 move(b::Path, p::Point) = Path(move.(b.segments, p), b.closed)
 Base.:+(b::Path, p::Point) = move(b, p)
 Base.:+(p::Point, b::Path) = move(b, p)
@@ -83,19 +55,6 @@ function bracket(p1::Point, p2::Point, widthscale::Real = 0.1, innerstrength=1, 
 end
 
 needed_attributes(::Type{Path}) = (Visible, Linewidth, Stroke, Linestyle, Fill)
-
-paths(args...) = Shape(Paths, args...)
-function paths!(layer::Layer, args...)
-    r = paths(args...)
-    push!(layer, r)
-    r
-end
-paths(f::Function, args...) = Shape(f, Paths, args...)
-function paths!(f::Function, layer::Layer, args...)
-    r = paths(f, args...)
-    push!(layer, r)
-    r
-end
 
 needed_attributes(::Type{Paths}) = (Visible, Linewidths, Strokes, Linestyle, Fills)
 

@@ -1,4 +1,4 @@
-export Arc, arc, arc!, fraction, arclength, intersection
+export fraction, arclength, intersection
 
 function Arc(from::Point, through::Point, to::Point)
     circle = Circle(from, through, to)
@@ -19,19 +19,6 @@ end
 function Arc(from::Point, to::Point, radiusfraction::Real)
     heightpoint = between(from, to, 0.5) + rotate(from → to, deg(90)) * radiusfraction / 2
     arc = Arc(from, heightpoint, to)
-end
-
-arc(args...) = Shape(Arc(args[1:fieldcount(Arc)]...), args[fieldcount(Arc)+1:end]...)
-function arc!(layer::Layer, args...)
-    r = arc(args...)
-    push!(layer, r)
-    r
-end
-arc(f::Function, args...) = Shape(f, Arc, args...)
-function arc!(f::Function, layer::Layer, args...)
-    r = arc(f, args...)
-    push!(layer, r)
-    r
 end
 
 function fraction(a::Arc, f::Real)

@@ -7,7 +7,6 @@ import Juno
 import Cairo
 
 export Point, Transform, Layer, Shape, upward_transform, solve!, →, point, line, Angle, rad, deg, needed_attributes
-export Opacity, Operator
 
 include("alltypes.jl")
 include("angles.jl")
@@ -22,5 +21,47 @@ include("drawing.jl")
 include("video.jl")
 
 Base.Broadcast.broadcastable(g::GeometricObject) = Ref(g)
+
+
+for geom in (:Circle, :Rect, :Point, :Points, :Arc, :Bezier, :Path, :Paths, :Line, :Polygon, :Polygons, :Txt, :LineSegments)
+
+    lowerc = Symbol(lowercase(String(geom)))
+    lowerc_exc = Symbol(lowercase(String(geom)) * "!")
+    lowerc_first_exc = Symbol(lowercase(String(geom)) * "_first!")
+
+
+    @eval begin
+        $lowerc(args...) = Shape($geom, args...)
+
+        function $lowerc_exc(layer::Layer, args...)
+            x = $lowerc(args...)
+            push!(layer, x)
+            x
+        end
+
+        function $lowerc_first_exc(layer::Layer, args...)
+            x = $lowerc(args...)
+            pushfirst!(layer, x)
+            x
+        end
+
+        $lowerc(f::Function, args...) = Shape(f, $geom, args...)
+
+        function $lowerc_exc(f::Function, layer::Layer, args...)
+            x = $lowerc(f, args...)
+            push!(layer, x)
+            x
+        end
+
+        function $lowerc_first_exc(f::Function, layer::Layer, args...)
+            x = $lowerc(f, args...)
+            pushfirst!(layer, x)
+            x
+        end
+
+        export $geom, $lowerc, $lowerc_exc, $lowerc_first_exc
+
+    end
+end
 
 end # module

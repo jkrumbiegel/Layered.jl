@@ -1,37 +1,9 @@
-export Polygon, polygon, polygon!, ncross, grow, center
-export Polygons, polygons, polygons!
+export ncross, grow, center
 
 Polygon(points::Vararg{T, N}) where {T <: Point, N} = Polygon([points...])
 
 
-polygon(args...) = Shape(Polygon, args...)
-function polygon!(layer::Layer, args...)
-    r = polygon(args...)
-    push!(layer, r)
-    r
-end
-polygon(f::Function, args...) = Shape(f, Polygon, args...)
-function polygon!(f::Function, layer::Layer, args...)
-    r = polygon(f, args...)
-    push!(layer, r)
-    r
-end
-
 needed_attributes(::Type{Polygon}) = (Visible, Linewidth, Stroke, Linestyle, Fill)
-
-
-polygons(args...) = Shape(Polygons, args...)
-function polygons!(layer::Layer, args...)
-    r = polygons(args...)
-    push!(layer, r)
-    r
-end
-polygons(f::Function, args...) = Shape(f, Polygons, args...)
-function polygons!(f::Function, layer::Layer, args...)
-    r = polygons(f, args...)
-    push!(layer, r)
-    r
-end
 
 needed_attributes(::Type{Polygons}) = (Visible, Linewidth, Stroke, Linestyle, Fill)
 

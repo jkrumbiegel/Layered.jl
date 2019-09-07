@@ -42,9 +42,9 @@ function example()
 
     textl = layer!(l, Transform())
 
-    phases = text!.((r, phase) -> begin
-        Txt(bottomleft(r) + Y(0), "phase $phase", 10, :l, :t, deg(0), "Helvetica")
-    end, textl, rs, 1:5) .+ Fill("black")
+    phases = txt!.((r, phase) -> begin
+        Txt(bottomleft(r) + Y(0), "phase $phase", 10, :l, :t)
+    end, textl, rs, 1:5)
 
     path!((c1, c2) -> begin
         Path(false, outertangents(c1, c2)...)
@@ -55,26 +55,25 @@ function example()
         a + normal(a.segments[1], -5)
     end + Fill("tomato") + Stroke("transparent")
 
-    te = text!(textl, arr) do arr
+    te = txt!(textl, arr) do arr
         pos = normfrom(arr.segments[1], 0.5, -4)
-        Txt(pos, "time", 10, :c, :b, angle(arr.segments[1]), "Helvetica")
-    end + Fill("black")
+        Txt(pos, "time", 10, :c, :b, angle(arr.segments[1]))
+    end
 
-    r = rect(te) do t
+    r = rect_first!(textl, te) do t
         Rect(t, 4)
     end + Fill("tomato") + Stroke("transparent")
-    pushfirst!(textl, r)
 
-    text!(textl, focuscircle) do fc
-        Txt(fc.center, "focus circle", 10, :c, :c, deg(0), "Helvetica")
-    end + Fill("black")
+    txt!(textl, focuscircle) do fc
+        Txt(fc.center, "focus circle", 10, :c, :c)
+    end
 
-    text!(textl, c.rect) do r
-        Txt(bottomleft(r) + P(5, -5), "experimental paradigm", 12, :l, :b, deg(0), "Helvetica")
-    end + Fill("black")
+    txt!(textl, c.rect) do r
+        Txt(bottomleft(r) + P(5, -5), "experimental paradigm", 12, :l, :b)
+    end
 
-    # c
+    c
 
-    draw_svg(c, "example.svg")
+    # draw_svg(c, "example.svg")
 
 end; example()

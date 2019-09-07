@@ -1,18 +1,5 @@
-export Line, line, line!, move, normal, normfrom, direction
-export LineSegments, linesegments, linesegments!
+export move, normal, normfrom, direction
 
-line(args...) = Shape(Line, args...)
-function line!(layer::Layer, args...)
-    r = line(args...)
-    push!(layer, r)
-    r
-end
-line(f::Function, args...) = Shape(f, Line, args...)
-function line!(f::Function, layer::Layer, args...)
-    r = line(f, args...)
-    push!(layer, r)
-    r
-end
 
 xs(l::Line) = SVector(l.from.x, l.to.x)
 ys(l::Line) = SVector(l.from.y, l.to.y)
@@ -70,20 +57,6 @@ function rotate(l::Line, angle::Angle; around::Point=Point(0, 0))
 end
 
 needed_attributes(::Type{Line}) = (Visible, Linewidth, Stroke, Linestyle)
-
-
-linesegments(args...) = Shape(LineSegments, args...)
-function linesegments!(layer::Layer, args...)
-    r = linesegments(args...)
-    push!(layer, r)
-    r
-end
-linesegments(f::Function, args...) = Shape(f, LineSegments, args...)
-function linesegments!(f::Function, layer::Layer, args...)
-    r = linesegments(f, args...)
-    push!(layer, r)
-    r
-end
 
 needed_attributes(::Type{LineSegments}) = (Visible, Linewidth, Stroke, Linestyle)
 

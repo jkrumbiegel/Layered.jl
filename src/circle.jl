@@ -1,4 +1,4 @@
-export Circle, circle, circle!, outertangents, scale, scalearea
+export outertangents, scale, scalearea
 
 function Circle(p1::Point, p2::Point, p3::Point)
     circlethrough(p1, p2, p3)
@@ -23,20 +23,6 @@ end
 function Circle(center::Point, p1::Point)
     radius = from_to(center, p1) |> magnitude
     Circle(center, radius)
-end
-
-
-circle(args...) = Shape(Circle, args...)
-function circle!(layer::Layer, args...)
-    r = circle(args...)
-    push!(layer, r)
-    r
-end
-circle(f::Function, args...) = Shape(f, Circle, args...)
-function circle!(f::Function, layer::Layer, args...)
-    r = circle(f, args...)
-    push!(layer, r)
-    r
 end
 
 needed_attributes(::Type{Circle}) = (Visible, Fill, Stroke, Linewidth, Linestyle)

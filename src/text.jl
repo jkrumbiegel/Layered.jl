@@ -1,5 +1,3 @@
-export Txt, text, text!
-
 export defaultfont
 
 Txt(pos::Point,
@@ -12,17 +10,6 @@ Txt(pos::Point,
 
 Txt(t::Txt, extent::TextExtent) = Txt(t.pos, t.text, t.size, t.halign, t.valign, t.angle, t.font, extent)
 
-text(args...) = Shape(Txt, args...)
-function text!(layer::Layer, args...)
-    r = text(args...)
-    push!(layer, r)
-    r
-end
-text(f::Function, args...) = Shape(f, Txt, args...)
-function text!(f::Function, layer::Layer, args...)
-    r = text(f, args...)
-    push!(layer, r)
-    r
 function Txt(pos::Point, text::String, size::Real; ha=:c, va=:c, angle=deg(0), font=default_font())
     Txt(pos, text, size, ha, va, angle, font)
 end

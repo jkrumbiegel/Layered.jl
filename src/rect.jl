@@ -1,17 +1,4 @@
-export Rect, rect, rect!, topright, topleft, bottomright, bottomleft, topline, rightline, bottomline, leftline
-
-rect(args...) = Shape(Rect, args...)
-function rect!(layer::Layer, args...)
-    r = rect(args...)
-    push!(layer, r)
-    r
-end
-rect(f::Function, args...) = Shape(f, Rect, args...)
-function rect!(f::Function, layer::Layer, args...)
-    r = rect(f, args...)
-    push!(layer, r)
-    r
-end
+export topright, topleft, bottomright, bottomleft, topline, rightline, bottomline, leftline
 
 needed_attributes(::Type{Rect}) = needed_attributes(Circle)
 
