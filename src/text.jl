@@ -1,15 +1,5 @@
 export Txt, text, text!
 
-struct Txt{T <: Union{Nothing, TextExtent}} <: GeometricObject
-    pos::Point
-    text::String
-    size::Float64
-    halign::Symbol
-    valign::Symbol
-    angle::Angle
-    font::String
-    extent::T
-end
 export defaultfont
 
 Txt(pos::Point,

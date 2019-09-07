@@ -82,9 +82,6 @@ function rotate(p::Point, angle::Angle; around::Point=Point(0, 0))
     rotated_vector + around
 end
 
-struct Points <: GeometricObject
-    points::Vector{Point}
-end
 
 points(args...) = Shape(Points(args[1:fieldcount(Points)]...), args[fieldcount(Points)+1:end]...)
 function points!(layer::Layer, args...)

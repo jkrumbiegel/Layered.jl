@@ -6,12 +6,6 @@ export reversed, concat
 export scaleby
 export rotate
 
-struct Bezier <: GeometricObject
-    from::Point
-    c1::Point
-    c2::Point
-    to::Point
-end
 
 bezier(args...) = Shape(Bezier, args...)
 function bezier!(layer::Layer, args...)
@@ -56,13 +50,6 @@ end
 
 needed_attributes(::Type{Bezier}) = (Linewidth, Stroke, Linestyle, Fill, Visible)
 
-const BezierSegment = Union{Bezier, Line, Arc}
-
-struct Path <: GeometricObject
-    segments::Vector{<:BezierSegment}
-    closed::Bool
-end
-
 function Path(closed::Bool, segments::Vararg{<: BezierSegment, N}) where N
     Path([segments...], closed)
 end
@@ -96,10 +83,6 @@ function bracket(p1::Point, p2::Point, widthscale::Real = 0.1, innerstrength=1, 
 end
 
 needed_attributes(::Type{Path}) = (Visible, Linewidth, Stroke, Linestyle, Fill)
-
-struct Paths <: GeometricObject
-    paths::Vector{Path}
-end
 
 paths(args...) = Shape(Paths, args...)
 function paths!(layer::Layer, args...)

@@ -1,11 +1,6 @@
 export Line, line, line!, move, normal, normfrom, direction
 export LineSegments, linesegments, linesegments!
 
-struct Line <: GeometricObject
-    from::Point
-    to::Point
-end
-
 line(args...) = Shape(Line, args...)
 function line!(layer::Layer, args...)
     r = line(args...)
@@ -76,10 +71,6 @@ end
 
 needed_attributes(::Type{Line}) = (Visible, Linewidth, Stroke, Linestyle)
 
-
-struct LineSegments <: GeometricObject
-    segments::Vector{Line}
-end
 
 linesegments(args...) = Shape(LineSegments, args...)
 function linesegments!(layer::Layer, args...)

@@ -25,11 +25,31 @@ end
 
 const P = Point
 
+struct Points <: GeometricObject
+    points::Vector{Point}
+end
+
+struct Line <: GeometricObject
+    from::Point
+    to::Point
+end
+
+struct LineSegments <: GeometricObject
+    segments::Vector{Line}
+end
+
 struct Arc <: GeometricObject
     center::Point
     radius::Float64
     start_angle::Angle
     end_angle::Angle
+end
+
+struct Bezier <: GeometricObject
+    from::Point
+    c1::Point
+    c2::Point
+    to::Point
 end
 
 struct Rect <: GeometricObject
@@ -59,6 +79,28 @@ struct TextExtent
     height::Float64
     xadvance::Float64
     yadvance::Float64
+end
+
+struct Txt{T <: Union{Nothing, TextExtent}} <: GeometricObject
+    pos::Point
+    text::String
+    size::Float64
+    halign::Symbol
+    valign::Symbol
+    angle::Angle
+    font::String
+    extent::T
+end
+
+const BezierSegment = Union{Bezier, Line, Arc}
+
+struct Path <: GeometricObject
+    segments::Vector{<:BezierSegment}
+    closed::Bool
+end
+
+struct Paths <: GeometricObject
+    paths::Vector{Path}
 end
 
 abstract type Attribute end
