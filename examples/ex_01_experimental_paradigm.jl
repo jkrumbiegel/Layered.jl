@@ -60,7 +60,7 @@ function example()
         Txt(pos, "time", 10, :c, :b, angle(arr.segments[1]))
     end
 
-    r = rect_first!(textl, te) do t
+    r = rect_pre!(textl, te, te) do t
         Rect(t, 4)
     end + Fill("tomato") + Stroke("transparent")
 

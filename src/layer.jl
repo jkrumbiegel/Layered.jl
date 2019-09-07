@@ -81,6 +81,11 @@ function Base.pushfirst!(l::Layer, lc::LayerContent)
     lc.parent = l
 end
 
+function Base.insert!(l::Layer, index::Integer, lc::LayerContent)
+    insert!(l.content, index, lc)
+    lc.parent = l
+end
+
 function upward_transform(l::Layer, cc::Cairo.CairoContext)
     if isnothing(l.parent)
         return gettransform!(l, cc)

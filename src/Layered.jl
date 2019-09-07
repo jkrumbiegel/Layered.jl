@@ -28,38 +28,157 @@ for geom in (:Circle, :Rect, :Point, :Points, :Arc, :Bezier, :Path, :Paths, :Lin
     lowerc = Symbol(lowercase(String(geom)))
     lowerc_exc = Symbol(lowercase(String(geom)) * "!")
     lowerc_first_exc = Symbol(lowercase(String(geom)) * "_first!")
+    lowerc_pre_exc = Symbol(lowercase(String(geom)) * "_pre!")
+    lowerc_post_exc = Symbol(lowercase(String(geom)) * "_post!")
 
 
     @eval begin
+        """
+        $($lowerc)(args...)
+
+        Creates a shape containing a `GeometricObject` of type `$($geom)`,
+        passing any trailing arguments to the constructor `$($geom)()`."""
         $lowerc(args...) = Shape($geom, args...)
 
+        """
+        $($lowerc_exc)(layer::Layer, args...)
+
+        Creates a shape containing a `GeometricObject` of type `$($geom)`,
+        passing any trailing arguments to the constructor `$($geom)()`. Then
+        appends the created shape to the given `Layer` `layer`."""
         function $lowerc_exc(layer::Layer, args...)
             x = $lowerc(args...)
             push!(layer, x)
             x
         end
 
+        """
+        $($lowerc_first_exc)(layer::Layer, args...)
+
+        Creates a shape containing a `GeometricObject` of type `$($geom)`,
+        passing any trailing arguments to the constructor `$($geom)()`. Then
+        prepends the created shape to the given `Layer` `layer`."""
         function $lowerc_first_exc(layer::Layer, args...)
             x = $lowerc(args...)
             pushfirst!(layer, x)
             x
         end
 
+        """
+        $($lowerc_pre_exc)(layer::Layer, pre::LayerContent, args...)
+
+        Creates a shape containing a `GeometricObject` of type `$($geom)`,
+        passing any trailing arguments to the constructor `$($geom)()`. Then
+        inserts the created shape into the given `Layer` `layer` before the given
+        LayerContent object."""
+        function $lowerc_pre_exc(layer::Layer, pre::LayerContent, args...)
+            x = $lowerc(args...)
+            for (i, c) in enumerate(layer.content)
+                if c === pre
+                    insert!(layer, i, x)
+                    return x
+                end
+            end
+            error("Could not find given shape in layer.")
+        end
+
+        """
+        $($lowerc_pre_exc)(layer::Layer, post::LayerContent, args...)
+
+        Creates a shape containing a `GeometricObject` of type `$($geom)`,
+        passing any trailing arguments to the constructor `$($geom)()`. Then
+        inserts the created shape into the given `Layer` `layer` after the given
+        LayerContent object."""
+        function $lowerc_post_exc(layer::Layer, post::LayerContent, args...)
+            x = $lowerc(args...)
+            for (i, c) in enumerate(layer.content)
+                if c === post
+                    insert!(layer, i+1, x)
+                    return x
+                end
+            end
+            error("Could not find given shape in layer.")
+        end
+
+        """
+        $($lowerc)(f::Function, args...)
+
+        Creates a shape containing a `GeometricObject` of type `$($geom)`,
+        storing any trailing arguments as dependencies, later to be passed as arguments
+        to the given `Function` `f` that should return a `GeometricObject` of type `$($geom)`
+        and will be evaluated when `solve!` is called on the shape during
+        the drawing process."""
         $lowerc(f::Function, args...) = Shape(f, $geom, args...)
 
+        """
+        $($lowerc_exc)(f::Function, layer::Layer, args...)
+
+        Creates a shape containing a `GeometricObject` of type `$($geom)`,
+        storing any trailing arguments as dependencies, later to be passed as arguments
+        to the given `Function` `f` that should return a `GeometricObject` of type `$($geom)`
+        and will be evaluated when `solve!` is called on the shape during
+        the drawing process. This function then appends the created shape to the given `Layer` `layer`."""
         function $lowerc_exc(f::Function, layer::Layer, args...)
             x = $lowerc(f, args...)
             push!(layer, x)
             x
         end
 
+        """
+        $($lowerc_first_exc)(f::Function, layer::Layer, args...)
+
+        Creates a shape containing a `GeometricObject` of type `$($geom)`,
+        storing any trailing arguments as dependencies, later to be passed as arguments
+        to the given `Function` `f` that should return a `GeometricObject` of type `$($geom)`
+        and will be evaluated when `solve!` is called on the shape during
+        the drawing process. This function then prepends the created shape to the given `Layer` `layer`."""
         function $lowerc_first_exc(f::Function, layer::Layer, args...)
             x = $lowerc(f, args...)
             pushfirst!(layer, x)
             x
         end
 
-        export $geom, $lowerc, $lowerc_exc, $lowerc_first_exc
+        """
+        $($lowerc_pre_exc)(f::Function, layer::Layer,  pre::LayerContent, args...)
+
+        Creates a shape containing a `GeometricObject` of type `$($geom)`,
+        storing any trailing arguments as dependencies, later to be passed as arguments
+        to the given `Function` `f` that should return a `GeometricObject` of type `$($geom)`
+        and will be evaluated when `solve!` is called on the shape during
+        the drawing process. This function then inserts the created shape into the given `Layer` `layer` before the given
+        LayerContent object."""
+        function $lowerc_pre_exc(f::Function, layer::Layer, pre::LayerContent, args...)
+            x = $lowerc(f, args...)
+            for (i, c) in enumerate(layer.content)
+                if c === pre
+                    insert!(layer, i, x)
+                    return x
+                end
+            end
+            error("Could not find given shape in layer.")
+        end
+
+        """
+        $($lowerc_post_exc)(f::Function, layer::Layer, post::LayerContent, args...)
+
+        Creates a shape containing a `GeometricObject` of type `$($geom)`,
+        storing any trailing arguments as dependencies, later to be passed as arguments
+        to the given `Function` `f` that should return a `GeometricObject` of type `$($geom)`
+        and will be evaluated when `solve!` is called on the shape during
+        the drawing process. This function then inserts the created shape into the given `Layer` `layer` after the given
+        LayerContent object."""
+        function $lowerc_post_exc(f::Function, layer::Layer, post::LayerContent, args...)
+            x = $lowerc(f, args...)
+            for (i, c) in enumerate(layer.content)
+                if c === post
+                    insert!(layer, i+1, x)
+                    return x
+                end
+            end
+            error("Could not find given shape in layer.")
+        end
+
+        export $geom, $lowerc, $lowerc_exc, $lowerc_first_exc, $lowerc_pre_exc, $lowerc_post_exc
 
     end
 end
