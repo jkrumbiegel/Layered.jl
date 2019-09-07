@@ -43,3 +43,7 @@ Here's an example:
 <p align="center">
   <img src="https://raw.githubusercontent.com/jkrumbiegel/Layered.jl/master/examples/01_experimental_paradigm/example.svg?sanitize=true">
 </p>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/jkrumbiegel/Layered.jl/master/examples/02_gabor_patches/gabors.svg?sanitize=true">
+</p>
