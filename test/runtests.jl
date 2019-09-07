@@ -92,70 +92,6 @@ end
     display(fig)
 end
 
-using Pkg
-pkg"activate ."
-using Revise
-using Layered
-using Colors
-
-function test2()
-    c, l = canvas(4, 3)
-    n = 5
-
-    sls = layer!.((r, i) -> begin
-        margin = 20
-        avail_w = (r.width - 2margin) / n
-        avail_h = (r.height - 2margin) / n
-        Transform(translation = topleft(r) + P(margin + (i-0.5) * avail_w, margin + (i-0.5) * avail_h))
-    end, l, c.rect, 1:n) .+ Opacity.(0.6:0.1:1)
-
-    rs = rect!.((r, i) -> begin
-        Rect(P(0, 0), 80, 50, deg(0))
-    end, sls, c.rect, 0:n-1) .+ Fill(Gray(0.5)) .+ Visible(true)
-
-    crosses = polygon!.(r -> begin
-        ncross(r.center, 4, 3, 0.3)
-    end, sls, rs) .+ Fill("black") .+ Stroke("transparent")
-
-    circlesleft = circle!.(r -> begin
-        Circle(r.center - X(r.width/4), 10)
-    end, sls, rs) .+ Linestyle(:dashed)
-
-    circlesright = circle!.(r -> begin
-        Circle(r.center + X(r.width/4), 10)
-    end, sls, rs) .+ Linestyle(:dashed)
-
-    focuscircle = circle!.(r -> begin
-        Circle(bottomleft(r) + P(35, -35), 30)
-    end, l, c.rect) .+ Linestyle(:dashed)
-
-    textl = layer!(l, Transform())
-
-    text!.((r, phase) -> begin
-        Txt(bottomleft(r) + Y(0), "phase $phase", 10, :l, :t, deg(0), "Helvetica")
-    end, textl, rs, 1:5) .+ Fill("black")
-
-    path!((c1, c2) -> begin
-        Path(false, outertangents(c1, c2)...)
-    end, l, focuscircle, circlesright[2]) + Linestyle(:dashed)
-
-    arr = path!(l, rs[1], rs[end]) do r1, r2
-        a = arrow(topright(r1), topright(r2), 9, 9, 1, 1, 0)
-        a + normal(a.segments[1], -5)
-    end + Fill("tomato") + Stroke("transparent")
-
-    te = text!(l, arr) do arr
-        pos = normfrom(arr.segments[1], 0.5, -3)
-        Txt(pos, "time", 10, :c, :b, angle(arr.segments[1]), "Helvetica")
-    end + Fill("black")
-
-    rect!(l, te) do t
-        Rect(t, 2.5)
-    end + Stroke("tomato")
-
-    c
-end; test2()
-
 
 function transformtest()
 
@@ -176,7 +112,7 @@ function transformtest()
         (poly, f)
     end
 
-    text!(tl, circ) do c
+    te = text!(tl, circ) do c
         Txt(P(c, deg(-90), 0.5), "Hello", 20, :c, :c, deg(0), "Helvetica Neue Light")
     end + Fill("black")
 
@@ -275,13 +211,23 @@ function fontaliasing()
 end; fontaliasing()
 
 
-function theresa()
+function petals()
 
-    c, l = canvas(3, 3, bgcolor=LCHuv(20, 30, 240))
+    c, tl = canvas(5, 5)
 
-    text!(l, P(0, 0), "Morning", 40, :c, :c, deg(0), "Helvetica") +
-        Fill(LCHuv(18, 30, 240))
+    l = rectlayer!(tl, c.rect, :w, margin=20)
+
+    degrees = range(0, 360, length=21)[1:end-1]
+
+    petals = path!.(ang -> begin
+        endpoint = P(ang)
+        Path(true, Arc(O, endpoint, 0.2), Arc(endpoint, O, 0.2))
+    end, l, deg.(degrees)) .+ Fill.(LCHuv.(70, 50, degrees)) .+ Stroke("transparent") .+ Operator(:mult)
+
+    circs = circle!(l, O, 0.2) + Visible(false)
+
+    petals .+ Clip(circs, c.rect)
 
     c
 
-end; theresa()
+end; petals()
