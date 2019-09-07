@@ -60,10 +60,11 @@ function scaleto(l::Line, len::Real)
     scale(l, scalar)
 end
 
-function extend(l::Line, len::Real)
-    dir = direction(l)
-    movement = len / 2 * dir
-    Line(l.from - movement, l.to + movement)
+function extend(l::Line, len::Real, fraction_to::Real=0.5)
+    vec = len * direction(l)
+    movement_to = fraction_to * vec
+    movement_from = (1 - fraction_to) * vec
+    Line(l.from - movement_from, l.to + movement_to)
 end
 
 function rotate(l::Line, angle::Angle; around::Point=Point(0, 0))
