@@ -9,43 +9,58 @@ LINETO = 2
 MOVETO = 1
 
 
-function fill!(cc, g::Gradient)
-    pat = C.pattern_create_linear(g.from.xy..., g.to.xy...);
+function fillpreserve!(cc, g::Gradient)
+    C.save(cc)
+    pat = C.pattern_create_linear(g.from.xy..., g.to.xy...)
     for (stop, col) in zip(g.stops, g.colors)
-        C.pattern_add_color_stop_rgba(pat, stop, rgba(col)...);
+        C.pattern_add_color_stop_rgba(pat, stop, rgba(col)...)
     end
-    C.set_source(cc, pat);
-    C.fill_preserve(cc);
-    C.destroy(pat);
+    C.set_source(cc, pat)
+    C.fill_preserve(cc)
+    C.destroy(pat)
+    C.restore(cc)
 end
 
-function fill!(cc, rg::RadialGradient)
-    pat = C.pattern_create_radial(rg.from.center.xy..., rg.from.radius, rg.to.center.xy..., rg.to.radius);
+function fillpreserve!(cc, rg::RadialGradient)
+    C.save(cc)
+    pat = C.pattern_create_radial(rg.from.center.xy..., rg.from.radius, rg.to.center.xy..., rg.to.radius)
     for (stop, col) in zip(rg.stops, rg.colors)
-        C.pattern_add_color_stop_rgba(pat, stop, rgba(col)...);
+        C.pattern_add_color_stop_rgba(pat, stop, rgba(col)...)
     end
-    C.set_source(cc, pat);
-    C.fill_preserve(cc);
-    C.destroy(pat);
+    C.set_source(cc, pat)
+    C.fill_preserve(cc)
+    C.destroy(pat)
+    C.restore(cc)
 end
 
-function fill!(cc, c::Colors.Colorant)
+function fillpreserve!(cc, c::Colors.Colorant)
+    C.save(cc)
     C.set_source_rgba(cc, rgba(c)...)
     C.fill_preserve(cc)
+    C.restore(cc)
 end
 
-function fillstroke!(cc, canvasmatrix, a::Attributes)
-    fill!(cc, a[Fill].content)
-    C.set_source_rgba(cc, rgba(a[Stroke].color)...)
+function strokepreserve!(cc, canvasmatrix, c::Colors.Colorant)
     C.save(cc)
+    C.set_source_rgba(cc, rgba(c)...)
     C.set_matrix(cc, canvasmatrix)
     C.stroke_transformed(cc)
     C.restore(cc)
 end
 
+function strokepreserve!(cc, canvasmatrix, c::Nothing)
+end
+
+function fillstroke!(cc, canvasmatrix, a::Attributes)
+    fillpreserve!(cc, a[Fill].content)
+    strokepreserve!(cc, canvasmatrix, a[Stroke].color)
+    # clear the path
+    Cairo.new_path(cc)
+end
+
 function stroke!(cc, canvasmatrix, a::Attributes)
-    C.set_source_rgba(cc, rgba(a[Stroke].color)...)
     C.save(cc)
+    C.set_source_rgba(cc, rgba(a[Stroke].color)...)
     C.set_matrix(cc, canvasmatrix)
     C.stroke_transformed(cc)
     C.restore(cc)
