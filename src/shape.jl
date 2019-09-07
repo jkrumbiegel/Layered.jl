@@ -12,13 +12,6 @@ end
 
 Base.Broadcast.broadcastable(s::Shape) = Ref(s)
 
-
-
-# function Base.:+(s::Shape, c::Clip)
-#     s.clip = c
-#     s
-# end
-
 function Base.copy!(l::Layer, s::Shape{T}) where T
     news = Shape{T}(s.content, nothing, nothing, Attributes(), s.clip, s.opacity, s.operator)
     for (Ta, attr) in s.attrs.attrs
@@ -32,7 +25,7 @@ function upward_transform(s::Shape)
     return upward_transform(s.parent)
 end
 
-function solve!(s::Shape{T}) where T
+function solve!(s::Shape{T}, cc::Cairo.CairoContext) where T
 
     if !isnothing(s.solved)
         return s.solved
@@ -48,9 +41,9 @@ function solve!(s::Shape{T}) where T
         solved_deps = []
         for d in dependencies
             if typeof(d) <: Shape
-                solved = solve!(d)
+                solved = solve!(d, cc)
 
-                t = transform_from_to(d, s)
+                t = transform_from_to(d, s, cc)
                 transformed = t * solved
                 push!(solved_deps, transformed)
             else

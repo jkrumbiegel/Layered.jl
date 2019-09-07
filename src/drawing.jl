@@ -186,7 +186,7 @@ function draw!(cc::C.CairoContext, canvasmatrix, l::Layer)
 
     C.save(cc)
     C.push_group(cc)
-    applytransform!(cc, gettransform!(l))
+    applytransform!(cc, gettransform!(l, cc))
 
     for content in l.content
         draw!(cc, canvasmatrix, content)
@@ -224,7 +224,7 @@ function getattribute(l::LayerContent, attr)
 end
 
 function draw!(cc, canvasmatrix, s::Shape)
-    geom = solve!(s)
+    geom = solve!(s, cc)
     attributes = getattributes(s)
     if !attributes[Visible].visible
         return
@@ -482,10 +482,10 @@ function setclippath!(cc, c::Clip)
         return
     end
     if typeof(sh) <: Shape
-        makepath!(cc, solve!(sh))
+        makepath!(cc, solve!(sh, cc))
     else
-        makepath!(cc, solve!(sh[1]))
-        makepath!(cc, solve!(sh[2]))
+        makepath!(cc, solve!(sh[1], cc))
+        makepath!(cc, solve!(sh[2], cc))
     end
     C.clip(cc)
 end

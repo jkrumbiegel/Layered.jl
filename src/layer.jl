@@ -81,11 +81,11 @@ function Base.pushfirst!(l::Layer, lc::LayerContent)
     lc.parent = l
 end
 
-function upward_transform(l::Layer)
+function upward_transform(l::Layer, cc::Cairo.CairoContext)
     if isnothing(l.parent)
-        return gettransform!(l)
+        return gettransform!(l, cc)
     else
-        return upward_transform(l.parent) * gettransform!(l)
+        return upward_transform(l.parent, cc) * gettransform!(l, cc)
     end
 end
 
@@ -125,24 +125,24 @@ end
 
 function gettransform! end
 
-function transform_from_to(from::LayerContent, to::LayerContent)
+function transform_from_to(from::LayerContent, to::LayerContent, cc::Cairo.CairoContext)
     from_ancestors, to_ancestors = lowestcommonancestorchainfromto(from, to)
 
     #start with identity
     t = Transform()
 
     for a in reverse(from_ancestors)
-        t = gettransform!(a) * t
+        t = gettransform!(a, cc) * t
     end
 
     for a in to_ancestors
-        t = inverse(gettransform!(a)) * t
+        t = inverse(gettransform!(a, cc)) * t
     end
 
     t
 end
 
-function gettransform!(l::Layer)
+function gettransform!(l::Layer, cc::Cairo.CairoContext)
     if typeof(l.transform) <: Transform
         l.transform
     else
@@ -151,8 +151,8 @@ function gettransform!(l::Layer)
         solved_deps = []
         for d in deps
             if typeof(d) <: Shape
-                solved = solve!(d)
-                t = transform_from_to(d, l)
+                solved = solve!(d, cc)
+                t = transform_from_to(d, l, cc)
                 transformed = t * solved
                 push!(solved_deps, transformed)
             else
