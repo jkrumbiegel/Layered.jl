@@ -39,4 +39,7 @@ You can also add a shape as a clipping mask on any layer, or any shape living in
 
 This library is very much a work in progress, so if you find it's lacking some vital functionality, I'm open to suggestions.
 
-![Example](https://raw.githubusercontent.com/jkrumbiegel/Layered.jl/master/examples/example.svg?sanitize=true)
+Here's an example:
+<p align="center">
+  <img src="https://raw.githubusercontent.com/jkrumbiegel/Layered.jl/master/examples/example.svg?sanitize=true">
+</p>
