@@ -35,3 +35,14 @@ function text!(f::Function, layer::Layer, args...)
 end
 
 needed_attributes(::Type{Txt}) = (Visible, Fill, Font)
+
+function Base.:*(r::Real, te::TextExtent)
+    TextExtent(
+        te.xbearing * r,
+        te.ybearing * r,
+        te.width * r,
+        te.height * r,
+        te.xadvance * r,
+        te.yadvance * r
+    )
+end
