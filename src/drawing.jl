@@ -161,6 +161,7 @@ function draw_rgba(canvas::Canvas; dpi=100)
     canvasmatrix = C.get_matrix(cc)
 
     draw!(cc, canvasmatrix, canvas.toplayer)
+    C.finish(c)
     c
 end
 
@@ -183,6 +184,7 @@ end
 
 function draw!(cc::C.CairoContext, canvasmatrix, l::Layer)
 
+    C.save(cc)
     C.push_group(cc)
     applytransform!(cc, gettransform!(l))
 
@@ -201,7 +203,7 @@ function draw!(cc::C.CairoContext, canvasmatrix, l::Layer)
     C.set_operator(cc, Base.convert(Int32, l.operator))
 
     C.paint_with_alpha(cc, l.opacity.opacity)
-
+    C.restore(cc)
 end
 
 function getattributes(s::Shape{T}) where T
@@ -229,6 +231,7 @@ function draw!(cc, canvasmatrix, s::Shape)
     end
     # transformed_to_toplevel = upward_transform(s) * geom
 
+    C.save(cc)
     C.push_group(cc)
     draw!(cc, canvasmatrix, geom, attributes)
     gr = C.pop_group(cc)
@@ -240,7 +243,7 @@ function draw!(cc, canvasmatrix, s::Shape)
 
     C.paint_with_alpha(cc, s.opacity.opacity)
 
-    # C.restore(cc)
+    C.restore(cc)
 end
 
 function draw!(cc, canvasmatrix, p::Point, a::Attributes)

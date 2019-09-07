@@ -1,4 +1,4 @@
-export Line, line, line!, move, normal, normfrom
+export Line, line, line!, move, normal, normfrom, direction
 export LineSegments, linesegments, linesegments!
 
 struct Line <: GeometricObject
