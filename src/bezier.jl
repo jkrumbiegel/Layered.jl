@@ -54,7 +54,7 @@ function perpendicularbezier(l1::Line, l2::Line, fraction1=0.5, fraction2=0.5; s
     Bezier(fpoint1, c1, c2, fpoint2)
 end
 
-needed_attributes(::Type{Bezier}) = (Linewidth, Stroke, Linestyle, Fill)
+needed_attributes(::Type{Bezier}) = (Linewidth, Stroke, Linestyle, Fill, Visible)
 
 const BezierSegment = Union{Bezier, Line, Arc}
 
