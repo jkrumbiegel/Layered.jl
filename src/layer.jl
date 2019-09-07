@@ -30,6 +30,12 @@ function layer(t::Transform, varargs::Vararg{Attribute, N}) where N
     Layer(t, Vector{LayerContent}[], nothing, Attributes(varargs...), Clip(nothing), Opacity(1), Operator())
 end
 
+function layer!(parent::Layer) where N
+    l = Layer(Transform(), Vector{LayerContent}[], nothing, Attributes(), Clip(nothing), Opacity(1), Operator())
+    push!(parent, l)
+    l
+end
+
 function layer!(parent::Layer, t::Transform, varargs::Vararg{Attribute, N}) where N
     l = Layer(t, Vector{LayerContent}[], nothing, Attributes(varargs...), Clip(nothing), Opacity(1), Operator())
     push!(parent, l)
@@ -60,14 +66,19 @@ function layer!(f::Function, parent::Layer, varargs...)
     l
 end
 
-function rectlayer!(l::Layer, sr::Shape{Rect}, wh::Symbol; margin=0)
+function rectlayer!(l::Layer, sr::Shape{Rect}, wh::Symbol, mode::Symbol=:center; margin=0)
     layer!(l, sr) do r
         d = @match wh begin
             :w => r.width
             :h => r.height
             _ => error("Symbol not allowed")
         end
-        Transform(translation=r.center, scale=(d - margin)/2, rotation=r.angle)
+
+        @match mode begin
+            :center => Transform(translation=r.center, scale=(d - margin)/2, rotation=r.angle)
+            :norm => Transform(translation=topleft(r) + P(margin, margin), scale=(d - 2*margin), rotation=r.angle)
+        end
+
     end
 end
 
