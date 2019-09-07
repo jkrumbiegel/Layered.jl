@@ -9,6 +9,8 @@ function example()
     c, l = canvas(4.5, 3)
     n = 5
 
+    defaultfont("Helvetica Neue Light")
+
     sls = layer!.((r, i) -> begin
         margin = 20
         avail_w = (r.width - 2margin) / n
