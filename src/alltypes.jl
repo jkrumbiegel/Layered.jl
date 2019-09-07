@@ -72,9 +72,13 @@ struct Clip
     # shape::Union{Nothing, Shape, Tuple{Shape, Shape}}
 end
 
+Base.Broadcast.broadcastable(c::Clip) = Ref(c)
+
 struct Opacity
     opacity::Float64
 end
+
+Base.Broadcast.broadcastable(o::Opacity) = Ref(o)
 
 struct Operator
     operator::Symbol
