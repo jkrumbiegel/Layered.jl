@@ -37,7 +37,7 @@ function Txt(pos::Point, text::String, size::Real; ha=:c, va=:c, angle=deg(0), f
     Txt(pos, text, size, ha, va, angle, font)
 end
 
-needed_attributes(::Type{Txt}) = (Visible, Fill, Font)
+needed_attributes(::Type{Txt}) = (Visible, Textfill)
 
 function Base.:*(r::Real, te::TextExtent)
     TextExtent(

@@ -127,6 +127,10 @@ struct Fill <: Attribute
     content::Union{Colors.Colorant, Gradient, RadialGradient}
 end
 
+struct Textfill <: Attribute
+    content::Union{Colors.Colorant, Gradient, RadialGradient}
+end
+
 struct Fills <: Attribute
     colors::Union{Colors.Colorant, Array{<:Colors.Colorant}} # if it's a real parametric type then the dict lookup of the type doesn't work..
 end

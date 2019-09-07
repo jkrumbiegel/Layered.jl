@@ -27,7 +27,7 @@ function canvas(
             Strokes("black"),
             Linewidth(1),
             Linestyle(:solid),
-            Font("Helvetica Neue LT Std"),
+            Textfill("black"),
         )
     else
         toplayer
