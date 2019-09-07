@@ -8,7 +8,7 @@ import Cairo
 
 export Point, Transform, Layer, Shape, upward_transform, solve!, →, point, line, Angle, rad, deg, needed_attributes
 
-include("alltypes.jl")
+include("types.jl")
 include("angles.jl")
 include("geometry.jl")
 include("gradient.jl")
