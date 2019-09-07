@@ -178,7 +178,7 @@ struct Fills <: Attribute
 end
 
 struct Stroke <: Attribute
-    color::Colors.Colorant
+    color::Union{Nothing, Colors.Colorant}
 end
 
 struct Strokes <: Attribute
