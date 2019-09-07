@@ -89,7 +89,8 @@ function Base.:*(tr::Transform, t::Txt)
         t.halign,
         t.valign,
         tr.rotation + t.angle,
-        t.font
+        t.font,
+        t.extent
     )
 end
 

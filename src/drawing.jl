@@ -1,4 +1,3 @@
-import Cairo
 const C = Cairo
 
 export draw, applytransform!
@@ -338,15 +337,6 @@ alignments = Dict(
     :bl => "baseline",
     :cbl => "center_baseline"
 )
-
-struct TextExtent
-    xbearing::Float64
-    ybearing::Float64
-    width::Float64
-    height::Float64
-    xadvance::Float64
-    yadvance::Float64
-end
 
 function TextExtent(cc, t::Txt)
     C.save(cc)

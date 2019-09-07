@@ -52,6 +52,15 @@ struct Circle <: GeometricObject
     radius::Float64
 end
 
+struct TextExtent
+    xbearing::Float64
+    ybearing::Float64
+    width::Float64
+    height::Float64
+    xadvance::Float64
+    yadvance::Float64
+end
+
 abstract type Attribute end
 
 mutable struct Attributes

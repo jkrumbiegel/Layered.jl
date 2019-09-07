@@ -4,6 +4,7 @@ using StaticArrays
 import Colors
 using Match
 import Juno
+import Cairo
 
 export Point, Transform, Layer, Shape, upward_transform, solve!, →, point, line, Angle, rad, deg, needed_attributes
 export Opacity, Operator

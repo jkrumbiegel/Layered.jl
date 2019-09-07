@@ -144,10 +144,14 @@ function test2()
         a + normal(a.segments[1], -5)
     end + Fill("tomato") + Stroke("transparent")
 
-    text!(l, arr) do arr
+    te = text!(l, arr) do arr
         pos = normfrom(arr.segments[1], 0.5, -3)
         Txt(pos, "time", 10, :c, :b, angle(arr.segments[1]), "Helvetica")
     end + Fill("black")
+
+    rect!(l, te) do t
+        Rect(t, 2.5)
+    end + Stroke("tomato")
 
     c
 end; test2()

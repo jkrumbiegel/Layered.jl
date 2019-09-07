@@ -27,13 +27,25 @@ end
 
 function solve!(s::Shape{T}, cc::Cairo.CairoContext) where T
 
+    # the shape was already solved
     if !isnothing(s.solved)
         return s.solved
     end
 
+    # the shape's content was given directly without a closure function
     if typeof(s.content) <: GeometricObject
         s.solved = s.content
+
+        # extra logic for text, get the extents
+        if T <: Txt{Nothing}
+            t = s.solved
+            t_with_extent = Txt(t, TextExtent(cc, t))
+            s.solved = t_with_extent
+        end
+
         return s.solved
+
+    # the shape's content was given as a function with dependencies
     else
         closure = s.content[1]
         dependencies = s.content[2]
@@ -64,6 +76,12 @@ function solve!(s::Shape{T}, cc::Cairo.CairoContext) where T
             end
         else
             s.solved = return_values
+        end
+
+        if typeof(s.solved) <: Txt{Nothing}
+            t = s.solved
+            t_with_extent = Txt(t, TextExtent(cc, t))
+            s.solved = t_with_extent
         end
 
         return s.solved
