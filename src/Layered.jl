@@ -83,7 +83,7 @@ for geom in (:Circle, :Rect, :Point, :Points, :Arc, :Bezier, :Path, :Paths, :Lin
         end
 
         """
-        $($lowerc_pre_exc)(layer::Layer, post::LayerContent, args...)
+        $($lowerc_post_exc)(layer::Layer, post::LayerContent, args...)
 
         Creates a shape containing a `GeometricObject` of type `$($geom)`,
         passing any trailing arguments to the constructor `$($geom)()`. Then
