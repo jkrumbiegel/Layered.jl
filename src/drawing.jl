@@ -1,6 +1,6 @@
 const C = Cairo
 
-export draw, applytransform!
+export draw, draw_svg, applytransform!
 
 CLOSEPOLY = 79
 CURVE3 = 3
@@ -102,7 +102,6 @@ function draw_svg(canvas::Canvas)
     C.set_source_rgba(cc, rgba(canvas.bgcolor)...)
     C.fill(cc)
 
-    # C.scale(cc, dpi / pt_per_in, dpi / pt_per_in)
     C.translate(cc, (size_pt./2)...)
 
     canvasmatrix = C.get_matrix(cc)
@@ -110,6 +109,26 @@ function draw_svg(canvas::Canvas)
     draw!(cc, canvasmatrix, canvas.toplayer)
     C.finish(c)
     c, iobuffer
+end
+
+function draw_svg(canvas::Canvas, filename::String)
+    pt_per_in = 72
+    size_pt = canvas.size_in .* pt_per_in
+
+    c = C.CairoSVGSurface(filename, size_pt...);
+    cc = C.CairoContext(c);
+
+    C.rectangle(cc, 0, 0, size_pt...)
+    C.set_source_rgba(cc, rgba(canvas.bgcolor)...)
+    C.fill(cc)
+
+    C.translate(cc, (size_pt./2)...)
+
+    canvasmatrix = C.get_matrix(cc)
+
+    draw!(cc, canvasmatrix, canvas.toplayer)
+    C.finish(c)
+    nothing
 end
 
 function draw_rgba(canvas::Canvas; dpi=100)
@@ -160,7 +179,7 @@ function draw_rgba(canvas::Canvas; dpi=100)
     canvasmatrix = C.get_matrix(cc)
 
     draw!(cc, canvasmatrix, canvas.toplayer)
-    C.finish(c)
+    # C.finish(c)
     c
 end
 
