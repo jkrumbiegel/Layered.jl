@@ -53,13 +53,13 @@ function example()
     rs .+ Clip.(clipcircs)
 
     txt!.((r, f, d) -> begin
-        Txt(center(topline(r)), "$f, $d", 6, :c, :t)
+        Txt(center(topline(r)), "$f, $(d)°", 6, :c, :t)
     end, tl, rs, freqs, degs)
 
     # rlayers .+ Operator(:mult)
 
     c
 
-    draw_svg(c, "./examples/02_gabor_patches/gabors.svg")
+    # draw_svg(c, "./examples/02_gabor_patches/gabors.svg")
 
 end; example()
