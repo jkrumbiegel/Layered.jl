@@ -1,8 +1,9 @@
-export between, P, X, Y, xs, ys, magnitude, normalize, point, point!, signed_angle_to
+export between, P, O, X, Y, xs, ys, magnitude, normalize, point, point!, signed_angle_to
 export Points, points, points!
 
 X(x::Real) = P(x, 0)
 Y(y::Real) = P(0, y)
+const O = P(0, 0)
 
 xs(ps::Array{Point}) = [p.x for p in ps]
 ys(ps::Array{Point}) = [p.y for p in ps]
