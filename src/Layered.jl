@@ -6,7 +6,7 @@ using Match
 import Juno
 import Cairo
 
-export Point, Transform, Layer, Shape, upward_transform, solve!, →, point, line, Angle, rad, deg, needed_attributes
+export Transform, Layer, Shape, upward_transform, solve!, →, Angle, rad, deg, needed_attributes
 
 include("types.jl")
 include("angles.jl")
