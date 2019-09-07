@@ -41,5 +41,5 @@ This library is very much a work in progress, so if you find it's lacking some v
 
 Here's an example:
 <p align="center">
-  <img src="https://raw.githubusercontent.com/jkrumbiegel/Layered.jl/master/examples/example.svg?sanitize=true">
+  <img src="https://raw.githubusercontent.com/jkrumbiegel/Layered.jl/master/examples/ex_01_experimental_paradigm/example.svg?sanitize=true">
 </p>
