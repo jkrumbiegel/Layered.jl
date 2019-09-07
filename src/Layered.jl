@@ -70,7 +70,7 @@ for geom in (:Circle, :Rect, :Point, :Points, :Arc, :Bezier, :Path, :Paths, :Lin
         Creates a shape containing a `GeometricObject` of type `$($geom)`,
         passing any trailing arguments to the constructor `$($geom)()`. Then
         inserts the created shape into the given `Layer` `layer` before the given
-        LayerContent object."""
+        `LayerContent` object."""
         function $lowerc_pre_exc(layer::Layer, pre::LayerContent, args...)
             x = $lowerc(args...)
             for (i, c) in enumerate(layer.content)
@@ -88,7 +88,7 @@ for geom in (:Circle, :Rect, :Point, :Points, :Arc, :Bezier, :Path, :Paths, :Lin
         Creates a shape containing a `GeometricObject` of type `$($geom)`,
         passing any trailing arguments to the constructor `$($geom)()`. Then
         inserts the created shape into the given `Layer` `layer` after the given
-        LayerContent object."""
+        `LayerContent` object."""
         function $lowerc_post_exc(layer::Layer, post::LayerContent, args...)
             x = $lowerc(args...)
             for (i, c) in enumerate(layer.content)
@@ -146,7 +146,7 @@ for geom in (:Circle, :Rect, :Point, :Points, :Arc, :Bezier, :Path, :Paths, :Lin
         to the given `Function` `f` that should return a `GeometricObject` of type `$($geom)`
         and will be evaluated when `solve!` is called on the shape during
         the drawing process. This function then inserts the created shape into the given `Layer` `layer` before the given
-        LayerContent object."""
+        `LayerContent` object."""
         function $lowerc_pre_exc(f::Function, layer::Layer, pre::LayerContent, args...)
             x = $lowerc(f, args...)
             for (i, c) in enumerate(layer.content)
@@ -166,7 +166,7 @@ for geom in (:Circle, :Rect, :Point, :Points, :Arc, :Bezier, :Path, :Paths, :Lin
         to the given `Function` `f` that should return a `GeometricObject` of type `$($geom)`
         and will be evaluated when `solve!` is called on the shape during
         the drawing process. This function then inserts the created shape into the given `Layer` `layer` after the given
-        LayerContent object."""
+        `LayerContent` object."""
         function $lowerc_post_exc(f::Function, layer::Layer, post::LayerContent, args...)
             x = $lowerc(f, args...)
             for (i, c) in enumerate(layer.content)
