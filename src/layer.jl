@@ -26,42 +26,30 @@ function layer()
     Layer(Transform(), Vector{LayerContent}[], nothing, Attributes(), Clip(nothing), Opacity(1), Operator())
 end
 
-function layer(t::Transform, varargs::Vararg{Attribute, N}) where N
-    Layer(t, Vector{LayerContent}[], nothing, Attributes(varargs...), Clip(nothing), Opacity(1), Operator())
+function layer(t::Transform)
+    Layer(t, Vector{LayerContent}[], nothing, Attributes(), Clip(nothing), Opacity(1), Operator())
 end
 
-function layer!(parent::Layer) where N
+function layer!(parent::Layer)
     l = Layer(Transform(), Vector{LayerContent}[], nothing, Attributes(), Clip(nothing), Opacity(1), Operator())
     push!(parent, l)
     l
 end
 
-function layer!(parent::Layer, t::Transform, varargs::Vararg{Attribute, N}) where N
-    l = Layer(t, Vector{LayerContent}[], nothing, Attributes(varargs...), Clip(nothing), Opacity(1), Operator())
+function layer!(parent::Layer, t::Transform)
+    l = Layer(t, Vector{LayerContent}[], nothing, Attributes(), Clip(nothing), Opacity(1), Operator())
     push!(parent, l)
     l
 end
 
-function layerfirst!(parent::Layer, t::Transform, varargs::Vararg{Attribute, N}) where N
-    l = Layer(t, Vector{LayerContent}[], nothing, Attributes(varargs...), Clip(nothing), Opacity(1), Operator())
+function layerfirst!(parent::Layer, t::Transform)
+    l = Layer(t, Vector{LayerContent}[], nothing, Attributes(), Clip(nothing), Opacity(1), Operator())
     pushfirst!(parent, l)
     l
 end
 
-function layer!(f::Function, parent::Layer, varargs...)
-
-    deps = Tuple(v for v in varargs if !(typeof(v) <: Attribute))
-
-    attributes = Attributes()
-    attrs = Tuple(v for v in varargs if typeof(v) <: Attribute)
-    for a in attrs
-        if haskey(attributes, typeof(a))
-            error("Attribute of type $(typeof(a)) was added more than once.")
-        end
-        attributes[typeof(a)] = a
-    end
-
-    l = Layer((f, [deps...]), Vector{LayerContent}[], nothing, attributes, Clip(nothing), Opacity(1), Operator())
+function layer!(f::Function, parent::Layer, deps...)
+    l = Layer((f, [deps...]), Vector{LayerContent}[], nothing, Attributes(), Clip(nothing), Opacity(1), Operator())
     push!(parent, l)
     l
 end
