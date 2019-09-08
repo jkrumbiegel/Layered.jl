@@ -112,7 +112,7 @@ function transformtest()
         (poly, f)
     end
 
-    te = text!(tl, circ) do c
+    te = txt!(tl, circ) do c
         Txt(P(c, deg(-90), 0.5), "Hello", 20, :c, :c, deg(0), "Helvetica Neue Light")
     end + Fill("black")
 
@@ -121,32 +121,6 @@ function transformtest()
 
 end; transformtest()
 
-function transtest()
-
-    c, tl = canvas(5, 5)
-
-    l1 = rectlayer!(tl, c.rect, :h)
-
-    pinky = circle!(l1, P(-0.5, 0), 0.2) + Stroke("red") + Linewidth(1)
-
-    l2 = layer!(l1, Transform(rotation=deg(-45), translation=X(100)))
-
-    l3 = layer!(l2, Transform(scale=2, translation=Y(-50)))
-
-    pinkyclone = circle!(l3, pinky) do pin
-        pin
-    end + Fill("transparent") + Stroke("black") + Linestyle(:dashed)
-
-    pinkyclone2 = circle!(tl, pinkyclone) do pin
-        grow(pin, 1)
-    end + Fill("transparent") + Stroke("green") + Linestyle(:dashed)
-
-    # write_to_png(c, "transtest.png")
-
-    # Layered.preview(c)
-    c
-
-end; transtest()
 
 using Pkg
 pkg"activate ."
@@ -210,27 +184,6 @@ function fontaliasing()
 
 end; fontaliasing()
 
-
-function petals()
-
-    c, tl = canvas(5, 5)
-
-    l = rectlayer!(tl, c.rect, :w, margin=20)
-
-    degrees = range(0, 360, length=21)[1:end-1]
-
-    petals = path!.(ang -> begin
-        endpoint = P(ang)
-        Path(true, Arc(O, endpoint, 0.2), Arc(endpoint, O, 0.2))
-    end, l, deg.(degrees)) .+ Fill.(LCHuv.(70, 50, degrees)) .+ Stroke("transparent") .+ Operator(:mult)
-
-    circ = circle!(l, O, 0.2) + Visible(false)
-
-    petals .+ Clip(circ, c.rect)
-
-    c
-
-end; petals()
 
 function tpoints()
 
