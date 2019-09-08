@@ -18,15 +18,22 @@ Attributes() = Attributes(Dict{Type{<:Attribute}, Union{Function, Attribute}}())
 
 Operator() = Operator(:over)
 
+parameterlesstypeof(a::Attribute) = typeof(a).name.wrapper
+
 function Attributes(att::Attribute, varargs::Vararg{Attribute, N}) where N
     attributes = Attributes()
     for a in (att, varargs...)
-        if haskey(attributes, typeof(a))
-            error("Attribute of type $(typeof(a)) was added more than once.")
-        end
-        attributes[typeof(a)] = a
+        add!(attributes, a)
     end
     attributes
+end
+
+function add!(attrs::Attributes, a::Attribute)
+    pltype = parameterlesstypeof(a)
+    if haskey(attrs, pltype)
+        error("Attribute of type $pltype was added more than once.")
+    end
+    attrs[pltype] = a
 end
 
 Base.haskey(a::Attributes, key) = haskey(a.attrs, key)
