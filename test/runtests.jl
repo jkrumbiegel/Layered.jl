@@ -224,10 +224,25 @@ function petals()
         Path(true, Arc(O, endpoint, 0.2), Arc(endpoint, O, 0.2))
     end, l, deg.(degrees)) .+ Fill.(LCHuv.(70, 50, degrees)) .+ Stroke("transparent") .+ Operator(:mult)
 
-    circs = circle!(l, O, 0.2) + Visible(false)
+    circ = circle!(l, O, 0.2) + Visible(false)
 
-    petals .+ Clip(circs, c.rect)
+    petals .+ Clip(circ, c.rect)
 
     c
 
 end; petals()
+
+function tpoints()
+
+    c, tl = canvas(4, 4)
+
+    l = rectlayer!(tl, c.rect, :w, :norm, margin=40)
+
+    rect!(l, P(.5, .5), 1, 1, deg(0)) + Linewidth(1)
+
+    ps = point!.(l, grid(0:0.1:1, 0:0.1:1)...) .+
+        Fill("red") .+ Markersize(10) .+ Marker(:+) .+ Stroke(nothing)
+
+    c
+
+end; tpoints()
