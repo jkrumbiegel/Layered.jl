@@ -165,24 +165,26 @@ end
 
 Clip(s1::Shape, s2::Shape) = Clip((s1, s2))
 
-struct Fill <: Attribute
-    content::Union{Colors.Colorant, Gradient, RadialGradient}
+const Fillers = Union{Nothing, Colors.Colorant, Gradient, RadialGradient}
+
+struct Fill{T<:Fillers} <: Attribute
+    content::T
 end
 
-struct Textfill <: Attribute
-    content::Union{Colors.Colorant, Gradient, RadialGradient}
+struct Textfill{T<:Fillers} <: Attribute
+    content::T
 end
 
-struct Fills <: Attribute
-    colors::Union{Colors.Colorant, Array{<:Colors.Colorant}} # if it's a real parametric type then the dict lookup of the type doesn't work..
+struct Fills{T<:Union{Colors.Colorant, Array{<:Colors.Colorant}}} <: Attribute
+    colors::T
 end
 
-struct Stroke <: Attribute
-    color::Union{Nothing, Colors.Colorant}
+struct Stroke{T<:Union{Nothing, Colors.Colorant}} <: Attribute
+    color::T
 end
 
-struct Strokes <: Attribute
-    colors::Union{Colors.Colorant, Array{<:Colors.Colorant}} # if it's a real parametric type then the dict lookup of the type doesn't work..
+struct Strokes{T<:Union{Colors.Colorant, Array{<:Colors.Colorant}}} <: Attribute
+    colors::T
 end
 
 struct Linestyle <: Attribute
@@ -193,16 +195,16 @@ struct Linewidth <: Attribute
     width::Float64
 end
 
-struct Linewidths <: Attribute
-    widths::Union{Real, Array{<:Real}} # if it's a real parametric type then the dict lookup of the type doesn't work..
+struct Linewidths{T<:Union{Real, Array{<:Real}}} <: Attribute
+    widths::T
 end
 
 struct Markersize <: Attribute
     size::Float64
 end
 
-struct Markersizes <: Attribute
-    sizes::Union{Real, Array{<:Real}}
+struct Markersizes{T<:Union{Real, Array{<:Real}}} <: Attribute
+    sizes::T
 end
 
 struct Marker <: Attribute
