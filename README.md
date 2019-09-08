@@ -39,16 +39,22 @@ You can also add a shape as a clipping mask on any layer, or any shape living in
 
 This library is very much a work in progress, so if you find it's lacking some vital functionality, I'm open to suggestions.
 
-Here's an example:
+Here are some examples:
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/jkrumbiegel/Layered.jl/master/examples/01_experimental_paradigm/example.svg?sanitize=true">
+  <a href="https://github.com/jkrumbiegel/Layered.jl/blob/master/examples/01_experimental_paradigm/experimental_paradigm.jl">
+    <img src="https://raw.githubusercontent.com/jkrumbiegel/Layered.jl/master/examples/01_experimental_paradigm/example.svg?sanitize=true">
+  </a>
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/jkrumbiegel/Layered.jl/master/examples/03_petals/petals.svg?sanitize=true">
+  <a href="https://github.com/jkrumbiegel/Layered.jl/blob/master/examples/02_gabor_patches/gabor_patches.jl">
+    <img src="https://raw.githubusercontent.com/jkrumbiegel/Layered.jl/master/examples/02_gabor_patches/gabors.svg?sanitize=true">
+  </a>
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/jkrumbiegel/Layered.jl/master/examples/02_gabor_patches/gabors.svg?sanitize=true">
+  <a href="https://github.com/jkrumbiegel/Layered.jl/blob/master/examples/03_petals/petals.jl">
+    <img src="https://raw.githubusercontent.com/jkrumbiegel/Layered.jl/master/examples/03_petals/petals.svg?sanitize=true">
+  </a>
 </p>
