@@ -22,16 +22,18 @@ function Base.:+(l::LayerContent, a::T) where T <: Attribute
     l
 end
 
-function layer()
-    Layer(Transform(), Vector{LayerContent}[], nothing, Attributes(), Clip(nothing), Opacity(1), Operator())
+function layer(;scale=1, rotation=deg(0), translation=O)
+    Layer(
+        Transform(scale=scale, rotation=rotation, translation=translation),
+        Vector{LayerContent}[], nothing, Attributes(), Clip(nothing), Opacity(1), Operator())
 end
 
 function layer(t::Transform)
     Layer(t, Vector{LayerContent}[], nothing, Attributes(), Clip(nothing), Opacity(1), Operator())
 end
 
-function layer!(parent::Layer)
-    l = Layer(Transform(), Vector{LayerContent}[], nothing, Attributes(), Clip(nothing), Opacity(1), Operator())
+function layer!(parent::Layer; scale=1, rotation=deg(0), translation=O)
+    l = layer(scale=scale, rotation=rotation, translation=translation)
     push!(parent, l)
     l
 end
