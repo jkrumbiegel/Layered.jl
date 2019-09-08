@@ -14,7 +14,7 @@ Base.convert(::Type{Point}, t::Tuple{S, T}) where {S<:Real,T<:Real} = Point(t[1]
 Base.show(io::IO, p::Point) = print(io, "Point($(p.xy[1]), $(p.xy[2]))")
 
 function needed_attributes(::Type{Point})
-    (Visible, Fill, Stroke, Markersize, Marker)
+    (Visible, Fill, Stroke, Linestyle, Linewidth, Markersize, Marker)
 end
 
 magnitude(p::Point) = sqrt(sum(p.xy .^ 2))

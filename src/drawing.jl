@@ -2,14 +2,12 @@ const C = Cairo
 
 export draw, draw_svg, applytransform!
 
-CLOSEPOLY = 79
-CURVE3 = 3
-CURVE4 = 4
-LINETO = 2
-MOVETO = 1
 
+function fill!(cc, f::Fill)
+    fill!(cc, f.content)
+end
 
-function fillpreserve!(cc, g::Gradient)
+function fill!(cc, g::Gradient)
     C.save(cc)
     pat = C.pattern_create_linear(g.from.xy..., g.to.xy...)
     for (stop, col) in zip(g.stops, g.colors)
@@ -21,7 +19,7 @@ function fillpreserve!(cc, g::Gradient)
     C.restore(cc)
 end
 
-function fillpreserve!(cc, rg::RadialGradient)
+function fill!(cc, rg::RadialGradient)
     C.save(cc)
     pat = C.pattern_create_radial(rg.from.center.xy..., rg.from.radius, rg.to.center.xy..., rg.to.radius)
     for (stop, col) in zip(rg.stops, rg.colors)
@@ -33,37 +31,35 @@ function fillpreserve!(cc, rg::RadialGradient)
     C.restore(cc)
 end
 
-function fillpreserve!(cc, c::Colors.Colorant)
+function fill!(cc, c::Colors.Colorant)
     C.save(cc)
     C.set_source_rgba(cc, rgba(c)...)
     C.fill_preserve(cc)
     C.restore(cc)
 end
 
-function strokepreserve!(cc, canvasmatrix, c::Colors.Colorant)
+function fill!(cc, n::Nothing)
+    # do nothing
+end
+
+function stroke!(cc, canvasmatrix, s::Stroke)
+    stroke!(cc, canvasmatrix, s.color)
+end
+
+function stroke!(cc, canvasmatrix, c::Colors.Colorant)
     C.save(cc)
     C.set_source_rgba(cc, rgba(c)...)
     C.set_matrix(cc, canvasmatrix)
-    C.stroke_transformed(cc)
+    C.stroke_transformed_preserve(cc)
     C.restore(cc)
 end
 
-function strokepreserve!(cc, canvasmatrix, c::Nothing)
+function stroke!(cc, canvasmatrix, c::Nothing)
+    # do nothing
 end
 
-function fillstroke!(cc, canvasmatrix, a::Attributes)
-    fillpreserve!(cc, a[Fill].content)
-    strokepreserve!(cc, canvasmatrix, a[Stroke].color)
-    # clear the path
+function clearpath!(cc)
     Cairo.new_path(cc)
-end
-
-function stroke!(cc, canvasmatrix, a::Attributes)
-    C.save(cc)
-    C.set_source_rgba(cc, rgba(a[Stroke].color)...)
-    C.set_matrix(cc, canvasmatrix)
-    C.stroke_transformed(cc)
-    C.restore(cc)
 end
 
 function lineattrs!(cc, a::Attributes)
@@ -259,10 +255,11 @@ end
 function draw!(cc, canvasmatrix, s::Shape)
     geom = solve!(s, cc)
     attributes = getattributes(s)
+
+    #fast exit for invisible shapes
     if !attributes[Visible].visible
         return
     end
-    # transformed_to_toplevel = upward_transform(s) * geom
 
     C.save(cc)
     C.push_group(cc)
@@ -279,19 +276,67 @@ function draw!(cc, canvasmatrix, s::Shape)
     C.restore(cc)
 end
 
-function draw!(cc, canvasmatrix, p::Point, a::Attributes)
-    C.move_to(cc, (p + 0.5 * a[Markersize].size * X(1)).xy...)
-    C.arc(cc, p.x, p.y, 0.5 * a[Markersize].size, 0, 2pi)
-    fillstroke!(cc, canvasmatrix, a)
+needslineattrs(g) = false
+needslineattrs(g::Union{Point, Line, Bezier, Rect, Circle, Polygon, Path}) = true
+needsstroke(g) = false
+needsstroke(g::Union{Point, Line, Bezier, Rect, Circle, Polygon, Path}) = true
+needsfill(g) = false
+needsfill(g::Union{Point, Bezier, Rect, Circle, Polygon, Path}) = true
+
+function draw!(cc, canvasmatrix, g::GeometricObject, a::Attributes)
+    if typeof(g) <: Point
+        makepath!(cc, g, canvasmatrix, a[Marker], a[Markersize])
+    else
+        makepath!(cc, g)
+    end
+
+    needslineattrs(g) && lineattrs!(cc, a)
+    needsstroke(g) && stroke!(cc, canvasmatrix, a[Stroke])
+    needsfill(g) && fill!(cc, a[Fill])
+
+    clearpath!(cc)
 end
 
-function draw(ps::Points, a::Attributes)
-    PyPlot.scatter(
-        xs(ps.points), ys(ps.points),
-        s = a[Markersizes].sizes,
-        color = rgba.(a[Strokes].colors),
-        marker = a[Marker].marker,
-    )
+# function draw!(cc, canvasmatrix, p::Point, a::Attributes)
+#     C.move_to(cc, (p + 0.5 * a[Markersize].size * X(1)).xy...)
+#     C.arc(cc, p.x, p.y, 0.5 * a[Markersize].size, 0, 2pi)
+#     fill!(cc, canvasmatrix, a[Fill])
+#     stroke!(cc, canvasmatrix, a[Stroke])
+#     clearpath!(cc)
+# end
+
+# function draw(ps::Points, a::Attributes)
+#     PyPlot.scatter(
+#         xs(ps.points), ys(ps.points),
+#         s = a[Markersizes].sizes,
+#         color = rgba.(a[Strokes].colors),
+#         marker = a[Marker].marker,
+#     )
+# end
+
+function makepath!(cc, p::Point, canvasmatrix, m::Marker, ms::Markersize)
+    m = m.marker
+    s = ms.size
+
+    # save the position of the point in device coordinates
+    xdev, ydev = C.user_to_device!(cc, [p.xy...])
+    C.save(cc)
+    # set the canvasmatrix and convert the device space point to this space
+    C.set_matrix(cc, canvasmatrix)
+    xuser, yuser = C.device_to_user!(cc, [xdev, ydev])
+    # translate onto the point
+    C.translate(cc, xuser, yuser)
+
+    # now the shapes can be defined with origin (0, 0) and size in canvas units
+    shape = @match m begin
+        :square => Rect(O, s, s, deg(0))
+        :circle || :o => Circle(O, 0.5s)
+        :cross || :+ => Polygon(ncross(O, 4, 0.5s, 1 / Base.MathConstants.golden))
+        _ => error("Markertype $m is not implemented")
+    end
+
+    makepath!(cc, shape)
+    C.restore(cc)
 end
 
 function makepath!(cc, l::Line)
@@ -303,11 +348,6 @@ function continuepath!(cc, l::Line)
     C.line_to(cc, l.to.xy...)
 end
 
-function draw!(cc, canvasmatrix, l::Line, a::Attributes)
-    makepath!(cc, l)
-    lineattrs!(cc, a)
-    stroke!(cc, canvasmatrix, a)
-end
 
 # function draw(ls::LineSegments, a::Attributes)
 #     path = PyPlot.matplotlib.path.Path(ls, closed=false)
@@ -328,13 +368,7 @@ function makepath!(cc, p::Polygon)
         C.line_to(cc, po.xy...)
     end
 
-    C.line_to(cc, p.points[1].xy...)
-end
-
-function draw!(cc, canvasmatrix, p::Polygon, a::Attributes)
-    makepath!(cc, p)
-    lineattrs!(cc, a)
-    fillstroke!(cc, canvasmatrix, a)
+    C.close_path(cc)
 end
 
 function makepath!(cc, a::Arc)
@@ -354,12 +388,6 @@ function continuepath!(cc, a::Arc)
     else
         C.arc_negative(cc, a.center.xy..., a.radius, rad(a.start_angle), rad(a.end_angle))
     end
-end
-
-function draw!(cc, canvasmatrix, arc::Arc, a::Attributes)
-    makepath!(cc, arc)
-    lineattrs!(cc, a)
-    stroke!(cc, a)
 end
 
 alignments = Dict(
@@ -441,12 +469,6 @@ function continuepath!(cc, b::Bezier)
     C.curve_to(cc, b.c1.xy..., b.c2.xy..., b.to.xy...)
 end
 
-function draw!(cc, canvasmatrix, b::Bezier, a::Attributes)
-    makepath!(cc, b)
-    lineattrs!(cc, b)
-    stroke!(cc, b)
-end
-
 start(a::Arc) = fraction(a, 0)
 stop(a::Arc) = fraction(a, 1)
 start(b::Bezier) = b.from
@@ -470,11 +492,6 @@ function makepath!(cc, p::Path)
     end
 end
 
-function draw!(cc, canvasmatrix, p::Path, a::Attributes)
-    makepath!(cc, p)
-    lineattrs!(cc, a)
-    fillstroke!(cc, canvasmatrix, a)
-end
 
 # function draw(bs::Paths, a::Attributes)
 #     paths = PyPlot.matplotlib.path.Path.(bs.paths)
@@ -514,33 +531,6 @@ function setclippath!(cc, c::Clip)
     C.clip(cc)
 end
 
-function draw!(cc, canvasmatrix, c::Circle, a::Attributes)
-    C.save(cc)
-    makepath!(cc, c)
-    lineattrs!(cc, a)
-    fillstroke!(cc, canvasmatrix, a)
-    C.restore(cc)
-end
-
-function draw!(cc, canvasmatrix, r::Rect, a::Attributes)
-    # ax = PyPlot.gca()
-    # rectpatch = PyPlot.matplotlib.patches.Rectangle(
-    #     (bottomleft(r).xy...,),
-    #     r.width,
-    #     r.height,
-    #     deg(r.angle),
-    #     facecolor = rgba(a[Fill].color),
-    #     edgecolor = rgba(a[Stroke].color),
-    #     linewidth = a[Linewidth].width,
-    #     lineattrs = a[Linestyle].style,
-    #     zorder=zorder(),
-    #     snap=false,
-    # )
-    # ax.add_patch(rectpatch)
-    makepath!(cc, r)
-    lineattrs!(cc, a)
-    fillstroke!(cc, canvasmatrix, a)
-end
 
 function makepath!(cc, r::Rect)
     C.move_to(cc, bottomleft(r).xy...)
