@@ -19,6 +19,7 @@ include("shape.jl")
 include("canvas.jl")
 include("drawing.jl")
 include("video.jl")
+include("helpers.jl")
 
 Base.Broadcast.broadcastable(g::GeometricObject) = Ref(g)
 
