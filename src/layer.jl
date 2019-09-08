@@ -18,7 +18,7 @@ function Base.:+(l::LayerContent, o::Operator)
 end
 
 function Base.:+(l::LayerContent, a::T) where T <: Attribute
-    l.attrs[T] = a
+    add!(l.attrs, a)
     l
 end
 
