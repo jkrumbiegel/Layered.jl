@@ -227,7 +227,7 @@ function draw!(cc::C.CairoContext, canvasmatrix, l::Layer)
     # I guess this should go here so it only takes effect on the layer after
     # that is drawn, so there will be better fringes than if two antialiased clips
     # are applied on perfectly overlapping objects
-    setclippath!(cc, l.clip)
+    setclippath!(cc, l)
 
     C.set_operator(cc, Base.convert(Int32, l.operator))
 
@@ -267,7 +267,7 @@ function draw!(cc, canvasmatrix, s::Shape)
     gr = C.pop_group(cc)
 
     C.set_source(cc, gr);
-    setclippath!(cc, s.clip)
+    setclippath!(cc, s)
 
     C.set_operator(cc, Base.convert(Int32, s.operator))
 
@@ -517,16 +517,20 @@ function makepath!(cc, c::Circle)
     C.arc(cc, c.center.xy..., c.radius, 0, 2pi)
 end
 
-function setclippath!(cc, c::Clip)
-    sh = c.shape
+function setclippath!(cc, l::LayerContent)
+
+    sh = l.clip.shape
     if isnothing(sh)
         return
     end
     if typeof(sh) <: Shape
-        makepath!(cc, solve!(sh, cc))
+        s = transform_from_to(sh, l, cc) * solve!(sh, cc)
+        makepath!(cc, s)
     else
-        makepath!(cc, solve!(sh[1], cc))
-        makepath!(cc, solve!(sh[2], cc))
+        s_inner = transform_from_to(sh[1], l, cc) * solve!(sh[1], cc)
+        s_outer = transform_from_to(sh[2], l, cc) * solve!(sh[2], cc)
+        makepath!(cc, s_inner)
+        makepath!(cc, s_outer)
     end
     C.clip(cc)
 end
