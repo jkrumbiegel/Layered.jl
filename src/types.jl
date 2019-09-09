@@ -25,17 +25,9 @@ end
 
 const P = Point
 
-struct Points <: GeometricObject
-    points::Vector{Point}
-end
-
 struct Line <: GeometricObject
     from::Point
     to::Point
-end
-
-struct LineSegments <: GeometricObject
-    segments::Vector{Line}
 end
 
 struct Arc <: GeometricObject
@@ -61,10 +53,6 @@ end
 
 struct Polygon <: GeometricObject
     points::Vector{Point}
-end
-
-struct Polygons <: GeometricObject
-    polys::Vector{Polygon}
 end
 
 struct Circle <: GeometricObject
@@ -99,8 +87,19 @@ struct Path <: GeometricObject
     closed::Bool
 end
 
-struct Paths <: GeometricObject
-    paths::Vector{Path}
+
+single_geoms = (:Point, :Line, :Arc, :Circle, :Rect, :Bezier, :Path, :Polygon, :Txt)
+plural_geoms = Symbol.(String.(single_geoms) .* "s")
+
+for (singular, plural) in zip(single_geoms, plural_geoms)
+    @eval begin
+        struct $plural <: GeometricObject
+            parts::Array{$singular}
+        end
+
+        # to enable simpler returns from closures with auto-convert
+        Base.convert(::Type{$plural}, arr::Array{$singular}) = $plural(arr)
+    end
 end
 
 abstract type Attribute end

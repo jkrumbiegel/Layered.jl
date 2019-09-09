@@ -59,6 +59,6 @@ end
 
 needed_attributes(::Type{Line}) = (Visible, Linewidth, Stroke, Linestyle)
 
-needed_attributes(::Type{LineSegments}) = (Visible, Linewidth, Stroke, Linestyle)
-
-Base.convert(::Type{LineSegments}, ls::Vector{Line}) = LineSegments(ls)
+# needed_attributes(::Type{LineSegments}) = (Visible, Linewidth, Stroke, Linestyle)
+#
+# Base.convert(::Type{LineSegments}, ls::Vector{Line}) = LineSegments(ls)

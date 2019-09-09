@@ -40,11 +40,6 @@ function Base.:*(t::Transform, p::Point)
     Point(rmat * t.scale * p.xy + t.translation)
 end
 
-function Base.:*(t::Transform, ps::Points)
-    mat = rotmat(t.rotation) * t.scale
-    Points([Point(mat * p.xy + t.translation) for p in ps.points])
-end
-
 function Base.:*(t::Transform, l::Line)
     Line(t * l.from, t * l.to)
 end
@@ -65,20 +60,8 @@ function Base.:*(t::Transform, bp::Path)
     Path(BezierSegment[t * s for s in bp.segments], bp.closed)
 end
 
-function Base.:*(t::Transform, bps::Paths)
-    Paths(t .* bps.paths)
-end
-
-function Base.:*(t::Transform, ls::LineSegments)
-    LineSegments(t .* ls.segments)
-end
-
 function Base.:*(t::Transform, p::Polygon)
     Polygon(t .* p.points)
-end
-
-function Base.:*(t::Transform, ps::Polygons)
-    Polygons(t .* p.polys)
 end
 
 function Base.:*(tr::Transform, t::Txt)
