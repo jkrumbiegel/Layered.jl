@@ -175,56 +175,65 @@ end
 
 Clip(s1::Shape, s2::Shape) = Clip((s1, s2))
 
-const Fillers = Union{Nothing, Colors.Colorant, Gradient, RadialGradient}
-
-struct Fill{T<:Fillers} <: Attribute
+const FillContent = Union{Nothing, Colors.Colorant, Gradient, RadialGradient}
+struct Fill{T<:FillContent} <: Attribute
     content::T
 end
 
-struct Textfill{T<:Fillers} <: Attribute
+const TextfillContent = FillContent
+struct Textfill{T<:TextfillContent} <: Attribute
     content::T
 end
 
-struct Fills{T<:Union{Colors.Colorant, Array{<:Colors.Colorant}}} <: Attribute
-    colors::T
-end
-
-struct Stroke{T<:Union{Nothing, Colors.Colorant}} <: Attribute
+const StrokeContent = Union{Nothing, Colors.Colorant}
+struct Stroke{T<:StrokeContent} <: Attribute
     color::T
 end
 
-struct Strokes{T<:Union{Colors.Colorant, Array{<:Colors.Colorant}}} <: Attribute
-    colors::T
+const LinestyleContent = Symbol
+struct Linestyle{T<:LinestyleContent} <: Attribute
+    style::T
 end
 
-struct Linestyle <: Attribute
-    style::Symbol
+const LinewidthContent = Real
+struct Linewidth{T<:LinewidthContent} <: Attribute
+    width::T
 end
 
-struct Linewidth <: Attribute
-    width::Float64
+const MarkersizeContent = Real
+struct Markersize{T<:MarkersizeContent} <: Attribute
+    size::T
 end
 
-struct Linewidths{T<:Union{Real, Array{<:Real}}} <: Attribute
-    widths::T
+const MarkerContent = Symbol
+struct Marker{T<:MarkerContent} <: Attribute
+    marker::T
 end
 
-struct Markersize <: Attribute
-    size::Float64
+const VisibleContent = Bool
+struct Visible{T<:VisibleContent} <: Attribute
+    visible::T
 end
 
-struct Markersizes{T<:Union{Real, Array{<:Real}}} <: Attribute
-    sizes::T
-end
+singular_attrs = (:Fill, :Stroke, :Marker, :Markersize, :Linewidth, :Linestyle, :Textfill)
 
-struct Marker <: Attribute
-    marker::Symbol
-end
+plural_attrs = Symbol.(String.(singular_attrs) .* "s")
 
-struct Font <: Attribute
-    family::String
-end
 
-struct Visible <: Attribute
-    visible::Bool
+for (singular, plural) in zip(singular_attrs, plural_attrs)
+
+    contenttype = Symbol(String(singular) * "Content")
+
+    @eval begin
+        """A multi-element attribute that can have either one element or many
+        """
+        struct $plural <: Attribute
+            parts::Union{$contenttype, Array{<:$contenttype}}
+        end
+
+        export $plural
+
+        # to enable simpler returns from closures with auto-convert
+        Base.convert(::Type{$plural}, arr::Array{$singular}) = $plural(arr)
+    end
 end
