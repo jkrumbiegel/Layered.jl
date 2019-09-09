@@ -15,9 +15,15 @@ function canvas(
     size_pt = size_in .* pt_per_in
 
     l = if isnothing(toplayer)
-        layer() + Visible(true) + Markersize(3) + Markersizes(3) + Marker(:o) +
-            Fill("transparent") + Fills("transparent") + Stroke("black") +
-            Strokes("black") + Linewidth(1) + Linestyle(:solid) + Textfill("black")
+        layer() +
+            Visible(true) +
+            Markersize(3) +
+            Marker(:o) +
+            Fill("transparent") +
+            Stroke("black") +
+            Linewidth(1) +
+            Linestyle(:solid) +
+            Textfill("black")
     else
         toplayer
     end

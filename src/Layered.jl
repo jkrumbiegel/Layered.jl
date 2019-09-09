@@ -21,12 +21,11 @@ include("canvas.jl")
 include("drawing.jl")
 include("video.jl")
 include("helpers.jl")
-include("plurals.jl")
 
 Base.Broadcast.broadcastable(g::GeometricObject) = Ref(g)
 
 
-for geom in (single_geoms..., plural_geoms...)
+for geom in geoms
 
     lowerc = Symbol(lowercase(String(geom)))
     lowerc_exc = Symbol(lowercase(String(geom)) * "!")

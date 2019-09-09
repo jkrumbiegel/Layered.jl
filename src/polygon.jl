@@ -2,11 +2,7 @@ export ncross, grow, center
 
 Polygon(points::Vararg{T, N}) where {T <: Point, N} = Polygon([points...])
 
-
 needed_attributes(::Type{Polygon}) = (Visible, Linewidth, Stroke, Linestyle, Fill)
-
-needed_attributes(::Type{Polygons}) = (Visible, Linewidth, Stroke, Linestyle, Fill)
-
 
 Base.convert(::Type{Polygon}, ps::Vector{Point}) = Polygon(ps)
 

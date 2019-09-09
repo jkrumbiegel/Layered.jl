@@ -56,10 +56,6 @@ end
 
 needed_attributes(::Type{Path}) = (Visible, Linewidth, Stroke, Linestyle, Fill)
 
-needed_attributes(::Type{Paths}) = (Visible, Linewidths, Strokes, Linestyle, Fills)
-
-Base.convert(::Type{Paths}, paths::Vector{Path}) = Paths(paths)
-
 function arrow(from::Point, to::Point, tiplength, tipwidth, shaftwidthback, shaftwidthfront, tipretraction)
     vector = from → to
     tipconnection = to - normalize(vector) * tiplength

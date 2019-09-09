@@ -67,8 +67,3 @@ function rotate(p::Point, angle::Angle; around::Point=Point(0, 0))
     rotated_vector = Point(_rotation_matrix(angle) * vector.xy)
     rotated_vector + around
 end
-
-
-needed_attributes(::Type{Points}) = (Visible, Fills, Strokes, Markersizes, Marker)
-
-Base.convert(::Type{Points}, ps::Vector{Point}) = Points(ps)

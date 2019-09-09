@@ -82,15 +82,6 @@ function rgba(c::Colors.Colorant)
     Float64.((rgba.r, rgba.g, rgba.b, rgba.alpha))
 end
 
-function rgbas(f::T) where T <: Union{Fills,Strokes}
-    c = f.colors
-    if typeof(c) <: Colors.Colorant
-        return rgba(c)
-    else
-        return rgba.(c)
-    end
-end
-
 function draw(canvas::Canvas, kind::Symbol; kwargs...)
     @match kind begin
         :svg => draw_svg(canvas; kwargs...)

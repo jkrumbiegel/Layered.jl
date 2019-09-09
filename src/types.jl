@@ -88,19 +88,8 @@ struct Path <: GeometricObject
 end
 
 
-single_geoms = (:Point, :Line, :Arc, :Circle, :Rect, :Bezier, :Path, :Polygon, :Txt)
-plural_geoms = Symbol.(String.(single_geoms) .* "s")
+geoms = (:Point, :Line, :Arc, :Circle, :Rect, :Bezier, :Path, :Polygon, :Txt)
 
-for (singular, plural) in zip(single_geoms, plural_geoms)
-    @eval begin
-        struct $plural <: GeometricObject
-            parts::Array{$singular}
-        end
-
-        # to enable simpler returns from closures with auto-convert
-        Base.convert(::Type{$plural}, arr::Array{$singular}) = $plural(arr)
-    end
-end
 
 abstract type Attribute end
 
@@ -213,27 +202,4 @@ end
 const VisibleContent = Bool
 struct Visible{T<:VisibleContent} <: Attribute
     visible::T
-end
-
-singular_attrs = (:Fill, :Stroke, :Marker, :Markersize, :Linewidth, :Linestyle, :Textfill)
-
-plural_attrs = Symbol.(String.(singular_attrs) .* "s")
-
-
-for (singular, plural) in zip(singular_attrs, plural_attrs)
-
-    contenttype = Symbol(String(singular) * "Content")
-
-    @eval begin
-        """A multi-element attribute that can have either one element or many
-        """
-        struct $plural <: Attribute
-            parts::Union{$contenttype, Array{<:$contenttype}}
-        end
-
-        export $plural
-
-        # to enable simpler returns from closures with auto-convert
-        Base.convert(::Type{$plural}, arr::Array{$singular}) = $plural(arr)
-    end
 end
