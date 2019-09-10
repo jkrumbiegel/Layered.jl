@@ -69,7 +69,7 @@ struct TextExtent
     yadvance::Float64
 end
 
-struct Txt{T <: Union{Nothing, TextExtent}} <: GeometricObject
+struct Txt <: GeometricObject
     pos::Point
     text::String
     size::Float64
@@ -77,7 +77,7 @@ struct Txt{T <: Union{Nothing, TextExtent}} <: GeometricObject
     valign::Symbol
     angle::Angle
     font::String
-    extent::T
+    extent::Union{Nothing, TextExtent}
 end
 
 const BezierSegment = Union{Bezier, Line, Arc}
@@ -141,7 +141,7 @@ mutable struct Shapes{T <: GeometricObject} <: LayerContent
     # make this nicer and more julian
     content::Union{Tuple{Function, Vector}, Array{T}}
     parent::Union{Layer, Nothing}
-    solved::Union{T, Nothing}
+    solved::Union{Array{T}, Nothing}
     attrs::Attributes
     clip::Clip
     opacity::Opacity

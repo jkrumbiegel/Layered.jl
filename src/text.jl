@@ -6,11 +6,11 @@ Txt(pos::Point,
     halign::Symbol,
     valign::Symbol=:c,
     angle::Angle=deg(0),
-    font::String=defaultfont()) = Txt{Nothing}(pos, text, size, halign, valign, angle, font, nothing)
+    font::String=defaultfont()) = Txt(pos, text, size, halign, valign, angle, font, nothing)
 
 Txt(t::Txt, extent::TextExtent) = Txt(t.pos, t.text, t.size, t.halign, t.valign, t.angle, t.font, extent)
 
-function Txt(pos::Point, text::String, size::Real; ha=:c, va=:c, angle=deg(0), font=default_font())
+function Txt(pos::Point, text::String, size::Real; ha=:c, va=:c, angle=deg(0), font=defaultfont())
     Txt(pos, text, size, ha, va, angle, font)
 end
 

@@ -1,5 +1,5 @@
 export Attribute, Attributes, Fill, Fills, Stroke, Strokes, Linestyle, Linewidth, Linewidths, Markersize, Markersizes, Marker, Font, Visible
-export Clip, Textfill, Opacity, Operator
+export Clip, Textfill, Opacity, Operator, Invisible
 
 
 Base.Broadcast.broadcastable(a::Attribute) = Ref(a)
@@ -17,6 +17,8 @@ Strokes(s::String) = Strokes(parse(Colors.Colorant, s))
 Attributes() = Attributes(Dict{Type{<:Attribute}, Union{Function, Attribute}}())
 
 Operator() = Operator(:over)
+
+const Invisible = Visible(false)
 
 parameterlesstypeof(a::Attribute) = typeof(a).name.wrapper
 

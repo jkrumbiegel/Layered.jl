@@ -45,6 +45,13 @@ for geom in geoms
         $lowerc(args...) = Shape($geom, args...)
 
         """
+        $($lowerc_plural)(args...)
+
+        Creates `Shapes` containing `GeometricObject`s of type `$($geom)`,
+        passing any trailing arguments to the constructor `$($geom).()`."""
+        $lowerc_plural(args...) = Shapes($geom, args...)
+
+        """
         $($lowerc_exc)(layer::Layer, args...)
 
         Creates a shape containing a `GeometricObject` of type `$($geom)`,
@@ -52,6 +59,18 @@ for geom in geoms
         appends the created shape to the given `Layer` `layer`."""
         function $lowerc_exc(layer::Layer, args...)
             x = $lowerc(args...)
+            push!(layer, x)
+            x
+        end
+
+        """
+        $($lowerc_plural_exc)(layer::Layer, args...)
+
+        Creates `Shapes` containing `GeometricObject`s of type `$($geom)`,
+        passing any trailing arguments to the constructor `$($geom).()`. Then
+        appends the created `Shapes` to the given `Layer` `layer`."""
+        function $lowerc_plural_exc(layer::Layer, args...)
+            x = $lowerc_plural(args...)
             push!(layer, x)
             x
         end
@@ -208,7 +227,7 @@ for geom in geoms
             error("Could not find given shape in layer.")
         end
 
-        export $geom, $lowerc, $lowerc_exc, $lowerc_first_exc, $lowerc_pre_exc, $lowerc_post_exc
+        export $geom, $lowerc, $lowerc_exc, $lowerc_first_exc, $lowerc_pre_exc, $lowerc_post_exc, $lowerc_plural, $lowerc_plural_exc
 
     end
 end

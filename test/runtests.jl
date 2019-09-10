@@ -191,10 +191,13 @@ function tpoints()
 
     l = rectlayer!(tl, c.rect, :w, :norm, margin=40)
 
-    rect!(l, P(.5, .5), 1, 1, deg(0)) + Linewidth(1)
+    ls = lines!(l, P.(0, (0:0.03:1) .- 0.1), P.(1, (0:0.03:1) .+ 0.1))
 
-    ps = point!.(l, grid(0:0.1:1, 0:0.1:1)...) .+
-        Fill("red") .+ Markersize(10) .+ Marker(:+) .+ Stroke(nothing)
+    circ = circle!(l, P(0.5, 0.5), 0.3) + Invisible
+
+    txt!(tl, O, "X", 100) + Textfill("white")
+
+    ls + Clip(circ)
 
     c
 

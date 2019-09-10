@@ -231,6 +231,11 @@ function getattributes(s::Shape{T}) where T
     attributes = Attributes(Dict(attr => getattribute(s, attr) for attr in needed))
 end
 
+function getattributes(s::Shapes{T}) where T
+    needed = needed_attributes(T)
+    attributes = Attributes(Dict(attr => getattribute(s, attr) for attr in needed))
+end
+
 function getattribute(l::LayerContent, attr)
     if haskey(l.attrs, attr)
         return l.attrs[attr]
@@ -255,6 +260,31 @@ function draw!(cc, canvasmatrix, s::Shape)
     C.save(cc)
     C.push_group(cc)
     draw!(cc, canvasmatrix, geom, attributes)
+    gr = C.pop_group(cc)
+
+    C.set_source(cc, gr);
+    setclippath!(cc, s)
+
+    C.set_operator(cc, Base.convert(Int32, s.operator))
+
+    C.paint_with_alpha(cc, s.opacity.opacity)
+
+    C.restore(cc)
+end
+
+function draw!(cc, canvasmatrix, s::Shapes)
+    geoms = solve!(s, cc)
+    attributes = getattributes(s)
+
+    #fast exit for invisible shapes
+    if !attributes[Visible].visible
+        return
+    end
+
+    C.save(cc)
+    C.push_group(cc)
+
+    draw!.(Ref(cc), Ref(canvasmatrix), geoms, Ref(attributes))
     gr = C.pop_group(cc)
 
     C.set_source(cc, gr);
