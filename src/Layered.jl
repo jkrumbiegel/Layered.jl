@@ -28,7 +28,9 @@ Base.Broadcast.broadcastable(g::GeometricObject) = Ref(g)
 for geom in geoms
 
     lowerc = Symbol(lowercase(String(geom)))
+    lowerc_plural = Symbol(lowercase(String(geom)) * "s")
     lowerc_exc = Symbol(lowercase(String(geom)) * "!")
+    lowerc_plural_exc = Symbol(lowercase(String(geom)) * "s!")
     lowerc_first_exc = Symbol(lowercase(String(geom)) * "_first!")
     lowerc_pre_exc = Symbol(lowercase(String(geom)) * "_pre!")
     lowerc_post_exc = Symbol(lowercase(String(geom)) * "_post!")
@@ -113,6 +115,17 @@ for geom in geoms
         $lowerc(f::Function, args...) = Shape(f, $geom, args...)
 
         """
+        $($lowerc_plural)(f::Function, args...)
+
+        Creates shapes containing `GeometricObject`s of type `$($geom)`,
+        storing any trailing arguments as dependencies, later to be passed as arguments
+        to the given `Function` `f` that should return `GeometricObject`s of type `$($geom)`
+        and will be evaluated when `solve!` is called on the shapes during
+        the drawing process."""
+        $lowerc_plural(f::Function, args...) = Shapes(f, $geom, args...)
+
+
+        """
         $($lowerc_exc)(f::Function, layer::Layer, args...)
 
         Creates a shape containing a `GeometricObject` of type `$($geom)`,
@@ -125,6 +138,21 @@ for geom in geoms
             push!(layer, x)
             x
         end
+
+        """
+        $($lowerc_plural_exc)(f::Function, layer::Layer, args...)
+
+        Creates multiple shapes containing `GeometricObject`s of type `$($geom)`,
+        storing any trailing arguments as dependencies, later to be passed as arguments
+        to the given `Function` `f` that should return the `GeometricObject`s of type `$($geom)`
+        and will be evaluated when `solve!` is called on the shapes during
+        the drawing process. This function then appends the created shapes to the given `Layer` `layer`."""
+        function $lowerc_plural_exc(f::Function, layer::Layer, args...)
+            x = $lowerc_plural(f, args...)
+            push!(layer, x)
+            x
+        end
+
 
         """
         $($lowerc_first_exc)(f::Function, layer::Layer, args...)
