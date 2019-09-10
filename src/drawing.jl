@@ -273,7 +273,7 @@ function draw!(cc, canvasmatrix, s::Shape)
     C.restore(cc)
 end
 
-function getattributes(attr::Attributes, i::Int, n::Int)
+function getattributes(attr::Attributes, i::Int, n::Int, geom::GeometricObject)
     singleattrs = Attributes()
     for (typ, a) in attr.attrs
         if ismultiattr(a)
@@ -283,6 +283,7 @@ function getattributes(attr::Attributes, i::Int, n::Int)
                 value = @match sym begin
                     :i => func(i)
                     :frac => func((i - 1) / (n - 1))
+                    :geom => func(geom)
                     _ => error("Not implemented")
                 end
                 add!(singleattrs, typ(value))
@@ -312,7 +313,7 @@ function draw!(cc, canvasmatrix, s::Shapes)
 
     n = length(geoms)
     for (i, g) in enumerate(geoms)
-        singleattrs = getattributes(attributes, i, n)
+        singleattrs = getattributes(attributes, i, n, g)
         draw!(cc, canvasmatrix, g, singleattrs)
     end
 
