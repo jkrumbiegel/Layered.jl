@@ -164,42 +164,42 @@ end
 
 Clip(s1::Shape, s2::Shape) = Clip((s1, s2))
 
-const FillContent = Union{Nothing, Colors.Colorant, Gradient, RadialGradient}
+const FillContent = Union{Nothing, Colors.Colorant, Gradient, RadialGradient, Array{<:Colors.Colorant}, Pair{Symbol, <:Function}}
 struct Fill{T<:FillContent} <: Attribute
-    content::T
+    val::T
 end
 
 const TextfillContent = FillContent
 struct Textfill{T<:TextfillContent} <: Attribute
-    content::T
+    val::T
 end
 
-const StrokeContent = Union{Nothing, Colors.Colorant}
+const StrokeContent = Union{Nothing, Colors.Colorant, Array{<:Colors.Colorant}, Pair{Symbol, <:Function}}
 struct Stroke{T<:StrokeContent} <: Attribute
-    color::T
+    val::T
 end
 
 const LinestyleContent = Symbol
 struct Linestyle{T<:LinestyleContent} <: Attribute
-    style::T
+    val::T
 end
 
 const LinewidthContent = Real
 struct Linewidth{T<:LinewidthContent} <: Attribute
-    width::T
+    val::T
 end
 
 const MarkersizeContent = Real
 struct Markersize{T<:MarkersizeContent} <: Attribute
-    size::T
+    val::T
 end
 
 const MarkerContent = Symbol
 struct Marker{T<:MarkerContent} <: Attribute
-    marker::T
+    val::T
 end
 
 const VisibleContent = Bool
 struct Visible{T<:VisibleContent} <: Attribute
-    visible::T
+    val::T
 end

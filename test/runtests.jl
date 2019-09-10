@@ -126,6 +126,7 @@ using Pkg
 pkg"activate ."
 using Revise
 using Layered
+using Colors
 import Cairo
 const C = Cairo
 
@@ -191,11 +192,14 @@ function tpoints()
 
     l = rectlayer!(tl, c.rect, :w, :norm, margin=40)
 
-    ls = lines!(l, P.(0, (0:0.03:1) .- 0.1), P.(1, (0:0.03:1) .+ 0.1))
+    rect!(l, P(0.5, 0.5), 2, 2, deg(0)) +
+        Fill(Gradient(P(0, 0), P(0, 1), LCHuv.(40, 20, -120:40)...))
 
-    circ = circle!(l, P(0.5, 0.5), 0.3) + Invisible
+    ls = lines!(l, P.(0, 0:0.05:1), P.(1, 0:0.05:1)) +
+        Stroke(:frac => f -> LCHuv(30, 40, -140 + f * 100)) +
+        Linewidth(7)
 
-    txt!(tl, O, "X", 100) + Textfill("white")
+    circ = circle!(l, P(0.5, 0.5), 0.5) + Invisible
 
     ls + Clip(circ)
 

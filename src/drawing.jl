@@ -4,7 +4,7 @@ export draw, draw_svg, applytransform!
 
 
 function fill!(cc, f::Fill)
-    fill!(cc, f.content)
+    fill!(cc, f.val)
 end
 
 function fill!(cc, g::Gradient)
@@ -43,7 +43,7 @@ function fill!(cc, n::Nothing)
 end
 
 function stroke!(cc, canvasmatrix, s::Stroke)
-    stroke!(cc, canvasmatrix, s.color)
+    stroke!(cc, canvasmatrix, s.val)
 end
 
 function stroke!(cc, canvasmatrix, c::Colors.Colorant)
@@ -63,8 +63,8 @@ function clearpath!(cc)
 end
 
 function lineattrs!(cc, a::Attributes)
-    style = a[Linestyle].style
-    lw = a[Linewidth].width
+    style = a[Linestyle].val
+    lw = a[Linewidth].val
     if style == :solid
         #
     elseif style == :dashed
@@ -199,6 +199,7 @@ function Base.convert(::Type{Int32}, op::Operator)
         :screen => C.OPERATOR_SCREEN
         :sat => C.OPERATOR_SATURATE
         :darken => C.OPERATOR_DARKEN
+        :overlay => C.OPERATOR_OVERLAY
     end
 end
 
@@ -253,7 +254,7 @@ function draw!(cc, canvasmatrix, s::Shape)
     attributes = getattributes(s)
 
     #fast exit for invisible shapes
-    if !attributes[Visible].visible
+    if !attributes[Visible].val
         return
     end
 
@@ -272,19 +273,49 @@ function draw!(cc, canvasmatrix, s::Shape)
     C.restore(cc)
 end
 
+function getattributes(attr::Attributes, i::Int, n::Int)
+    singleattrs = Attributes()
+    for (typ, a) in attr.attrs
+        if ismultiattr(a)
+            if typeof(a.val) <: Pair{Symbol, <:Function}
+                sym = a.val[1]
+                func = a.val[2]
+                value = @match sym begin
+                    :i => func(i)
+                    :frac => func((i - 1) / (n - 1))
+                    _ => error("Not implemented")
+                end
+                add!(singleattrs, typ(value))
+            elseif typeof(a.val) <: AbstractArray
+                add!(singleattrs, typ(a.val[i]))
+            else
+                error("Not implemented")
+            end
+        else
+            add!(singleattrs, a)
+        end
+    end
+    singleattrs
+end
+
 function draw!(cc, canvasmatrix, s::Shapes)
     geoms = solve!(s, cc)
     attributes = getattributes(s)
 
     #fast exit for invisible shapes
-    if !attributes[Visible].visible
+    if attributes[Visible].val == false
         return
     end
 
     C.save(cc)
     C.push_group(cc)
 
-    draw!.(Ref(cc), Ref(canvasmatrix), geoms, Ref(attributes))
+    n = length(geoms)
+    for (i, g) in enumerate(geoms)
+        singleattrs = getattributes(attributes, i, n)
+        draw!(cc, canvasmatrix, g, singleattrs)
+    end
+
     gr = C.pop_group(cc)
 
     C.set_source(cc, gr);
@@ -336,8 +367,8 @@ end
 # end
 
 function makepath!(cc, p::Point, canvasmatrix, m::Marker, ms::Markersize)
-    m = m.marker
-    s = ms.size
+    m = m.val
+    s = ms.val
 
     # save the position of the point in device coordinates
     xdev, ydev = C.user_to_device!(cc, [p.xy...])
@@ -451,7 +482,7 @@ function draw!(cc, canvasmatrix, t::Txt, a::Attributes)
     #     C.destroy(pat);
     #     end
     # end
-    C.set_source_rgba(cc, rgba(a[Textfill].content)...)
+    C.set_source_rgba(cc, rgba(a[Textfill].val)...)
     C.select_font_face(cc, t.font, Cairo.FONT_SLANT_NORMAL, Cairo.FONT_WEIGHT_NORMAL)
     C.set_font_size(cc, t.size)
 

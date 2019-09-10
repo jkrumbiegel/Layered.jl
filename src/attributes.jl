@@ -8,11 +8,7 @@ Fill(s::String) = Fill(parse(Colors.Colorant, s))
 
 Textfill(s::String) = Textfill(parse(Colors.Colorant, s))
 
-Fills(s::String) = Fills(parse(Colors.Colorant, s))
-
 Stroke(s::String) = Stroke(parse(Colors.Colorant, s))
-
-Strokes(s::String) = Strokes(parse(Colors.Colorant, s))
 
 Attributes() = Attributes(Dict{Type{<:Attribute}, Union{Function, Attribute}}())
 
@@ -41,3 +37,8 @@ end
 Base.haskey(a::Attributes, key) = haskey(a.attrs, key)
 Base.setindex!(a::Attributes, value, key) = setindex!(a.attrs, value, key)
 Base.getindex(a::Attributes, key) = getindex(a.attrs, key)
+
+
+ismultiattr(a::Attribute) = false
+ismultiattr(f::Fill{T}) where T <: Union{Array, Pair{Symbol, <:Function}} = true
+ismultiattr(s::Stroke{T}) where T <: Union{Array, Pair{Symbol, <:Function}} = true
