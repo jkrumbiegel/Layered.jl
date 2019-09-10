@@ -172,3 +172,188 @@ end
 function rotate(p::Path, ang::Angle)
     Path([rotate(s, ang) for s in p.segments], false)
 end
+
+
+abstract type PathCommand end
+struct Move <: PathCommand
+    p::Point
+end
+
+struct RelMove <: PathCommand
+    p::Point
+end
+
+struct Lineto <: PathCommand
+    p::Point
+end
+
+struct RelLineto <: PathCommand
+    p::Point
+end
+
+struct HLineto <: PathCommand
+    x::Float64
+end
+
+struct RelHLineto <: PathCommand
+    x::Float64
+end
+
+struct VLineto <: PathCommand
+    x::Float64
+end
+
+struct RelVLineto <: PathCommand
+    x::Float64
+end
+
+struct CurveTo <: PathCommand
+    p::Point
+end
+
+struct RelCurveTo <: PathCommand
+    p::Point
+end
+
+struct Close <: PathCommand
+end
+
+function Path(svg::String)
+
+    # args = split(svg, r"[\s,]+", keepempty=false)
+    args = split(svg, r"((?<=[a-zA-Z])(?=\d)|(?<=\d)(?=[a-zA-Z])|([\s,]+)|((?<=\d)(?=\-))|((?<=[a-zA-Z])(?=\-)))", keepempty=false)
+
+    println(args)
+
+    i = 1
+
+    commands = PathCommand[]
+
+    while i <= length(args)
+
+        comm = args[i]
+        if comm == "M"
+            x, y = parse.(Float64, args[i+1:i+2])
+            push!(commands, Move(P(x, y)))
+            i += 3
+        elseif comm == "m"
+            x, y = parse.(Float64, args[i+1:i+2])
+            push!(commands, RelMove(P(x, y)))
+            i += 3
+        elseif comm == "L"
+            x, y = parse.(Float64, args[i+1:i+2])
+            push!(commands, Lineto(P(x, y)))
+            i += 3
+        elseif comm == "l"
+            x, y = parse.(Float64, args[i+1:i+2])
+            push!(commands, RelLineto(P(x, y)))
+            i += 3
+        elseif comm == "H"
+            x = parse(Float64, args[i+1])
+            push!(commands, HLineto(x))
+            i += 2
+        elseif comm == "h"
+            x = parse(Float64, args[i+1])
+            push!(commands, RelHLineto(x))
+            i += 2
+        elseif comm == "Z"
+            push!(commands, Close())
+            i += 1
+        elseif comm == "z"
+            push!(commands, Close())
+            i += 1
+        elseif comm == "C"
+            x1, y1, x2, y2, x3, y3 = parse.(Float64, args[i+1:i+6])
+            push!(commands, CurveTo(P(x1, y1)))
+            push!(commands, CurveTo(P(x2, y2)))
+            push!(commands, CurveTo(P(x3, y3)))
+            i += 7
+        elseif comm == "c"
+            x1, y1, x2, y2, x3, y3 = parse.(Float64, args[i+1:i+6])
+            push!(commands, RelCurveTo(P(x1, y1)))
+            push!(commands, RelCurveTo(P(x2, y2)))
+            push!(commands, RelCurveTo(P(x3, y3)))
+            i += 7
+        else
+            for c in commands
+                println(c)
+            end
+            error("Parsing $comm not implemented.")
+        end
+
+    end
+
+    Path(commands)
+
+end
+
+function Path(comms::Vector{<:PathCommand})
+
+    segments = BezierSegment[]
+
+    last = O
+    closed = false
+
+
+    i = 1
+    while i <= length(comms)
+
+        c = comms[i]
+
+        if typeof(c) <: Move
+            last = c.p
+            i += 1
+        elseif typeof(c) <: Lineto
+            curr = c.p
+            push!(segments, Line(last, curr))
+            last = curr
+            i += 1
+        elseif typeof(c) <: RelLineto
+            curr = last + c.p
+            push!(segments, Line(last, curr))
+            last = curr
+            i += 1
+        elseif typeof(c) <: CurveTo
+            c1 = c.p
+            c2 = comms[i+1].p
+            curr = comms[i+2].p
+            push!(segments, Bezier(last, c1, c2, curr))
+            last = curr
+            i += 3
+        elseif typeof(c) <: RelCurveTo
+            c1 = c.p + last
+            c2 = comms[i+1].p + c1
+            curr = comms[i+2].p + c2
+            push!(segments, Bezier(last, c1, c2, curr))
+            last = curr
+            i += 3
+        elseif typeof(c) <: Close
+            println("broke")
+            closed = true
+            break
+        else
+            error("$(typeof(c)) not implemented")
+        end
+    end
+
+    Path(closed, segments...)
+
+end
+
+Path("M 165.097656 39.6875 L 165.097656 40.3125 L 159.503906 40.3125 L 162.992188 44.683594 L 162.503906 45.074219 L 159.015625 40.699219 L 157.773438 46.152344 L 157.164062 46.015625 L 158.410156 40.5625 L 153.371094 42.988281 L 153.101562 42.425781 L 158.136719 40 L 153.101562 37.574219 L 153.371094 37.011719 L 158.410156 39.4375 L 157.164062 33.984375 L 157.773438 33.847656 L 159.015625 39.300781 L 162.503906 34.925781 L 162.992188 35.316406 L 159.503906 39.6875 Z M 165.097656 39.6875 ")
+Path("M500,225.2c73.6,0,133.2,58.1,133.2,129.9c0,71.7-59.6,129.8-133.2,129.8c-73.6,0-133.2-58.1-133.2-129.8C366.8,283.4,426.4,225.2,500,225.2z M852.4,351.7C852.4,162,694.6,10,500,10c-194.6,0-352.4,151.2-352.4,340.8c0,3,0.4,6.5,0.5,6.5h-0.5C143,568.7,397.4,895.1,500,990c102.6-94.9,357-421.3,352.4-632.7h-0.5C852,357.3,852.4,354.7,852.4,351.7z")
+
+
+function pathtest()
+
+    # svgstr = "M500,225.2c73.6,0,133.2,58.1,133.2,129.9c0,71.7-59.6,129.8-133.2,129.8c-73.6,0-133.2-58.1-133.2-129.8C366.8,283.4,426.4,225.2,500,225.2z M852.4,351.7C852.4,162,694.6,10,500,10c-194.6,0-352.4,151.2-352.4,340.8c0,3,0.4,6.5,0.5,6.5h-0.5C143,568.7,397.4,895.1,500,990c102.6-94.9,357-421.3,352.4-632.7h-0.5C852,357.3,852.4,354.7,852.4,351.7z"
+    svgstr = "M 509.18838,395.16009 C 491.67535,410.75205 468.29486,431.4073 437.98958,444.4974 326.88012,492.49442 195.81534,442.33805 145.83768,332.62845 116.00894,267.07372 120.77439,192.09233 157.48325,125.71854 194.41549,58.98735 267.83321,0 267.83321,0 c 0,0 -54.3857,11.64557 -102.50186,34.90693 C 61.02755,85.34624 0,191.09457 0,300.69993 c 0,40.89352 8.5629188,82.4274 26.597171,122.04021 32.688011,71.66046 91.377509,126.40357 165.376019,154.04318 74.05808,27.68429 154.26657,24.89948 226.00149,-7.74385 C 489.93299,536.23232 543.97617,475.1452 572.76247,401.6828 595.91958,342.69546 599.94043,276.60462 600,276.44081 c 0,0 -37.58749,71.19881 -90.81162,118.71928"
+    c, l = canvas(4, 4)
+
+    ll = layer!(l, scale=0.1)
+
+    path!(ll, svgstr)
+
+    c
+
+end; pathtest()
