@@ -196,8 +196,8 @@ function tpoints()
         Fill(Gradient(P(0, 0), P(0, 1), LCHuv.(40, 20, -120:40)...))
 
     ls = lines!(l, P.(0, 0:0.05:1), P.(1, 0:0.05:1)) +
-        Stroke(:frac => f -> LCHuv(30, 40, -140 + f * 100)) +
-        Linewidth(7)
+        Stroke(:frac => f -> LCHuv(30, 25, -140 + f * 100)) +
+        Linewidth(8)
 
     circ = circle!(l, P(0.5, 0.5), 0.5) + Invisible
 
@@ -206,3 +206,19 @@ function tpoints()
     c
 
 end; tpoints()
+
+
+function polys()
+
+    c, tl = canvas(4, 4)
+
+    l = rectlayer!(tl, c.rect, :w, :norm, margin=40)
+
+    n = 6
+    polygons!(l, grid(range(0, 1, length=n), range(0, 1, length=n))..., grid(1:n, range(0.1, 0.5, length=n))...) do x, y, i, d
+        Polygon.(ncross.(P.(x, y), i .+ 2, 0.03, d))
+    end + Stroke(nothing) + Fill(:frac => f -> LCHuv(50, 50, f * 360))
+
+    c
+
+end; polys()
