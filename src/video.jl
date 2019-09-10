@@ -2,7 +2,7 @@ import VideoIO
 import Colors
 using ProgressMeter
 
-export record
+export record, record_mpy, rgb_array
 
 function bgra_array(c::Cairo.CairoSurfaceBase{UInt32})
     bgra_buffer_ptr = ccall((:cairo_image_surface_get_data, Cairo.libcairo), Ptr{UInt8}, (Ptr{Nothing},), c.ptr)
@@ -46,6 +46,22 @@ function record(figure_func, filename, framerate::Real, ts; quality=:medium)
 
     frames = [view(full_buffer, i, :, :) for i in 1:nframes]
     VideoIO.encodevideo(filename, frames, framerate=framerate, AVCodecContextProperties=props, codec_name=codec_name)
+
+    nothing
+end
+
+function record_mpy(figure_func, filename, framerate::Real, duration::Real)
+
+    mpy = PyCall.pyimport("moviepy.editor")
+
+    function arrfunc(t)
+        c = figure_func(t)
+        rgba = rgb_array(c)
+        result = permutedims(reshape(reinterpret(UInt8, rgba), 3, size(rgba)...), [2,3,1])
+    end
+
+    clip = mpy.VideoClip(arrfunc, duration=duration)
+    clip.write_videofile(filename, fps=framerate)
 
     nothing
 end

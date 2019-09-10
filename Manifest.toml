@@ -122,9 +122,9 @@ version = "0.2.2"
 
 [[FFTW]]
 deps = ["AbstractFFTs", "BinaryProvider", "Conda", "Libdl", "LinearAlgebra", "Reexport", "Test"]
-git-tree-sha1 = "e1a479d3c972f20c9a70563eec740bbfc786f515"
+git-tree-sha1 = "03f8776fbdae28c20c0d1d2ae4e090cd1dfcd247"
 uuid = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
-version = "0.3.0"
+version = "1.0.0"
 
 [[FileWatching]]
 uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
@@ -351,10 +351,10 @@ uuid = "295af30f-e4ad-537b-8983-00126c2a3abe"
 version = "2.1.7"
 
 [[Rotations]]
-deps = ["LinearAlgebra", "Random", "StaticArrays", "Statistics", "Test"]
-git-tree-sha1 = "dfb3ceb177a59f25fee4e2f26c1aeb92b73d3a0e"
+deps = ["LinearAlgebra", "StaticArrays", "Statistics"]
+git-tree-sha1 = "4fa94411637e4f4ca4d9b5bfa64d7042541d67b3"
 uuid = "6038ab10-8711-5258-84ad-4b1120ba62dc"
-version = "0.11.1"
+version = "0.12.0"
 
 [[SHA]]
 uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"

@@ -149,6 +149,17 @@ mutable struct Shape{T <: GeometricObject} <: LayerContent
     operator::Operator
 end
 
+mutable struct Shapes{T <: GeometricObject} <: LayerContent
+    # make this nicer and more julian
+    content::Union{Tuple{Function, Vector}, Array{T}}
+    parent::Union{Layer, Nothing}
+    solved::Union{T, Nothing}
+    attrs::Attributes
+    clip::Clip
+    opacity::Opacity
+    operator::Operator
+end
+
 struct Gradient
     from::Point
     to::Point

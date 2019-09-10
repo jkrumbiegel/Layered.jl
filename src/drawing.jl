@@ -291,8 +291,8 @@ function draw!(cc, canvasmatrix, g::GeometricObject, a::Attributes)
     end
 
     needslineattrs(g) && lineattrs!(cc, a)
-    needsstroke(g) && stroke!(cc, canvasmatrix, a[Stroke])
     needsfill(g) && fill!(cc, a[Fill])
+    needsstroke(g) && stroke!(cc, canvasmatrix, a[Stroke])
 
     clearpath!(cc)
 end
