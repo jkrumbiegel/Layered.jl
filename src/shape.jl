@@ -173,7 +173,7 @@ function solve!(s::Shapes{T}, cc::Cairo.CairoContext) where T <: GeometricObject
             s.solved = return_values
         end
 
-        if typeof(s.solved) <: Array{Txt{Nothing}}
+        if typeof(s.solved) <: Array{Txt}
             ts = s.solved
             for (i, t) in enumerate(ts)
                 if isnothing(t.extent)
