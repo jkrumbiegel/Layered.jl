@@ -212,12 +212,17 @@ function polys()
 
     c, tl = canvas(4, 4)
 
-    l = rectlayer!(tl, c.rect, :w, :norm, margin=40)
+    l = rectlayer!(tl, c.rect, :h, :norm, margin=40)
 
     n = 6
-    polygons!(l, grid(range(0, 1, length=n), range(0, 1, length=n))..., grid(1:n, range(0.1, 0.5, length=n))...) do x, y, i, d
-        Polygon.(ncross.(P.(x, y), i .+ 2, 0.03, d))
-    end + Stroke(nothing) + Fill(:frac => f -> LCHuv(50, 50, f * 360))
+    polygons!(
+        l,
+        grid(range(0, 1, length=n), range(0, 1, length=n))...,
+        grid(1:n, range(0.1, 0.5, length=n))...) do x, y, i, d
+            Polygon.(ncross.(P.(x, y), i .+ 2, 0.03, d))
+    end +
+        Stroke(nothing) +
+        Fill(:frac => f -> LCHuv(60, 40, f * 360))
 
     c
 
