@@ -30,8 +30,9 @@ normfrom(l::Line, frac::Real, length::Real) = fraction(l, frac) + normal(l, leng
 move(l::Line, p::Point) = Line(l.from + p, l.to + p)
 Base.:+(l::Line, p::Point) = move(l, p)
 Base.:+(p::Point, l::Line) = move(l, p)
+Base.:-(l::Line, p::Point) = move(l, -p)
 
-scaleby(l::Line, by::Real) = Line(by * s.from, by * s.to)
+scaleby(l::Line, by::Real) = Line(by * l.from, by * l.to)
 
 function scale(l::Line, scalar::Real)
     movement = (scalar - 1) * vector(l) / 2

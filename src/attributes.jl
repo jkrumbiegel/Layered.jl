@@ -5,10 +5,13 @@ export Clip, Textfill, Opacity, Operator, Invisible
 Base.Broadcast.broadcastable(a::Attribute) = Ref(a)
 
 Fill(s::String) = Fill(parse(Colors.Colorant, s))
+Fill(s::String, r::Real) = Fill(Colors.RGBA(parse(Colors.Colorant, s), r))
 
 Textfill(s::String) = Textfill(parse(Colors.Colorant, s))
 
 Stroke(s::String) = Stroke(parse(Colors.Colorant, s))
+Stroke(s::String, r::Real) = Stroke(Colors.RGBA(parse(Colors.Colorant, s), r))
+
 
 Attributes() = Attributes(Dict{Type{<:Attribute}, Union{Function, Attribute}}())
 
