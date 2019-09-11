@@ -57,3 +57,5 @@ function Rect(t::Txt, margin::Real)
     r = Rect(t)
     Rect(r.center, r.width + 2 * margin, r.height + 2 * margin, r.angle)
 end
+
+Rect(bb::BBox) = Rect((bb.from + bb.to) / 2, bb.to.x - bb.from.x, bb.to.y - bb.from.y, deg(0))

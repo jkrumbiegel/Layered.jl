@@ -529,20 +529,38 @@ stop(b::Bezier) = b.to
 start(l::Line) = l.from
 stop(l::Line) = l.to
 
+function makepath!(cc, m::Move)
+    C.move_to(cc, m.p.xy...)
+end
+
+function makepath!(cc, l::Lineto)
+    C.line_to(cc, l.p.xy...)
+end
+
+function makepath!(cc, c::CurveTo)
+    C.curve_to(cc, c.c1.xy..., c.c2.xy..., c.p.xy...)
+end
+
+function makepath!(cc, c::Close)
+    C.close_path(cc)
+end
+
+
 function makepath!(cc, p::Path)
-    makepath!(cc, p.segments[1])
-    for i in 2:length(p.segments)
-        news = p.segments[i]
-        olds = p.segments[i-1]
-        if isapprox(start(news), stop(olds))
-            continuepath!(cc, news)
-        else
-            makepath!(cc, news)
-        end
-    end
-    if p.closed
-        C.close_path(cc)
-    end
+    makepath!.(Ref(cc), p.commands)
+    # makepath!(cc, p.segments[1])
+    # for i in 2:length(p.segments)
+    #     news = p.segments[i]
+    #     olds = p.segments[i-1]
+    #     if isapprox(start(news), stop(olds))
+    #         continuepath!(cc, news)
+    #     else
+    #         makepath!(cc, news)
+    #     end
+    # end
+    # if p.closed
+    #     C.close_path(cc)
+    # end
 end
 
 

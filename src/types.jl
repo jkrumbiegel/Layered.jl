@@ -1,6 +1,8 @@
 abstract type LayerContent end
 abstract type GeometricObject <: LayerContent end
 
+export BBox, bbox
+
 struct Angle
     rad::Float64
 end
@@ -80,11 +82,29 @@ struct Txt <: GeometricObject
     extent::Union{Nothing, TextExtent}
 end
 
-const BezierSegment = Union{Bezier, Line, Arc}
+abstract type PathCommand end
+
+export Move, Lineto, Curveto, Close
+
+struct Move <: PathCommand
+    p::Point
+end
+
+struct Lineto <: PathCommand
+    p::Point
+end
+
+struct CurveTo <: PathCommand
+    c1::Point
+    c2::Point
+    p::Point
+end
+
+struct Close <: PathCommand
+end
 
 struct Path <: GeometricObject
-    segments::Vector{<:BezierSegment}
-    closed::Bool
+    commands::Vector{PathCommand}
 end
 
 
@@ -202,4 +222,9 @@ end
 const VisibleContent = Bool
 struct Visible{T<:VisibleContent} <: Attribute
     val::T
+end
+
+struct BBox
+    from::Point
+    to::Point
 end

@@ -8,6 +8,7 @@ xs(ps::Array{Point}) = [p.x for p in ps]
 ys(ps::Array{Point}) = [p.y for p in ps]
 
 Point(ang::Angle) = Point(cos(ang.rad), sin(ang.rad))
+Point(ang::Angle, length::Real) = Point(cos(ang.rad) * length, sin(ang.rad) * length)
 
 Base.convert(::Type{Point}, t::Tuple{S, T}) where {S<:Real,T<:Real} = Point(t[1], t[2])
 

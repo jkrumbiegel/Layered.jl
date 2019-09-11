@@ -3,6 +3,7 @@ export bracket, arrow, arcarrow
 export reversed, concat
 export scaleby
 export rotate
+export centeredin
 
 
 move(b::Bezier, p::Point) = Bezier(b.from + p, b.c1 + p, b.c2 + p, b.to + p)
@@ -35,13 +36,14 @@ end
 
 needed_attributes(::Type{Bezier}) = (Linewidth, Stroke, Linestyle, Fill, Visible)
 
-function Path(closed::Bool, segments::Vararg{<: BezierSegment, N}) where N
-    Path([segments...], closed)
-end
+# function Path(closed::Bool, segments::Vararg{<: BezierSegment, N}) where N
+#     Path([segments...], closed)
+# end
 
-move(b::Path, p::Point) = Path(BezierSegment[move(s, p) for s in b.segments], b.closed)
+move(b::Path, p::Point) = Path(move.(b.commands, p))
 Base.:+(b::Path, p::Point) = move(b, p)
-Base.:+(p::Point, b::Path) = move(b, p)
+# Base.:+(p::Point, b::Path) = move(b, p)
+Base.:-(bp::Path, p::Point) = move(bp, -p)
 
 function bracket(p1::Point, p2::Point, widthscale::Real = 0.1, innerstrength=1, outerstrength=1; flip=false)
     l = Line(p1, p2)
@@ -147,76 +149,33 @@ function concat(bp::Path, paths...)
     )
 end
 
-function center(bp::Path)
-    com = centerofmass(bp)
-    Path(BezierSegment[s - com for s in bp.segments], false)
-end
-
-function centerofmass(bp::Path)
-    p = P(0, 0)
-
-    for s in bp.segments
-        p += start(s)
-        p += stop(s)
-    end
-
-    p /= 2 * length(bp.segments)
-end
+# function center(bp::Path)
+#     com = centerofmass(bp)
+#     Path(BezierSegment[s - com for s in bp.segments], false)
+# end
+#
+# function centerofmass(bp::Path)
+#     p = P(0, 0)
+#
+#     for s in bp.segments
+#         p += start(s)
+#         p += stop(s)
+#     end
+#
+#     p /= 2 * length(bp.segments)
+# end
 
 function scaleby(bp::Path, by::Real)
 
-    Path(BezierSegment[scaleby(s, by) for s in bp.segments], false)
+    Path(scaleby.(bp.commands, by))
 
 end
 
 function rotate(p::Path, ang::Angle)
-    Path([rotate(s, ang) for s in p.segments], false)
+    Path(BezierSegment[rotate(s, ang) for s in p.segments], false)
 end
 
 
-abstract type PathCommand end
-struct Move <: PathCommand
-    p::Point
-end
-
-struct RelMove <: PathCommand
-    p::Point
-end
-
-struct Lineto <: PathCommand
-    p::Point
-end
-
-struct RelLineto <: PathCommand
-    p::Point
-end
-
-struct HLineto <: PathCommand
-    x::Float64
-end
-
-struct RelHLineto <: PathCommand
-    x::Float64
-end
-
-struct VLineto <: PathCommand
-    x::Float64
-end
-
-struct RelVLineto <: PathCommand
-    x::Float64
-end
-
-struct CurveTo <: PathCommand
-    p::Point
-end
-
-struct RelCurveTo <: PathCommand
-    p::Point
-end
-
-struct Close <: PathCommand
-end
 
 function Path(svg::String)
 
@@ -224,17 +183,17 @@ function Path(svg::String)
     # args = split(svg, r"((?<=[a-zA-Z])(?=\d)|(?<=\d)(?=[a-zA-Z])|([\s,]+)|((?<=\d)(?=\-))|((?<=[a-zA-Z])(?=\-)))|((?<=\.\d+))", keepempty=false)
     args = [e.match for e in eachmatch(r"([a-zA-Z])|(\-?\d*\.?\d+)", svg)]
 
-    println(args)
-
     i = 1
 
     commands = PathCommand[]
     lastcomm = nothing
+    lastp() = commands[end].p
 
     while i <= length(args)
 
         comm = args[i]
 
+        # command letter is omitted, use last command
         if isnothing(match(r"[a-zA-Z]", comm))
             comm = lastcomm
             i -= 1
@@ -246,7 +205,7 @@ function Path(svg::String)
             i += 3
         elseif comm == "m"
             x, y = parse.(Float64, args[i+1:i+2])
-            push!(commands, RelMove(P(x, y)))
+            push!(commands, Move(P(x, y) + lastp()))
             i += 3
         elseif comm == "L"
             x, y = parse.(Float64, args[i+1:i+2])
@@ -254,15 +213,15 @@ function Path(svg::String)
             i += 3
         elseif comm == "l"
             x, y = parse.(Float64, args[i+1:i+2])
-            push!(commands, RelLineto(P(x, y)))
+            push!(commands, Lineto(P(x, y) + lastp()))
             i += 3
         elseif comm == "H"
             x = parse(Float64, args[i+1])
-            push!(commands, HLineto(x))
+            push!(commands, Lineto(P(x, lastp().y)))
             i += 2
         elseif comm == "h"
             x = parse(Float64, args[i+1])
-            push!(commands, RelHLineto(x))
+            push!(commands, Lineto(X(x) + lastp()))
             i += 2
         elseif comm == "Z"
             push!(commands, Close())
@@ -272,16 +231,28 @@ function Path(svg::String)
             i += 1
         elseif comm == "C"
             x1, y1, x2, y2, x3, y3 = parse.(Float64, args[i+1:i+6])
-            push!(commands, CurveTo(P(x1, y1)))
-            push!(commands, CurveTo(P(x2, y2)))
-            push!(commands, CurveTo(P(x3, y3)))
+            push!(commands, CurveTo(P(x1, y1), P(x2, y2), P(x3, y3)))
             i += 7
         elseif comm == "c"
             x1, y1, x2, y2, x3, y3 = parse.(Float64, args[i+1:i+6])
-            push!(commands, RelCurveTo(P(x1, y1)))
-            push!(commands, RelCurveTo(P(x2, y2)))
-            push!(commands, RelCurveTo(P(x3, y3)))
+            l = lastp()
+            push!(commands, CurveTo(P(x1, y1) + l, P(x2, y2) + l, P(x3, y3) + l))
             i += 7
+        elseif comm == "S"
+            x1, y1, x2, y2 = parse.(Float64, args[i+1:i+4])
+            prev_control = commands[end-1]
+            prev = commands[end]
+            reflected = prev.p + (prev_control → prev.p)
+            push!(commands, CurveTo(reflected, P(x1, y1), P(x2, y2)))
+            i += 5
+        elseif comm == "s"
+            x1, y1, x2, y2 = parse.(Float64, args[i+1:i+4])
+            prev_control = commands[end-1]
+            prev = commands[end]
+            reflected = prev.p + (prev_control.p → prev.p)
+            l = lastp()
+            push!(commands, CurveTo(reflected, P(x1, y1) + l, P(x2, y2) + l))
+            i += 5
         else
             for c in commands
                 println(c)
@@ -297,71 +268,173 @@ function Path(svg::String)
 
 end
 
-function Path(comms::Vector{<:PathCommand})
+# function Path(comms::Vector{<:PathCommand})
+#
+#     segments = BezierSegment[]
+#
+#     last = O
+#     closed = false
+#
+#
+#     i = 1
+#     while i <= length(comms)
+#
+#         c = comms[i]
+#
+#         if typeof(c) <: Move
+#             last = c.p
+#             i += 1
+#         elseif typeof(c) <: RelMove
+#             last = last + c.p
+#             i += 1
+#         elseif typeof(c) <: Lineto
+#             curr = c.p
+#             push!(segments, Line(last, curr))
+#             last = curr
+#             i += 1
+#         elseif typeof(c) <: RelLineto
+#             curr = last + c.p
+#             push!(segments, Line(last, curr))
+#             last = curr
+#             i += 1
+#         elseif typeof(c) <: RelHLineto
+#             curr = last + X(c.x)
+#             push!(segments, Line(last, curr))
+#             last = curr
+#             i += 1
+#         elseif typeof(c) <: RelVLineto
+#             curr = last + Y(c.y)
+#             push!(segments, Line(last, curr))
+#             last = curr
+#             i += 1
+#         elseif typeof(c) <: CurveTo
+#             c1 = c.p
+#             c2 = comms[i+1].p
+#             curr = comms[i+2].p
+#             push!(segments, Bezier(last, c1, c2, curr))
+#             last = curr
+#             i += 3
+#         elseif typeof(c) <: RelCurveTo
+#             c1 = c.p + last
+#             c2 = comms[i+1].p + last
+#             curr = comms[i+2].p + last
+#             push!(segments, Bezier(last, c1, c2, curr))
+#             last = curr
+#             i += 3
+#         elseif typeof(c) <: Close
+#             closed = true
+#             i += 1
+#             # break
+#         else
+#             error("$(typeof(c)) not implemented")
+#         end
+#     end
+#
+#     Path(segments, closed)
+#
+# end
 
-    segments = BezierSegment[]
 
-    last = O
-    closed = false
+function bbox(b::Bezier)
 
+    p0 = [b.from.xy...]
+    p1 = [b.c1.xy...]
+    p2 = [b.c2.xy...]
+    p3 = [b.to.xy...]
 
-    i = 1
-    while i <= length(comms)
+    mi = min.(p0, p3)
+    ma = max.(p0, p3)
 
-        c = comms[i]
+    c = -p0 + p1
+    b =  p0 - 2p1 + p2
+    a = -p0 + 3p1 - 3p2 + 1p3
 
-        if typeof(c) <: Move
-            last = c.p
-            i += 1
-        elseif typeof(c) <: RelMove
-            last = last + c.p
-            i += 1
-        elseif typeof(c) <: Lineto
-            curr = c.p
-            push!(segments, Line(last, curr))
-            last = curr
-            i += 1
-        elseif typeof(c) <: RelLineto
-            curr = last + c.p
-            push!(segments, Line(last, curr))
-            last = curr
-            i += 1
-        elseif typeof(c) <: RelHLineto
-            curr = last + X(c.x)
-            push!(segments, Line(last, curr))
-            last = curr
-            i += 1
-        elseif typeof(c) <: RelVLineto
-            curr = last + Y(c.y)
-            push!(segments, Line(last, curr))
-            last = curr
-            i += 1
-        elseif typeof(c) <: CurveTo
-            c1 = c.p
-            c2 = comms[i+1].p
-            curr = comms[i+2].p
-            push!(segments, Bezier(last, c1, c2, curr))
-            last = curr
-            i += 3
-        elseif typeof(c) <: RelCurveTo
-            c1 = c.p + last
-            c2 = comms[i+1].p + last
-            curr = comms[i+2].p + last
-            push!(segments, Bezier(last, c1, c2, curr))
-            last = curr
-            i += 3
-        elseif typeof(c) <: Close
-            closed = true
-            i += 1
-            # break
-        else
-            error("$(typeof(c)) not implemented")
+    h = b.*b - a.*c
+
+    if h[1] > 0
+        h[1] = sqrt(h[1])
+        t = (-b[1] - h[1]) / a[1]
+        if t > 0 && t < 1
+            s = 1.0-t
+            q = s*s*s*p0[1] + 3.0*s*s*t*p1[1] + 3.0*s*t*t*p2[1] + t*t*t*p3[1]
+            mi[1] = min(mi[1],q)
+            ma[1] = max(ma[1],q)
+        end
+        t = (-b[1] + h[1])/a[1]
+        if t>0 && t<1
+            s = 1.0-t
+            q = s*s*s*p0[1] + 3.0*s*s*t*p1[1] + 3.0*s*t*t*p2[1] + t*t*t*p3[1]
+            mi[1] = min(mi[1],q)
+            ma[1] = max(ma[1],q)
         end
     end
 
-    for s in segments
-        println(s)
+    if h[2]>0.0
+        h[2] = sqrt(h[2])
+        t = (-b[2] - h[2])/a[2]
+        if t>0.0 && t<1.0
+            s = 1.0-t
+            q = s*s*s*p0[2] + 3.0*s*s*t*p1[2] + 3.0*s*t*t*p2[2] + t*t*t*p3[2]
+            mi[2] = min(mi[2],q)
+            ma[2] = max(ma[2],q)
+        end
+        t = (-b[2] + h[2])/a[2]
+        if t>0.0 && t<1.0
+            s = 1.0-t
+            q = s*s*s*p0[2] + 3.0*s*s*t*p1[2] + 3.0*s*t*t*p2[2] + t*t*t*p3[2]
+            mi[2] = min(mi[2],q)
+            ma[2] = max(ma[2],q)
+        end
     end
-    Path(segments, closed)
 
+    BBox(P(mi...), P(ma...))
 end
+
+function bbox(bboxes::Array{BBox})
+    mi = [bboxes[1].from.xy...]
+    ma = [bboxes[1].to.xy...]
+
+    for i in 2:length(bboxes)
+        mi .= min.(mi, bboxes[i].from.xy)
+        ma .= max.(ma, bboxes[i].to.xy)
+    end
+    BBox(P(mi...), P(ma...))
+end
+
+function segments(p::Path)
+    segs = []
+    last = nothing
+    for c in p.commands
+        if typeof(c) <: Move
+            last = c.p
+        elseif typeof(c) <: Lineto
+            push!(segs, Line(last, c.p))
+            last = c.p
+        elseif typeof(c) <: CurveTo
+            push!(segs, Bezier(last, c.c1, c.c2, c.p))
+            last = c.p
+        elseif typeof(c) <: Close
+            # what doing
+        end
+    end
+    segs
+end
+
+bbox(p::Path) = bbox(bbox.(segments(p)))
+
+function centeredin(p::Path, squarelength::Real)
+    bb = bbox(p)
+    r = Rect(bb)
+    factor = squarelength / max(r.width, r.height)
+    scaleby(p - r.center, factor)
+end
+
+
+move(m::Move, p::Point) = Move(m.p + p)
+move(l::Lineto, p::Point) = Lineto(l.p + p)
+move(c::CurveTo, p::Point) = CurveTo(c.c1 + p, c.c2 + p, c.p + p)
+
+
+scaleby(m::Move, s::Real) = Move(m.p * s)
+scaleby(l::Lineto, s::Real) = Lineto(l.p * s)
+scaleby(c::CurveTo, s::Real) = CurveTo(c.c1 * s, c.c2 * s, c.p * s)

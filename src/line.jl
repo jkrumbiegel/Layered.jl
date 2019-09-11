@@ -63,3 +63,9 @@ needed_attributes(::Type{Line}) = (Visible, Linewidth, Stroke, Linestyle)
 # needed_attributes(::Type{LineSegments}) = (Visible, Linewidth, Stroke, Linestyle)
 #
 # Base.convert(::Type{LineSegments}, ls::Vector{Line}) = LineSegments(ls)
+
+function bbox(l::Line)
+    mi = min.(l.from.xy, l.to.xy)
+    ma = max.(l.from.xy, l.to.xy)
+    BBox(P(mi...), P(ma...))
+end
