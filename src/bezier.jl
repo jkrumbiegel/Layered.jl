@@ -172,7 +172,7 @@ function scaleby(bp::Path, by::Real)
 end
 
 function rotate(p::Path, ang::Angle)
-    Path(BezierSegment[rotate(s, ang) for s in p.segments], false)
+    Path(rotate.(p.commands, ang))
 end
 
 
@@ -272,6 +272,10 @@ function Path(ps::AbstractArray{Point}, closed::Bool=false)
     segs = [Move(ps[1]), Lineto.(ps[2:end])...]
     closed && push!(segs, Close())
     Path(segs)
+end
+
+function Path(xs::AbstractArray, ys::AbstractArray, closed::Bool=false)
+    Path(P.(xs, ys), closed)
 end
 
 
@@ -379,3 +383,8 @@ scaleby(m::Move, s::Real) = Move(m.p * s)
 scaleby(l::Lineto, s::Real) = Lineto(l.p * s)
 scaleby(c::CurveTo, s::Real) = CurveTo(c.c1 * s, c.c2 * s, c.p * s)
 scaleby(c::Close, s::Real) = c
+
+rotate(m::Move, a::Angle) = Move(rotate(m.p, a))
+rotate(l::Lineto, a::Angle) = Lineto(rotate(l.p, a))
+rotate(c::CurveTo, a::Angle) = CurveTo(rotate.([c.c1, c.c2, c.p], a)...)
+rotate(c::Close, a::Angle) = c
