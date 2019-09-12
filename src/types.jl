@@ -194,7 +194,7 @@ struct Textfill{T<:TextfillContent} <: Attribute
     val::T
 end
 
-const StrokeContent = Union{Nothing, Colors.Colorant, Array{<:Colors.Colorant}, Pair{Symbol, <:Function}}
+const StrokeContent = Union{Nothing, Colors.Colorant, Gradient, RadialGradient, Array{<:Colors.Colorant}, Pair{Symbol, <:Function}}
 struct Stroke{T<:StrokeContent} <: Attribute
     val::T
 end
