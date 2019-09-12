@@ -37,6 +37,9 @@ for geom in geoms
 
 
     @eval begin
+        $geom(g::$geom) = $geom((getfield(g, k) for k ∈ fieldnames($geom))...)
+
+
         """
         $($lowerc)(args...)
 
