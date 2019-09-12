@@ -187,7 +187,7 @@ function Path(svg::String)
 
     commands = PathCommand[]
     lastcomm = nothing
-    lastp() = commands[end].p
+    lastp() = isnothing(lastcomm) ? O : commands[end].p
 
     while i <= length(args)
 
@@ -433,8 +433,9 @@ end
 move(m::Move, p::Point) = Move(m.p + p)
 move(l::Lineto, p::Point) = Lineto(l.p + p)
 move(c::CurveTo, p::Point) = CurveTo(c.c1 + p, c.c2 + p, c.p + p)
-
+move(c::Close, p::Point) = c
 
 scaleby(m::Move, s::Real) = Move(m.p * s)
 scaleby(l::Lineto, s::Real) = Lineto(l.p * s)
 scaleby(c::CurveTo, s::Real) = CurveTo(c.c1 * s, c.c2 * s, c.p * s)
+scaleby(c::Close, s::Real) = c

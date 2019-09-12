@@ -177,3 +177,27 @@ end
 #     tnew = Transform(trans.scale * s, trans.rotation, trans.translation)
 #     l.transform = tnew
 # end
+
+function spaces(n)
+    s = ""
+    for _ in 1:n
+        s *= " "
+    end
+    s
+end
+
+function Base.show(io::IO, l::Layer, level::Int=0)
+    println(io, "$(spaces(2level))Layer $(l.transform)")
+    for c in l.content
+        Base.show(io, c, level+1)
+        print(io, "\n")
+    end
+end
+
+function Base.show(io::IO, s::Shape{T}, level::Int=0) where T
+    print(io, "$(spaces(2level))Shape{$T}")
+end
+
+function Base.show(io::IO, s::Shapes{T}, level::Int=0) where T
+    print(io, "$(spaces(2level))Shapes{$T}")
+end

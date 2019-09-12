@@ -56,8 +56,20 @@ function Base.:*(t::Transform, b::Bezier)
     Bezier((t .* (b.from, b.c1, b.c2, b.to))...)
 end
 
+function Base.:*(t::Transform, x::T) where T <: Union{Move, Lineto}
+    T(t * x.p)
+end
+
+function Base.:*(t::Transform, x::Close)
+    x
+end
+
+function Base.:*(t::Transform, c::CurveTo)
+    CurveTo(t * c.c1, t * c.c2, t * c.p)
+end
+
 function Base.:*(t::Transform, bp::Path)
-    Path(BezierSegment[t * s for s in bp.segments], bp.closed)
+    Path([t * c for c in bp.commands])
 end
 
 function Base.:*(t::Transform, p::Polygon)
