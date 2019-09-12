@@ -246,32 +246,54 @@ function pathtest()
 
     c, tl = canvas(4, 4)
 
-    l = rectlayer!(tl, c.rect, :h, margin=40)
+    l = rectlayer!(tl, c.rect, :h, margin=0)
 
-    p = centeredin(Path(svgstr), 2)
+    p = centeredin(Path(svgstr), 1.5)
 
     # p = Path(svgstr)
 
-    head = path!(l, p) do p
-        p
-        # Path([Move(O), Lineto(P(1, 0)), Lineto(P(0.5, 1)), Close()])
-    end + Fill("green", 0.3)
+    head = path!(l, p) + Fill("red", 0.8) + Invisible
 
 
-    # sines = paths!(l) do
-    #     xs = (-1:0.01:1)
-    #     xs = xs
-    #     ys = sin.(xs .* 8π) .* 0.05
+    sines = paths!(l) do
+        xs = LinRange(-1, 1, 200)
+        ys = [cos.(xs .* 8π * f) .* 0.05 for f in rand(30) .+ 2]
+
+        ps = (Path(xs, y) for y in ys) .+ Y.(LinRange(-1, 1, 30)) #.+ X.(cumsum(randn(30))) .* 0.005
+    end + Clip(head) + Stroke(:frac => f -> LCHuvA(80, 40, f * 140)) + Linewidth(0.5)
     #
-    #     ps = P.(xs, ys)
+    # ls = lines!(l, P.(-1, LinRange(-3, 1, 200)), P.(1, LinRange(-8, 4, 200))) +
+    #     Linewidth(1) + Clip(head) + Stroke(RadialGradient(P(-1, -1), 2, Gray(0.9), Gray(0.1)))
     #
-    #     p = Path([Line(a, b) for (a, b) in zip(ps[1:end-1], ps[2:end])], false)
-    #     pths = p .+ Y.(-1:0.02:1)
-    #     pths .+ X.(rand(length(pths)) * 0.1)
-    # end + Clip(head) + Stroke(:frac => f -> LCHuv(50, 40, f * 360)) + Linewidth(0.5)
-
-    ls = lines!(l, P.(-1, -3:0.04:1), P.(1, -2:0.04:2)) + Linewidth(1) + Clip(head)
+    # ls = lines!(l, P.(-1, LinRange(-3, 1, 200)), P.(1, LinRange(-8, 4, 200))) +
+    #     Linewidth(1) + Clip(head, c.rect) + Stroke(RadialGradient(P(-1, -1), 2, Gray(0.), Gray(0.9)))
 
     c
+    # png(c, "test.png")
 
 end; pathtest()
+
+
+function pathvid()
+
+    t = 0.5
+    # record_mpy("test.mp4", 30, 2) do t
+
+        c, tl = canvas(3, 3)
+
+        svgstr = "M81.4,243.7c2-4.5,4.2-8.9,6.7-13.2c1-1.8,2.2-3.5,3.3-5.3c2.8-4.3,6.8-6.9,11.6-8.3c2.8-0.8,4.5-2.4,5.4-5.2 c1.6-5.1,3.1-10.2,3.7-15.5c0.2-1.3,0.1-2.7,0-4c-0.3-4.3,0.8-8.2,2.9-11.8c0.5-0.9,0.9-1.9,1.2-2.9c0.3-1.2-0.2-1.9-1.3-2.2 c-1.8-0.6-3.7-0.6-5.5-0.7c-4.7-0.3-9.4-0.5-14.1-1.4c-5-1.1-7.6-5-6.8-10.1c0.2-1.1,0.3-2.3,0.4-3.4c0.1-1.9-0.4-3.7-1.5-5.3 c-1.3-1.8-1.1-3.6,0.3-5.2c0.3-0.4,0.2-0.5-0.2-0.7c-1.5-0.5-2.4-1.7-3.2-3c-0.8-1.5-0.7-2.5,0.6-3.6c1.5-1.2,1.1-2.8,1.2-4.3 c0-0.5-0.5-0.3-0.8-0.4c-2.4-0.1-4.7-0.7-6.7-2.1c-1-0.7-1.4-1.6-1.3-2.8c0.1-2.2,0.7-4.2,2.3-5.8c2.6-2.5,4-5.7,6.1-8.5 c1-1.3,2.1-2.6,3.3-3.7c1.1-1,1.9-2.3,2.5-3.7c0.6-1.4,0.6-2.9-0.3-4c-2.1-2.7-2.1-5.5-1.2-8.5c2.2-7.8,4.4-15.7,8.2-22.9 c3.2-6.1,8-10.7,13.8-14.3c7.7-4.8,16.1-7.1,25.1-7.4c11.2-0.4,22,1.7,32.2,6.3c6.5,2.9,12.2,7.2,17.2,12.2 c6.8,6.8,11,14.9,12.8,24.4c0.9,4.9,0.8,9.8,0.6,14.7c-0.3,5.8-1.3,11.4-3.3,16.8c-1.4,3.7-3.2,7.2-5.7,10.2 c-3.6,4.3-5.8,9.2-7.1,14.6c-1.8,7.2-3.9,14.3-4.7,21.7c-0.7,6.5-1.1,13.1,0.5,19.6c1.1,4.3,3.7,7.9,6.3,11.4 c2.3,3.1,5.1,5.8,7.8,8.5c4.8,4.9,9.2,10.1,13.8,15.2c4.1,4.6,7.7,9.4,10.8,14.7"
+
+        # svgstr = "m61.1 18.2c-6.4-17-27.2-9.4-29.1-.9-2.6-9-22.9-15.7-29.1.9-6.9 18.5 26.7 35.1 29.1 37.8 2.4-2.2 36-19.6 29.1-37.8"
+
+        l = rectlayer!(tl, c.rect, :h, margin=0)
+
+        p = centeredin(Path(svgstr), 1.5)
+        p = rotate(p, deg(t * 180))
+        # p = p + X(t / 4)
+
+        path!(l, p) + Fill("red", 0.8)
+
+        c
+    # end
+
+end; pathvid()
