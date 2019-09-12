@@ -268,71 +268,11 @@ function Path(svg::String)
 
 end
 
-# function Path(comms::Vector{<:PathCommand})
-#
-#     segments = BezierSegment[]
-#
-#     last = O
-#     closed = false
-#
-#
-#     i = 1
-#     while i <= length(comms)
-#
-#         c = comms[i]
-#
-#         if typeof(c) <: Move
-#             last = c.p
-#             i += 1
-#         elseif typeof(c) <: RelMove
-#             last = last + c.p
-#             i += 1
-#         elseif typeof(c) <: Lineto
-#             curr = c.p
-#             push!(segments, Line(last, curr))
-#             last = curr
-#             i += 1
-#         elseif typeof(c) <: RelLineto
-#             curr = last + c.p
-#             push!(segments, Line(last, curr))
-#             last = curr
-#             i += 1
-#         elseif typeof(c) <: RelHLineto
-#             curr = last + X(c.x)
-#             push!(segments, Line(last, curr))
-#             last = curr
-#             i += 1
-#         elseif typeof(c) <: RelVLineto
-#             curr = last + Y(c.y)
-#             push!(segments, Line(last, curr))
-#             last = curr
-#             i += 1
-#         elseif typeof(c) <: CurveTo
-#             c1 = c.p
-#             c2 = comms[i+1].p
-#             curr = comms[i+2].p
-#             push!(segments, Bezier(last, c1, c2, curr))
-#             last = curr
-#             i += 3
-#         elseif typeof(c) <: RelCurveTo
-#             c1 = c.p + last
-#             c2 = comms[i+1].p + last
-#             curr = comms[i+2].p + last
-#             push!(segments, Bezier(last, c1, c2, curr))
-#             last = curr
-#             i += 3
-#         elseif typeof(c) <: Close
-#             closed = true
-#             i += 1
-#             # break
-#         else
-#             error("$(typeof(c)) not implemented")
-#         end
-#     end
-#
-#     Path(segments, closed)
-#
-# end
+function Path(ps::AbstractArray{Point}, closed::Bool=false)
+    segs = [Move(ps[1]), Lineto.(ps[2:end])...]
+    closed && push!(segs, Close())
+    Path(segs)
+end
 
 
 function bbox(b::Bezier)
