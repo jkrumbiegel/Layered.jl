@@ -58,6 +58,32 @@ function stroke!(cc, canvasmatrix, c::Nothing)
     # do nothing
 end
 
+function stroke!(cc, canvasmatrix, g::Gradient)
+    C.save(cc)
+    pat = C.pattern_create_linear(g.from.xy..., g.to.xy...)
+    for (stop, col) in zip(g.stops, g.colors)
+        C.pattern_add_color_stop_rgba(pat, stop, rgba(col)...)
+    end
+    C.set_source(cc, pat)
+    C.set_matrix(cc, canvasmatrix)
+    C.stroke_transformed_preserve(cc)
+    C.destroy(pat)
+    C.restore(cc)
+end
+
+function stroke!(cc, canvasmatrix, rg::RadialGradient)
+    C.save(cc)
+    pat = C.pattern_create_radial(rg.from.center.xy..., rg.from.radius, rg.to.center.xy..., rg.to.radius)
+    for (stop, col) in zip(rg.stops, rg.colors)
+        C.pattern_add_color_stop_rgba(pat, stop, rgba(col)...)
+    end
+    C.set_source(cc, pat)
+    C.set_matrix(cc, canvasmatrix)
+    C.stroke_transformed_preserve(cc)
+    C.destroy(pat)
+    C.restore(cc)
+end
+
 function clearpath!(cc)
     Cairo.new_path(cc)
 end
