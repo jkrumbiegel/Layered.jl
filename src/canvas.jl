@@ -1,4 +1,4 @@
-export Canvas, canvas, write_to_png
+export Canvas, canvas, png, svg
 
 mutable struct Canvas
     size_in::Tuple{Float64, Float64}
@@ -32,9 +32,15 @@ function canvas(
     Canvas((width, height), l, r, bgcolor), l
 end
 
-function write_to_png(c::Canvas, filename::String; dpi=200)
-    cc = draw(c, :rgba; dpi=dpi)
-    Cairo.write_to_png(cc, filename);
+function png(c::Canvas, filename::String; dpi=200)
+    cc = draw_rgba(c, dpi=dpi)
+    Cairo.write_to_png(cc, filename)
+    nothing
+end
+
+function svg(c::Canvas, filename::String)
+    draw_svg(c, filename)
+    nothing
 end
 
 function Base.show(io::IO, ::MIME"image/svg+xml", c::Canvas)

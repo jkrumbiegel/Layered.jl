@@ -19,19 +19,20 @@ function rgb_array(c)
     rgb = Colors.RGB.(bgra)
 end
 
-function record(figure_func, filename, framerate::Real, ts; quality=:medium)
+function record(canvas_func, filename, framerate::Real, ts; dpi=200, quality=:medium)
 
     nframes = length(ts)
 
-    first_frame = rgb_array(figure_func(ts[1]))
+    first_frame = rgb_array(draw_rgba(canvas_func(ts[1]), dpi=dpi))
 
     full_size = (nframes, size(first_frame)...)
     full_buffer = Array{Colors.RGB{Colors.N0f8}, 3}(undef, full_size...)
     full_buffer[1, :, :, :] = first_frame
 
     @showprogress 1/3 "Rendering frames..." for (i, t) in enumerate(ts[2:end])
-        fig = figure_func(t)
-        full_buffer[i, :, :, :] = rgb_array(fig)
+        canv = canvas_func(t)
+        csurf = draw_rgba(canv, dpi=dpi)
+        full_buffer[i, :, :, :] = rgb_array(csurf)
     end
 
     codec_name, props = if quality == :medium
@@ -50,13 +51,14 @@ function record(figure_func, filename, framerate::Real, ts; quality=:medium)
     nothing
 end
 
-function record_mpy(figure_func, filename, framerate::Real, duration::Real)
+function record_mpy(canvas_func, filename, framerate::Real, duration::Real; dpi=200)
 
     mpy = PyCall.pyimport("moviepy.editor")
 
     function arrfunc(t)
-        c = figure_func(t)
-        rgba = rgb_array(c)
+        canv = canvas_func(t)
+        csurf = draw_rgba(canv, dpi=dpi)
+        rgba = rgb_array(csurf)
         result = permutedims(reshape(reinterpret(UInt8, rgba), 3, size(rgba)...), [2,3,1])
     end
 

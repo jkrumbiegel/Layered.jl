@@ -1,6 +1,6 @@
 const C = Cairo
 
-export draw, draw_svg, applytransform!
+export applytransform!
 
 
 function fill!(cc, f::Fill)
@@ -108,13 +108,6 @@ function rgba(c::Colors.Colorant)
     Float64.((rgba.r, rgba.g, rgba.b, rgba.alpha))
 end
 
-function draw(canvas::Canvas, kind::Symbol; kwargs...)
-    @match kind begin
-        :svg => draw_svg(canvas; kwargs...)
-        :rgba => draw_rgba(canvas; kwargs...)
-        _ => error("Unknown surface type")
-    end
-end
 
 function draw_svg(canvas::Canvas)
     pt_per_in = 72
@@ -207,7 +200,7 @@ function draw_rgba(canvas::Canvas; dpi=100)
     canvasmatrix = C.get_matrix(cc)
 
     draw!(cc, canvasmatrix, canvas.toplayer)
-    # C.finish(c)
+    C.finish(c)
     c
 end
 
