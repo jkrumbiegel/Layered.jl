@@ -164,13 +164,13 @@ function draw_rgba(canvas::Canvas; dpi=100)
     begin
         font_options_ptr = ccall((:cairo_font_options_create, C.libcairo), Ptr{Nothing}, ())
 
-        # CAIRO_HINT_STYLE_NONE = 1
-        # CAIRO_HINT_STYLE_SLIGHT = 2
-        # CAIRO_HINT_STYLE_FULL = 4
-        # ccall(
-        #     (:cairo_font_options_set_hint_style, C.libcairo), Nothing,
-        #     (Ptr{Nothing}, Int32),
-        #     font_options_ptr, CAIRO_HINT_STYLE_SLIGHT)
+        CAIRO_HINT_STYLE_NONE = 1
+        CAIRO_HINT_STYLE_SLIGHT = 2
+        CAIRO_HINT_STYLE_FULL = 4
+        ccall(
+            (:cairo_font_options_set_hint_style, C.libcairo), Nothing,
+            (Ptr{Nothing}, Int32),
+            font_options_ptr, CAIRO_HINT_STYLE_NONE)
 
         CAIRO_HINT_METRICS_DEFAULT = 0
         CAIRO_HINT_METRICS_OFF = 1
