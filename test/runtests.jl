@@ -127,6 +127,7 @@ pkg"activate ."
 using Revise
 using Layered
 using Colors
+using Animations
 import Cairo
 const C = Cairo
 
@@ -276,8 +277,9 @@ end; pathtest()
 
 function pathvid()
 
-    t = 0.5
-    # record_mpy("test.mp4", 30, 2) do t
+    duration = 2
+    a_ang = Animation([0, duration], deg.([0, 90]))
+    record_mpy("test_full.mp4", 60, duration) do t
 
         c, tl = canvas(3, 3)
 
@@ -288,12 +290,14 @@ function pathvid()
         l = rectlayer!(tl, c.rect, :h, margin=0)
 
         p = centeredin(Path(svgstr), 1.5)
-        p = rotate(p, deg(t * 180))
+        p = rotate(p, a_ang(t))
         # p = p + X(t / 4)
 
         path!(l, p) + Fill("red", 0.8)
 
+        txt!(tl, O, "Hello\nWorld", 12, :c, :c, a_ang(t), "Helvetica")
+
         c
-    # end
+    end
 
 end; pathvid()

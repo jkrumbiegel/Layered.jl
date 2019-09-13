@@ -161,34 +161,41 @@ function draw_rgba(canvas::Canvas; dpi=100)
     c = C.CairoARGBSurface(size_pixel...);
     cc = C.CairoContext(c);
 
-    # begin
-    #     font_options_ptr = ccall((:cairo_font_options_create, C.libcairo), Ptr{Nothing}, ())
-    #
-    #     CAIRO_HINT_STYLE_NONE = 1
-    #     CAIRO_HINT_STYLE_FULL = 4
-    #     ccall(
-    #         (:cairo_font_options_set_hint_style, C.libcairo), Nothing,
-    #         (Ptr{Nothing}, Int32),
-    #         font_options_ptr, CAIRO_HINT_STYLE_NONE)
-    #
-    #     CAIRO_HINT_METRICS_DEFAULT = 0
-    #     CAIRO_HINT_METRICS_OFF = 1
-    #     CAIRO_HINT_METRICS_ON = 2
-    #     ccall(
-    #         (:cairo_font_options_set_hint_metrics, C.libcairo), Nothing,
-    #         (Ptr{Nothing}, Int32),
-    #         font_options_ptr, CAIRO_HINT_METRICS_OFF)
-    #
-    #     ccall(
-    #         (:cairo_set_font_options, C.libcairo), Nothing,
-    #         (Ptr{Nothing}, Ptr{Nothing}),
-    #         cc.ptr, font_options_ptr)
-    #
-    #     ccall(
-    #         (:cairo_font_options_destroy, C.libcairo), Nothing,
-    #         (Ptr{Nothing},),
-    #         font_options_ptr)
-    # end
+    begin
+        font_options_ptr = ccall((:cairo_font_options_create, C.libcairo), Ptr{Nothing}, ())
+
+        # CAIRO_HINT_STYLE_NONE = 1
+        # CAIRO_HINT_STYLE_SLIGHT = 2
+        # CAIRO_HINT_STYLE_FULL = 4
+        # ccall(
+        #     (:cairo_font_options_set_hint_style, C.libcairo), Nothing,
+        #     (Ptr{Nothing}, Int32),
+        #     font_options_ptr, CAIRO_HINT_STYLE_SLIGHT)
+
+        CAIRO_HINT_METRICS_DEFAULT = 0
+        CAIRO_HINT_METRICS_OFF = 1
+        CAIRO_HINT_METRICS_ON = 2
+
+        ccall(
+            (:cairo_font_options_set_hint_metrics, C.libcairo), Nothing,
+            (Ptr{Nothing}, Int32),
+            font_options_ptr, CAIRO_HINT_METRICS_OFF)
+
+        # ccall(
+        #     (:cairo_font_options_set_antialias, C.libcairo), Nothing,
+        #     (Ptr{Nothing}, Int32),
+        #     font_options_ptr, 3)
+
+        ccall(
+            (:cairo_set_font_options, C.libcairo), Nothing,
+            (Ptr{Nothing}, Ptr{Nothing}),
+            cc.ptr, font_options_ptr)
+
+        ccall(
+            (:cairo_font_options_destroy, C.libcairo), Nothing,
+            (Ptr{Nothing},),
+            font_options_ptr)
+    end
 
     C.rectangle(cc, 0, 0, size_pixel...)
     C.set_source_rgba(cc, rgba(canvas.bgcolor)...)
@@ -200,7 +207,7 @@ function draw_rgba(canvas::Canvas; dpi=100)
     canvasmatrix = C.get_matrix(cc)
 
     draw!(cc, canvasmatrix, canvas.toplayer)
-    C.finish(c)
+    # C.finish(c)
     c
 end
 
@@ -503,7 +510,7 @@ function draw!(cc, canvasmatrix, t::Txt, a::Attributes)
     #     end
     # end
     C.set_source_rgba(cc, rgba(a[Textfill].val)...)
-    C.select_font_face(cc, t.font, Cairo.FONT_SLANT_NORMAL, Cairo.FONT_WEIGHT_NORMAL)
+    C.set_font_face(cc, t.font)
     C.set_font_size(cc, t.size)
 
     ex = TextExtent(cc, t)
@@ -529,7 +536,10 @@ function draw!(cc, canvasmatrix, t::Txt, a::Attributes)
     C.move_to(cc, pos.xy...)
     C.rotate(cc, rad(t.angle))
 
-    C.show_text(cc, t.text)
+    # C.show_text(cc, t.text)
+    C.set_text(cc, t.text, false)
+    C.update_layout(cc)
+    C.show_layout(cc)
 end
 
 function makepath!(cc, b::Bezier)

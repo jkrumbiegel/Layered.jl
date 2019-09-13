@@ -51,7 +51,7 @@ function record(canvas_func, filename, framerate::Real, ts; dpi=200, quality=:me
     nothing
 end
 
-function record_mpy(canvas_func, filename, framerate::Real, duration::Real; dpi=200)
+function record_mpy(canvas_func, filename, framerate::Real, duration::Real; excludelast=false, dpi=200)
 
     mpy = PyCall.pyimport("moviepy.editor")
 
@@ -61,6 +61,8 @@ function record_mpy(canvas_func, filename, framerate::Real, duration::Real; dpi=
         rgba = rgb_array(csurf)
         result = permutedims(reshape(reinterpret(UInt8, rgba), 3, size(rgba)...), [2,3,1])
     end
+
+    duration = excludelast ? (0:1/framerate:duration)[end-1] : duration
 
     clip = mpy.VideoClip(arrfunc, duration=duration)
     clip.write_videofile(filename, fps=framerate)
