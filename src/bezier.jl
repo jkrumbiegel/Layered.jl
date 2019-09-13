@@ -1,17 +1,14 @@
 export horizontalbezier, perpendicularbezier
 export bracket, arrow, arcarrow
 export reversed, concat
-export scaleby
 export rotate
 export centeredin
 
 
-move(b::Bezier, p::Point) = Bezier(b.from + p, b.c1 + p, b.c2 + p, b.to + p)
-scaleby(b::Bezier, by::Real) = Bezier(by * b.from, by * b.c1, by * b.c2, by * b.to)
-rotate(b::Bezier, ang::Angle) = Bezier(rotate.([b.from, b.c1, b.c2, b.to], ang)...)
-Base.:+(b::Bezier, p::Point) = move(b, p)
-Base.:-(b::Bezier, p::Point) = move(b, -p)
-Base.:+(p::Point, b::Bezier) = move(b, p)
+Base.:*(b::Bezier, r::Real) = Bezier(r * b.from, r * b.c1, r * b.c2, r * b.to)
+Base.:+(b::Bezier, p::Point) = Bezier(b.from + p, b.c1 + p, b.c2 + p, b.to + p)
+Base.:-(b::Bezier, p::Point) = Bezier(b.from - p, b.c1 - p, b.c2 - p, b.to - p)
+rotate(b::Bezier, ang::Angle) = Bezier(rotate.((b.from, b.c1, b.c2, b.to), ang)...)
 
 function horizontalbezier(p1::Point, p2::Point, strength=1)
     diff = p1 → p2
@@ -40,10 +37,10 @@ needed_attributes(::Type{Bezier}) = (Linewidth, Stroke, Linestyle, Fill, Visible
 #     Path([segments...], closed)
 # end
 
-move(b::Path, p::Point) = Path(move.(b.commands, p))
-Base.:+(b::Path, p::Point) = move(b, p)
-# Base.:+(p::Point, b::Path) = move(b, p)
-Base.:-(bp::Path, p::Point) = move(bp, -p)
+Base.:+(path::Path, p::Point) = Path(path.commands .+ p)
+Base.:-(path::Path, p::Point) = Path(path.commands .- p)
+Base.:*(path::Path, r::Real) = Path(path.commands .* r)
+Base.:*(r::Real, path::Path) = Path(path.commands .* r)
 
 function bracket(p1::Point, p2::Point, widthscale::Real = 0.1, innerstrength=1, outerstrength=1; flip=false)
     l = Line(p1, p2)
@@ -165,17 +162,13 @@ end
 #     p /= 2 * length(bp.segments)
 # end
 
-function scaleby(bp::Path, by::Real)
-
-    Path(scaleby.(bp.commands, by))
-
-end
+Base.:*(p::Path, r::Real) = Path(p.commands .* r)
+Base.:+(path::Path, p::Point) = Path(path.commands .+ p)
+Base.:-(path::Path, p::Point) = Path(path.commands .- p)
 
 function rotate(p::Path, ang::Angle)
     Path(rotate.(p.commands, ang))
 end
-
-
 
 function Path(svg::String)
 
@@ -370,19 +363,28 @@ function centeredin(p::Path, squarelength::Real)
     bb = bbox(p)
     r = Rect(bb)
     factor = squarelength / max(r.width, r.height)
-    scaleby(p - r.center, factor)
+    (p - r.center) * factor
 end
 
+Base.:+(m::Move, p::Point) = Move(m.p + p)
+Base.:+(l::Lineto, p::Point) = Lineto(l.p + p)
+Base.:+(c::CurveTo, p::Point) = CurveTo(c.c1 + p, c.c2 + p, c.p + p)
+Base.:+(c::Close, p::Point) = c
 
-move(m::Move, p::Point) = Move(m.p + p)
-move(l::Lineto, p::Point) = Lineto(l.p + p)
-move(c::CurveTo, p::Point) = CurveTo(c.c1 + p, c.c2 + p, c.p + p)
-move(c::Close, p::Point) = c
+Base.:-(m::Move, p::Point) = Move(m.p - p)
+Base.:-(l::Lineto, p::Point) = Lineto(l.p - p)
+Base.:-(c::CurveTo, p::Point) = CurveTo(c.c1 - p, c.c2 - p, c.p - p)
+Base.:-(c::Close, p::Point) = c
 
-scaleby(m::Move, s::Real) = Move(m.p * s)
-scaleby(l::Lineto, s::Real) = Lineto(l.p * s)
-scaleby(c::CurveTo, s::Real) = CurveTo(c.c1 * s, c.c2 * s, c.p * s)
-scaleby(c::Close, s::Real) = c
+Base.:*(m::Move, s::Real) = Move(m.p * s)
+Base.:*(l::Lineto, s::Real) = Lineto(l.p * s)
+Base.:*(c::CurveTo, s::Real) = CurveTo(c.c1 * s, c.c2 * s, c.p * s)
+Base.:*(c::Close, s::Real) = c
+
+Base.:*(s::Real, m::Move) = m * s
+Base.:*(s::Real, l::Lineto) = l * s
+Base.:*(s::Real, c::CurveTo) = c * s
+Base.:*(s::Real, c::Close) = c * s
 
 rotate(m::Move, a::Angle) = Move(rotate(m.p, a))
 rotate(l::Lineto, a::Angle) = Lineto(rotate(l.p, a))

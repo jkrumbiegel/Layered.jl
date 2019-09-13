@@ -32,7 +32,7 @@ Base.:+(l::Line, p::Point) = move(l, p)
 Base.:+(p::Point, l::Line) = move(l, p)
 Base.:-(l::Line, p::Point) = move(l, -p)
 
-scaleby(l::Line, by::Real) = Line(by * l.from, by * l.to)
+Base.:*(l::Line, r::Real) = Line(r * l.from, r * l.to)
 
 function scale(l::Line, scalar::Real)
     movement = (scalar - 1) * vector(l) / 2
