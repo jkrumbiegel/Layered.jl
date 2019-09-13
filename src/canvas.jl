@@ -47,3 +47,9 @@ function Base.show(io::IO, ::MIME"image/svg+xml", c::Canvas)
     csurf, svgbuffer = draw_svg(c)
     print(io, String(take!(svgbuffer)))
 end
+
+function Base.show(io::IO, ::MIME"image/png", c::Canvas)
+    p = "/tmp/layered.png"
+    png(c, p, dpi=200)
+    write(io, read(p))
+end
