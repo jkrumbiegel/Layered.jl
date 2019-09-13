@@ -1,4 +1,4 @@
-export layer, layer!, layerfirst!, rectlayer!, upward_transform, transform_from_to
+export layer, layer!, layerfirst!, layer_in_rect!, upward_transform, transform_from_to
 
 Base.Broadcast.broadcastable(l::Layer) = Ref(l)
 
@@ -56,7 +56,7 @@ function layer!(f::Function, parent::Layer, deps...)
     l
 end
 
-function rectlayer!(l::Layer, sr::Shape{Rect}, wh::Symbol, mode::Symbol=:center; margin=0)
+function layer_in_rect!(l::Layer, sr::Shape{Rect}, wh::Symbol, mode::Symbol=:center; margin=0)
     layer!(l, sr) do r
         d = @match wh begin
             :w => r.width
