@@ -53,7 +53,7 @@ end
 
 function record_mpy(canvas_func, filename, framerate::Real, duration::Real; excludelast=false, dpi=200)
 
-    mpy = PyCall.pyimport("moviepy.editor")
+    mclip = PyCall.pyimport("moviepy.video.VideoClip")
 
     function arrfunc(t)
         canv = canvas_func(t)
@@ -64,7 +64,7 @@ function record_mpy(canvas_func, filename, framerate::Real, duration::Real; excl
 
     duration = excludelast ? (0:1/framerate:duration)[end-1] : duration
 
-    clip = mpy.VideoClip(arrfunc, duration=duration)
+    clip = mclip.VideoClip(arrfunc, duration=duration)
     clip.write_videofile(filename, fps=framerate)
 
     nothing
