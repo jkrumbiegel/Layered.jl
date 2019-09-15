@@ -67,14 +67,15 @@ function arrow(from::Point, to::Point, tiplength, tipwidth, shaftwidthback, shaf
     tipconnleft = tipconnection_retracted + 0.5shaftwidthfront * ortholeft
     tipconnright = tipconnection_retracted - 0.5shaftwidthfront * ortholeft
     Path([
-        Line(endleft, tipconnleft),
-        Line(tipconnleft, tipleft),
-        Line(tipleft, to),
-        Line(to, tipright),
-        Line(tipright, tipconnright),
-        Line(tipconnright, endright),
-        Line(endright, endleft),
-    ], false)
+        Move(endleft),
+        Lineto(tipconnleft),
+        Lineto(tipleft),
+        Lineto(to),
+        Lineto(tipright),
+        Lineto(tipconnright),
+        Lineto(endright),
+        Close()
+    ])
 end
 
 
