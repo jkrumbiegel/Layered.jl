@@ -163,10 +163,6 @@ end
 #     p /= 2 * length(bp.segments)
 # end
 
-Base.:*(p::Path, r::Real) = Path(p.commands .* r)
-Base.:+(path::Path, p::Point) = Path(path.commands .+ p)
-Base.:-(path::Path, p::Point) = Path(path.commands .- p)
-
 function rotate(p::Path, ang::Angle)
     Path(rotate.(p.commands, ang))
 end
