@@ -40,7 +40,7 @@ function upward_transform(s::Shapelike)
     return upward_transform(s.parent)
 end
 
-function solve!(s::Shape{T}, cc::Cairo.CairoContext) where T
+function solve!(s::Shape{T}, cc::Union{Nothing, Cairo.CairoContext}=nothing) where T
 
     # the shape was already solved
     if !isnothing(s.solved)
@@ -81,7 +81,20 @@ function solve!(s::Shape{T}, cc::Cairo.CairoContext) where T
             end
         end
 
-        return_values = closure(solved_deps...)
+        function transform_function(lay, x)
+            transform_from_to(lay, s, cc) * x
+        end
+        function transform_function(x)
+            inverse(upward_transform(s.parent, cc)) * x
+        end
+
+        return_values = if applicable(closure, solved_deps...)
+            closure(solved_deps...)
+        elseif applicable(closure, solved_deps..., transform_function)
+            closure(solved_deps..., transform_function)
+        else
+            error("Arguments don't fit closure")
+        end
 
         if typeof(return_values) <: Tuple
             s.solved = return_values[1]
@@ -110,7 +123,7 @@ function solve!(s::Shape{T}, cc::Cairo.CairoContext) where T
 end
 
 
-function solve!(s::Shapes{T}, cc::Cairo.CairoContext) where T <: GeometricObject
+function solve!(s::Shapes{T}, cc::Union{Nothing, Cairo.CairoContext}=nothing) where T <: GeometricObject
 
     # the shape was already solved
     if !isnothing(s.solved)
@@ -159,7 +172,20 @@ function solve!(s::Shapes{T}, cc::Cairo.CairoContext) where T <: GeometricObject
             end
         end
 
-        return_values = closure(solved_deps...)
+        function transform_function(lay, x)
+            transform_from_to(lay, s, cc) * x
+        end
+        function transform_function(x)
+            inverse(upward_transform(s.parent, cc)) * x
+        end
+
+        return_values = if applicable(closure, solved_deps...)
+            closure(solved_deps...)
+        elseif applicable(closure, solved_deps..., transform_function)
+            closure(solved_deps..., transform_function)
+        else
+            error("Arguments don't fit closure")
+        end
 
         if typeof(return_values) <: Tuple
             s.solved = return_values[1]
@@ -177,7 +203,7 @@ function solve!(s::Shapes{T}, cc::Cairo.CairoContext) where T <: GeometricObject
             ts = s.solved
             for (i, t) in enumerate(ts)
                 if isnothing(t.extent)
-                    t_with_extent = Txt(t, TextExtent(cc, ts))
+                    t_with_extent = Txt(t, TextExtent(cc, t))
                     ts[i] = t_with_extent
                 end
             end
