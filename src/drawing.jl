@@ -509,23 +509,78 @@ function draw!(cc, canvasmatrix, t::Txt, a::Attributes)
     #     C.destroy(pat);
     #     end
     # end
-    C.set_source_rgba(cc, rgba(a[Textfill].val)...)
-    C.set_font_face(cc, t.font)
-    C.set_font_size(cc, t.size)
-
     ex = TextExtent(cc, t)
+
+    C.set_source_rgba(cc, rgba(a[Textfill].val)...)
+    C.set_font_face(cc, "$(t.font) $(t.size)")
+
+    C.set_text(cc, t.text, false)
+    C.update_layout(cc)
+
+    # font_options_ptr = ccall((:cairo_font_options_create, C.libcairo), Ptr{Nothing}, ())
+    #
+    # CAIRO_HINT_STYLE_NONE = 1
+    # CAIRO_HINT_STYLE_FULL = 4
+    # ccall(
+    #     (:cairo_font_options_set_hint_style, C.libcairo), Nothing,
+    #     (Ptr{Nothing}, Int32),
+    #     font_options_ptr, CAIRO_HINT_STYLE_NONE)
+    #
+    # CAIRO_HINT_METRICS_DEFAULT = 0
+    # CAIRO_HINT_METRICS_OFF = 1
+    # CAIRO_HINT_METRICS_ON = 2
+    #
+    # ccall(
+    #     (:cairo_font_options_set_hint_metrics, C.libcairo), Nothing,
+    #     (Ptr{Nothing}, Int32),
+    #     font_options_ptr, CAIRO_HINT_METRICS_OFF)
+    #
+    # # cc is a cairo context
+    # # ccall(
+    # #     (:cairo_set_font_options, C.libcairo), Nothing,
+    # #     (Ptr{Nothing}, Ptr{Nothing}),
+    # #     cc.ptr, font_options_ptr)
+    #
+    # pango_ctx = ccall((:pango_layout_get_context, C.libpango), Ptr{Nothing}, (Ptr{Nothing},), cc.layout)
+    #
+    # ccall((:pango_cairo_context_set_font_options, C.libpangocairo), Nothing,
+    #     (Ptr{Nothing}, Ptr{Nothing}),
+    #     pango_ctx, font_options_ptr
+    #     )
+    #
+    # ccall((:pango_layout_context_changed, C.libpango), Nothing, (Ptr{Nothing},), cc.layout)
+    #
+    # ccall(
+    #     (:cairo_font_options_destroy, C.libcairo), Nothing,
+    #     (Ptr{Nothing},),
+    #     font_options_ptr)
+
+    function get_layout_size(ctx::C.CairoContext)
+        w = Vector{Int32}(undef, 2)
+        ccall((:pango_layout_get_size, C.libpango), Nothing,
+              (Ptr{Nothing},Ptr{Int32},Ptr{Int32}), ctx.layout, pointer(w,1), pointer(w,2))
+        w ./ 1024
+    end
+
+    w, h = get_layout_size(cc)
+    # C.set_font_size(cc, t.size)
+
+
 
     shiftx = @match t.halign begin
         :l => 0
-        :c => -ex.width/2
-        :r => -ex.width
+        :c => -w/2
+        :r => -w
+        _ => error("Alignment $(t.halign) doesn't exist")
     end
 
     shifty = @match t.valign begin
-        :t => ex.height
-        :c => ex.height/2
-        :bl => 0
-        :b => -(ex.ybearing + ex.height)
+        :t => 0
+        :c => -h/2
+        :b => -h
+        _ => error("Alignment $(t.valign) doesn't exist")
+        # :bl => 0
+        # :b => -(ex.ybearing + ex.height)
     end
 
     shift = rotate(P(shiftx, shifty), t.angle)
@@ -536,9 +591,6 @@ function draw!(cc, canvasmatrix, t::Txt, a::Attributes)
     C.move_to(cc, pos.xy...)
     C.rotate(cc, rad(t.angle))
 
-    # C.show_text(cc, t.text)
-    C.set_text(cc, t.text, false)
-    C.update_layout(cc)
     C.show_layout(cc)
 end
 
@@ -614,6 +666,8 @@ end
 # end
 
 function makepath!(cc, c::Circle)
+    # C.move_to(cc, c.center.xy...)
+    C.new_sub_path(cc)
     C.arc(cc, c.center.xy..., c.radius, 0, 2pi)
 end
 
