@@ -18,6 +18,10 @@ function Base.:*(t1::Transform, t2::Transform)
     Transform(scale, rotation, translation)
 end
 
+function Base.:*(t::Transform, r::Real)
+    t.scale * r
+end
+
 function inverse(t::Transform)
     scale = 1 / t.scale
     rotation = -1 * t.rotation
