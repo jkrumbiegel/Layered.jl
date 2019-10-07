@@ -1,5 +1,9 @@
 ### Layered.jl
 
+[![Build Status](https://travis-ci.com/jkrumbiegel/Layered.jl.svg?branch=master)](https://travis-ci.com/jkrumbiegel/Layered.jl)
+[![Build Status](https://ci.appveyor.com/api/projects/status/github/jkrumbiegel/Layered.jl?svg=true)](https://ci.appveyor.com/project/jkrumbiegel/Layered-jl)
+[![Codecov](https://codecov.io/gh/jkrumbiegel/Layered.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/jkrumbiegel/Layered.jl)
+
 Layered.jl's purpose is to help with the creation of vector graphics.
 There are many packages out there that do this, like Luxor.jl or Compose.jl, so
 what is different here?
