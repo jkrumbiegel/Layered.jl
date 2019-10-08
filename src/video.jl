@@ -1,4 +1,4 @@
-import VideoIO
+# import VideoIO
 import Colors
 using ProgressMeter
 
@@ -19,37 +19,37 @@ function rgb_array(c)
     rgb = Colors.RGB.(bgra)
 end
 
-function record(canvas_func, filename, framerate::Real, ts; dpi=200, quality=:medium)
-
-    nframes = length(ts)
-
-    first_frame = rgb_array(draw_rgba(canvas_func(ts[1]), dpi=dpi))
-
-    full_size = (nframes, size(first_frame)...)
-    full_buffer = Array{Colors.RGB{Colors.N0f8}, 3}(undef, full_size...)
-    full_buffer[1, :, :, :] = first_frame
-
-    @showprogress 1/3 "Rendering frames..." for (i, t) in enumerate(ts[2:end])
-        canv = canvas_func(t)
-        csurf = draw_rgba(canv, dpi=dpi)
-        full_buffer[i, :, :, :] = rgb_array(csurf)
-    end
-
-    codec_name, props = if quality == :medium
-        ("libx264", [:priv_data => ("crf"=>"22","pix_fmt"=>"yuv420p", "profile:v"=>"baseline", "level"=>"3")])
-    elseif quality == :fastbig
-        ("libx264rgb", [:priv_data => ("crf"=>"0","preset"=>"ultrafast")])
-    elseif quality == :slowsmall
-        ("libx264rgb", [:priv_data => ("crf"=>"0","preset"=>"ultraslow")])
-    # elseif quality == :bitrate
-    #     ("libx264", [:bit_rate => 400000,:gop_size => 0,:max_b_frames=>1])
-    end
-
-    frames = [view(full_buffer, i, :, :) for i in 1:nframes]
-    VideoIO.encodevideo(filename, frames, framerate=framerate, AVCodecContextProperties=props, codec_name=codec_name)
-
-    nothing
-end
+# function record(canvas_func, filename, framerate::Real, ts; dpi=200, quality=:medium)
+#
+#     nframes = length(ts)
+#
+#     first_frame = rgb_array(draw_rgba(canvas_func(ts[1]), dpi=dpi))
+#
+#     full_size = (nframes, size(first_frame)...)
+#     full_buffer = Array{Colors.RGB{Colors.N0f8}, 3}(undef, full_size...)
+#     full_buffer[1, :, :, :] = first_frame
+#
+#     @showprogress 1/3 "Rendering frames..." for (i, t) in enumerate(ts[2:end])
+#         canv = canvas_func(t)
+#         csurf = draw_rgba(canv, dpi=dpi)
+#         full_buffer[i, :, :, :] = rgb_array(csurf)
+#     end
+#
+#     codec_name, props = if quality == :medium
+#         ("libx264", [:priv_data => ("crf"=>"22","pix_fmt"=>"yuv420p", "profile:v"=>"baseline", "level"=>"3")])
+#     elseif quality == :fastbig
+#         ("libx264rgb", [:priv_data => ("crf"=>"0","preset"=>"ultrafast")])
+#     elseif quality == :slowsmall
+#         ("libx264rgb", [:priv_data => ("crf"=>"0","preset"=>"ultraslow")])
+#     # elseif quality == :bitrate
+#     #     ("libx264", [:bit_rate => 400000,:gop_size => 0,:max_b_frames=>1])
+#     end
+#
+#     frames = [view(full_buffer, i, :, :) for i in 1:nframes]
+#     VideoIO.encodevideo(filename, frames, framerate=framerate, AVCodecContextProperties=props, codec_name=codec_name)
+#
+#     nothing
+# end
 
 function record_mpy(canvas_func, filename, framerate::Real, duration::Real; excludelast=false, dpi=200)
 
