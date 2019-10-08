@@ -2,7 +2,7 @@
 import Colors
 using ProgressMeter
 
-export record, record_mpy, rgb_array
+export record, rgb_array
 
 function bgra_array(c::Cairo.CairoSurfaceBase{UInt32})
     bgra_buffer_ptr = ccall((:cairo_image_surface_get_data, Cairo.libcairo), Ptr{UInt8}, (Ptr{Nothing},), c.ptr)
@@ -51,7 +51,7 @@ end
 #     nothing
 # end
 
-function record_mpy(canvas_func, filename, framerate::Real, duration::Real; excludelast=false, dpi=200)
+function record(canvas_func, filename, framerate::Real, duration::Real; excludelast=false, dpi=200)
 
     mclip = PyCall.pyimport("moviepy.video.VideoClip")
 
@@ -65,15 +65,22 @@ function record_mpy(canvas_func, filename, framerate::Real, duration::Real; excl
     duration = excludelast ? (0:1/framerate:duration)[end-1] : duration
 
     clip = mclip.VideoClip(arrfunc, duration=duration)
-    clip.write_videofile(filename, fps=framerate)
+
+    rest, extension = splitext(filename)
+
+    if extension == ".gif"
+        clip.write_gif(filename, fps=framerate)
+    else
+        clip.write_videofile(filename, fps=framerate)
+    end
 
     nothing
 end
 
-function record(figure_func, filename, framerate::Real, duration::Real; excludelast=false, kwargs...)
-    frames = 0:1//framerate:duration
-    if excludelast
-        frames = frames[1:end-1]
-    end
-    record(figure_func, filename, framerate, frames; kwargs...)
-end
+# function record(figure_func, filename, framerate::Real, duration::Real; excludelast=false, kwargs...)
+#     frames = 0:1//framerate:duration
+#     if excludelast
+#         frames = frames[1:end-1]
+#     end
+#     record(figure_func, filename, framerate, frames; kwargs...)
+# end
