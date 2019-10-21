@@ -1,4 +1,4 @@
-export Canvas, canvas, png, svg
+export Canvas, canvas, png, svg, pdf
 
 mutable struct Canvas
     size_in::Tuple{Float64, Float64}
@@ -43,13 +43,18 @@ function svg(c::Canvas, filename::String)
     nothing
 end
 
-function Base.show(io::IO, ::MIME"image/svg+xml", c::Canvas)
-    csurf, svgbuffer = draw_svg(c)
-    print(io, String(take!(svgbuffer)))
+function pdf(c::Canvas, filename::String)
+    draw_pdf(c, filename)
+    nothing
 end
+
+# function Base.show(io::IO, ::MIME"image/svg+xml", c::Canvas)
+#     csurf, svgbuffer = draw_svg(c)
+#     print(io, String(take!(svgbuffer)))
+# end
 
 function Base.show(io::IO, ::MIME"image/png", c::Canvas)
     p = "/tmp/layered.png"
-    png(c, p, dpi=200)
+    png(c, p, dpi=100)
     write(io, read(p))
 end
