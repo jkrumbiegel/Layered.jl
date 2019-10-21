@@ -53,7 +53,7 @@ end
 
 function record(canvas_func, filename, framerate::Real, duration::Real; excludelast=false, dpi=200)
 
-    mclip = PyCall.pyimport("moviepy.video.VideoClip")
+    VideoClip = PyCall.pyimport_conda("moviepy.video.VideoClip", "moviepy").VideoClip
 
     function arrfunc(t)
         canv = canvas_func(t)
@@ -64,7 +64,7 @@ function record(canvas_func, filename, framerate::Real, duration::Real; excludel
 
     duration = excludelast ? (0:1/framerate:duration)[end-1] : duration
 
-    clip = mclip.VideoClip(arrfunc, duration=duration)
+    clip = VideoClip(arrfunc, duration=duration)
 
     rest, extension = splitext(filename)
 
