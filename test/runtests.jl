@@ -1,6 +1,7 @@
 using Layered
 using Test
 using FileIO
+using Colors
 
 generate_images = false
 originalimagepath(str) = joinpath("original_images", str)
@@ -8,6 +9,17 @@ testimagepath(str) = joinpath("test_images", str)
 
 if !isdir("test_images/")
     mkdir("test_images/")
+end
+
+function test_or_generate_png(surface, filename)
+    if generate_images
+        png(surface, originalimagepath(filename); dpi=100)
+    else
+        png(surface, testimagepath(filename); dpi=100)
+        testimg = load(testimagepath(filename))
+        originalimg = load(originalimagepath(filename))
+        @test testimg == originalimg
+    end
 end
 
 @testset "geometry" begin
@@ -45,14 +57,7 @@ end
     line!(l, P(-1,  -0.6), P(1,  -0.6)) + Stroke("green") + Linewidth(4)
 
     filename = "image_lines_1.png"
-    if generate_images
-        png(c, originalimagepath(filename); dpi=100)
-    else
-        png(c, testimagepath(filename); dpi=100)
-        testimg = load(testimagepath(filename))
-        originalimg = load(originalimagepath(filename))
-        @test testimg == originalimg
-    end
+    test_or_generate_png(c, filename)
 end
 
 @testset "image_circle_1" begin
@@ -60,12 +65,29 @@ end
     circle!(tl, O, 25) + Fill("orange") + Stroke("black") + Linewidth(5)
 
     filename = "image_circle_1.png"
-    if generate_images
-        png(c, originalimagepath(filename); dpi=100)
-    else
-        png(c, testimagepath(filename); dpi=100)
-        testimg = load(testimagepath(filename))
-        originalimg = load(originalimagepath(filename))
-        @test testimg == originalimg
-    end
+    test_or_generate_png(c, filename)
 end
+
+@testset "petals" begin
+
+    c, tl = canvas(4, 4)
+
+    l = layer_in_rect!(tl, c.rect, :w, margin=30)
+
+    degrees = range(0, 360, length=21)[1:end-1]
+
+    petals = path!.(ang -> begin
+        ang
+        endpoint = P(ang)
+        segments = [Arc(O, endpoint, 0.2), Arc(endpoint, O, 0.2)]
+        Path(segments)
+    end, l, deg.(degrees)) .+ Stroke.(LCHuv.(70, 50, degrees)) .+ Linewidth(10) .+
+        Fill.(LCHuvA.(70, 50, degrees, 0.5)) .+ Operator(:mult)
+
+    circ = circle!(l, O, 0.25) + Visible(false)
+
+    l + Clip(circ, c.rect)
+
+    filename = "image_petals.png"
+    test_or_generate_png(c, filename)
+end;
