@@ -128,7 +128,6 @@ function draw_svg(canvas::Canvas)
     canvasmatrix = C.get_matrix(cc)
 
     draw!(cc, canvasmatrix, canvas.toplayer)
-    C.finish(c)
     c, iobuffer
 end
 
@@ -148,8 +147,7 @@ function draw_svg(canvas::Canvas, filename::String)
     canvasmatrix = C.get_matrix(cc)
 
     draw!(cc, canvasmatrix, canvas.toplayer)
-    C.finish(c)
-    nothing
+    c
 end
 
 function draw_pdf(canvas::Canvas, filename::String)
@@ -168,8 +166,7 @@ function draw_pdf(canvas::Canvas, filename::String)
     canvasmatrix = C.get_matrix(cc)
 
     draw!(cc, canvasmatrix, canvas.toplayer)
-    C.finish(c)
-    nothing
+    c
 end
 
 function draw_rgba(canvas::Canvas; dpi=100)
@@ -227,7 +224,6 @@ function draw_rgba(canvas::Canvas; dpi=100)
     canvasmatrix = C.get_matrix(cc)
 
     draw!(cc, canvasmatrix, canvas.toplayer)
-    # C.finish(c)
     c
 end
 

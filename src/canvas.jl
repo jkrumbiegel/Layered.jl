@@ -33,23 +33,29 @@ function canvas(
 end
 
 function png(c::Canvas, filename::String; dpi=200)
-    cc = draw_rgba(c, dpi=dpi)
-    Cairo.write_to_png(cc, filename)
+    csurface = draw_rgba(c, dpi=dpi)
+    Cairo.write_to_png(csurface, filename)
+    Cairo.finish(csurface)
+    Cairo.destroy(csurface)
     nothing
 end
 
 function svg(c::Canvas, filename::String)
-    draw_svg(c, filename)
+    csurface = draw_svg(c, filename)
+    Cairo.finish(csurface)
+    Cairo.destroy(csurface)
     nothing
 end
 
 function pdf(c::Canvas, filename::String)
-    draw_pdf(c, filename)
+    csurface = draw_pdf(c, filename)
+    Cairo.finish(csurface)
+    Cairo.destroy(csurface)
     nothing
 end
 
 # function Base.show(io::IO, ::MIME"image/svg+xml", c::Canvas)
-#     csurf, svgbuffer = draw_svg(c)
+#     csurface, svgbuffer = draw_svg(c)
 #     print(io, String(take!(svgbuffer)))
 # end
 
