@@ -1,4 +1,4 @@
-export move, normal, normfrom, direction
+export move, normal, normfrom, direction, vector
 
 
 xs(l::Line) = SVector(l.from.x, l.to.x)
@@ -33,6 +33,7 @@ Base.:+(p::Point, l::Line) = move(l, p)
 Base.:-(l::Line, p::Point) = move(l, -p)
 
 Base.:*(l::Line, r::Real) = Line(r * l.from, r * l.to)
+Base.:/(l::Line, r::Real) = Line(l.from / r, l.to / r)
 
 function scale(l::Line, scalar::Real)
     movement = (scalar - 1) * vector(l) / 2
