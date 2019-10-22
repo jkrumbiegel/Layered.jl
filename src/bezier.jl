@@ -183,7 +183,7 @@ function Path(segments::Vector{T}) where T <:Union{Line, Bezier, Arc}
 
 end
 
-function Path(svg::String)
+function Path(svg::AbstractString)
 
     # args = split(svg, r"[\s,]+", keepempty=false)
     # args = split(svg, r"((?<=[a-zA-Z])(?=\d)|(?<=\d)(?=[a-zA-Z])|([\s,]+)|((?<=\d)(?=\-))|((?<=[a-zA-Z])(?=\-)))|((?<=\.\d+))", keepempty=false)
