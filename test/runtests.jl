@@ -107,3 +107,21 @@ end
     test_or_generate_png(c, filename)
 
 end
+
+@testset "svg to path" begin
+    c, tl = canvas(1, 1)
+
+    l = layer_in_rect!(tl, c.rect, :w; margin=10)
+
+    headsvg = open("head.svg") do file
+        content = join(readlines(file))
+        split(split(content, "<path d=\"")[2], "\"/>")[1]
+    end
+
+    headpath = centeredin(Path(headsvg), 2)
+
+    path!(l, headpath) + Fill("black")
+
+    filename = "image_headsvg_path.png"
+    test_or_generate_png(c, filename)
+end
