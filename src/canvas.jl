@@ -34,9 +34,12 @@ end
 
 function png(c::Canvas, filename::String; dpi=200)
     csurface = draw_rgba(c, dpi=dpi)
-    Cairo.write_to_png(csurface, filename)
+    bufdata = UInt8[]
+    iobuf = IOBuffer(bufdata, read=true, write=true)
+    Cairo.write_to_png(csurface, iobuf)
     Cairo.finish(csurface)
     Cairo.destroy(csurface)
+    write(filename, bufdata)
     nothing
 end
 
