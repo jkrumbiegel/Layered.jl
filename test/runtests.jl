@@ -6,6 +6,10 @@ generate_images = false
 originalimagepath(str) = joinpath("original_images", str)
 testimagepath(str) = joinpath("test_images", str)
 
+if !isdir("test_images/")
+    mkdir("test_images/")
+end
+
 @testset "geometry" begin
     p1 = Point(0, 0)
     x1 = X(0)
