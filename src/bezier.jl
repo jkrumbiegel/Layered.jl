@@ -78,39 +78,6 @@ function arrow(from::Point, to::Point, tiplength, tipwidth, shaftwidthback, shaf
     ])
 end
 
-
-function Base.convert(::Type{Path}, a::Arc)
-    # https://stackoverflow.com/a/44829356/2279303
-
-    function uptoquarter(center, p1, p2)
-        x1, y1 = p1.xy
-        x4, y4 = p2.xy
-        xc, yc = center.xy
-
-        ax = x1 - xc
-        ay = y1 - yc
-        bx = x4 - xc
-        by = y4 - yc
-        q1 = ax * ax + ay * ay
-        q2 = q1 + ax * bx + ay * by
-        k2 = 4/3 * (√(2 * q1 * q2) - q2) / (ax * by - ay * bx)
-
-
-        x2 = xc + ax - k2 * ay
-        y2 = yc + ay + k2 * ax
-        x3 = xc + bx + k2 * by
-        y3 = yc + by - k2 * bx
-        Bezier(p1, P(x2, y2), P(x3, y3), p2)
-    end
-
-    quarterfractions = (a.end_angle - a.start_angle) / deg(90)
-    nsegments=ceil(abs(quarterfractions))
-
-    points = [fraction(a, i / nsegments) for i in 0:nsegments]
-    segments = [uptoquarter(a.center, p1, p2) for (p1, p2) in zip(points[1:end-1], points[2:end])]
-    Path(segments, false)
-end
-
 reversed(b::Bezier) = Bezier(b.to, b.c2, b.c1, b.from)
 reversed(b::Path) = Path(reverse!(reversed.(b.segments)), b.closed)
 
@@ -147,24 +114,73 @@ function concat(bp::Path, paths...)
     )
 end
 
-# function center(bp::Path)
-#     com = centerofmass(bp)
-#     Path(BezierSegment[s - com for s in bp.segments], false)
-# end
-#
-# function centerofmass(bp::Path)
-#     p = P(0, 0)
-#
-#     for s in bp.segments
-#         p += start(s)
-#         p += stop(s)
-#     end
-#
-#     p /= 2 * length(bp.segments)
-# end
-
 function rotate(p::Path, ang::Angle)
     Path(rotate.(p.commands, ang))
+end
+
+continuecommands(l::Line) = PathCommand[Lineto(stop(l))]
+continuecommand(b::Bezier) = CurveTo(b.c1, b.c2, b.to)
+continuecommands(b::Bezier) = PathCommand[continuecommand(b)]
+function continuecommands(a::Arc)
+    # https://stackoverflow.com/a/44829356/2279303
+
+    function uptoquarter(center, p1, p2)
+        x1, y1 = p1.xy
+        x4, y4 = p2.xy
+        xc, yc = center.xy
+
+        ax = x1 - xc
+        ay = y1 - yc
+        bx = x4 - xc
+        by = y4 - yc
+        q1 = ax * ax + ay * ay
+        q2 = q1 + ax * bx + ay * by
+        k2 = 4/3 * (√(2 * q1 * q2) - q2) / (ax * by - ay * bx)
+
+
+        x2 = xc + ax - k2 * ay
+        y2 = yc + ay + k2 * ax
+        x3 = xc + bx + k2 * by
+        y3 = yc + by - k2 * bx
+        Bezier(p1, P(x2, y2), P(x3, y3), p2)
+    end
+
+    quarterfractions = (a.end_angle - a.start_angle) / deg(90)
+    nsegments=ceil(abs(quarterfractions))
+
+    points = [fraction(a, i / nsegments) for i in 0:nsegments]
+    segments = [uptoquarter(a.center, p1, p2) for (p1, p2) in zip(points[1:end-1], points[2:end])]
+    PathCommand[continuecommand.(segments)...]
+end
+
+function Path(segments::Vector{T}) where T <:Union{Line, Bezier, Arc}
+
+    laststop = nothing
+    commands = PathCommand[]
+
+    i = 1
+    while i <= length(segments)
+        seg = segments[i]
+
+        if i == 1 || !(start(seg) ≈ laststop)
+            push!(commands, Move(start(seg)))
+        end
+
+        append!(commands, continuecommands(seg))
+        laststop = stop(seg)
+
+        i += 1
+
+    end
+
+    if laststop ≈ start(segments[1])
+        # replace first value so start and stop are exactly the same
+        commands[1] = Move(laststop)
+        push!(commands, Close())
+    end
+
+    Path(commands)
+
 end
 
 function Path(svg::String)
