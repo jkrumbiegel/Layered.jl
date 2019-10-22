@@ -90,4 +90,20 @@ end
 
     filename = "image_petals.png"
     test_or_generate_png(c, filename)
-end;
+end
+
+@testset "gradients" begin
+
+    c, tl = canvas(1, 1)
+
+    l = layer_in_rect!(tl, c.rect, :w) + Stroke(nothing)
+
+    rect!(l, P(-0.5, -0.5), 1, 1, deg(0)) + Fill(Gradient(P(-1, -1), O, "red", "blue"))
+    rect!(l, P(0.5, -0.5), 1, 1, deg(0)) + Fill(Gradient(P(1, -1), O, "yellow", "green", "orange"))
+    rect!(l, P(-0.5, 0.5), 1, 1, deg(0)) + Fill(RadialGradient(O, 1, RGB(1, 0, 1), RGB(0, 1, 0)))
+    rect!(l, P(0.5, 0.5), 1, 1, deg(0)) + Fill(RadialGradient(O, 0.3, 1.41, RGB(1, 0, 0), RGB(0, 1, 1)))
+
+    filename = "image_gradients.png"
+    test_or_generate_png(c, filename)
+
+end
