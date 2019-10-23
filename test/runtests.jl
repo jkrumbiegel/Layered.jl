@@ -138,3 +138,19 @@ end
     test_or_generate_png(c, filename)
 
 end
+
+@testset "linaxis" begin
+
+    c, tl = canvas(1, 1)
+
+    ax = LinAxis((0, 10), (1, -1), 0.1, 0.1)
+    xx = 0:0.1:10
+    yy = sin.(xx)
+
+    path!(tl, c.rect) do r
+        Path(ax.(r, xx, yy))
+    end + Stroke("red")
+
+    filename = "image_linaxis.png"
+    test_or_generate_png(c, filename)
+end
