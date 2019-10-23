@@ -125,3 +125,16 @@ end
     filename = "image_headsvg_path.png"
     test_or_generate_png(c, filename)
 end
+
+@testset "gridrects" begin
+
+    c, tl = canvas(1, 1)
+
+    rects!(tl, c.rect) do r
+        gridrects(r, 3, 4, 5, 5, 5)
+    end + Fill(:frac => f -> LCHuv(60, 60, f * 270))
+
+    filename = "image_gridrects.png"
+    test_or_generate_png(c, filename)
+
+end
