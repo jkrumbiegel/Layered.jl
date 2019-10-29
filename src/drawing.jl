@@ -605,9 +605,12 @@ function draw!(cc, canvasmatrix, t::Txt, a::Attributes)
 
 
     C.move_to(cc, pos.xy...)
+
+    C.save(cc) # this is needed if multiple texts are drawn in one go
     C.rotate(cc, rad(t.angle))
 
     C.show_layout(cc)
+    C.restore(cc)
 end
 
 function makepath!(cc, b::Bezier)
