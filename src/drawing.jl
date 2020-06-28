@@ -110,11 +110,14 @@ end
 
 
 function draw_svg(canvas::Canvas)
-
     bufferdata = UInt8[]
     iobuffer = IOBuffer(bufferdata, read=true, write=true)
+    _draw_svg(canvas, iobuffer)
+    iobuffer
+end
 
-    c = C.CairoSVGSurface(iobuffer, canvas.size...);
+function _draw_svg(canvas, target)
+    c = C.CairoSVGSurface(target, canvas.size...);
     cc = C.CairoContext(c);
 
     C.rectangle(cc, 0, 0, canvas.size...)
@@ -130,26 +133,11 @@ function draw_svg(canvas::Canvas)
     draw!(cc, canvasmatrix, canvas.toplayer)
     Cairo.finish(c)
     Cairo.destroy(c)
-    iobuffer
+    nothing
 end
 
 function draw_svg(canvas::Canvas, filename::String)
-
-    c = C.CairoSVGSurface(filename, canvas.size...);
-    cc = C.CairoContext(c);
-
-    C.rectangle(cc, 0, 0, canvas.size...)
-    C.set_source_rgba(cc, rgba(canvas.color)...)
-    C.fill(cc)
-
-    C.translate(cc, (canvas.size./2)...)
-
-    canvasmatrix = C.get_matrix(cc)
-
-    draw!(cc, canvasmatrix, canvas.toplayer)
-    Cairo.finish(c)
-    Cairo.destroy(c)
-    nothing
+    _draw_svg(canvas, filename)
 end
 
 function draw_pdf(canvas::Canvas, filename::String)
