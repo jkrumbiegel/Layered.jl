@@ -6,7 +6,7 @@ using Colors
 
 
 function example()
-    c, tl = canvas(5, 5, bgcolor=Gray(0.5))
+    c, tl = canvas(5, 5, color=Gray(0.5))
 
     l = rectlayer!(tl, c.rect, :w, :norm, margin=10)
 

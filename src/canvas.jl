@@ -4,12 +4,12 @@ mutable struct Canvas
     size::Tuple{Int, Int}
     toplayer::Layer
     rect::Shape{Rect}
-    bgcolor::Colors.Colorant
+    color::Colors.Colorant
 end
 
 
 function canvas(
-    width, height, toplayer::Union{Layer,Nothing}=nothing; bgcolor::Union{String, Colors.Colorant}="white")
+    width, height, toplayer::Union{Layer,Nothing}=nothing; color::Union{String, Colors.Colorant}="white")
 
     l = if isnothing(toplayer)
         layer() +
@@ -25,8 +25,8 @@ function canvas(
         toplayer
     end
     r = rect!(l, (0, 0), width, height, deg(0)) + Visible(false)
-    bgcolor = typeof(bgcolor) <: String ? parse(Colors.Colorant, bgcolor) : bgcolor
-    Canvas((width, height), l, r, bgcolor), l
+    color = typeof(color) <: String ? parse(Colors.Colorant, color) : color
+    Canvas((width, height), l, r, color), l
 end
 
 function png(c::Canvas, filename::String; px_per_pt=1/0.75)
@@ -52,12 +52,16 @@ function pdf(c::Canvas, filename::String)
 end
 
 function Base.show(io::IO, ::MIME"image/svg+xml", c::Canvas)
+    println("svg show")
     svgbuffer = draw_svg(c)
     print(io, String(take!(svgbuffer)))
 end
 
 function Base.show(io::IO, ::MIME"image/png", c::Canvas)
-    p = "/tmp/layered.png"
-    png(c, p)
-    write(io, read(p))
+    println("png show")
+    mktempdir() do path
+        p = joinpath(path, "layered.png")
+        png(c, p)
+        write(io, read(p))
+    end
 end

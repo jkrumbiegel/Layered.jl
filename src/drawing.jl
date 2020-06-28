@@ -118,7 +118,7 @@ function draw_svg(canvas::Canvas)
     cc = C.CairoContext(c);
 
     C.rectangle(cc, 0, 0, canvas.size...)
-    C.set_source_rgba(cc, rgba(canvas.bgcolor)...)
+    C.set_source_rgba(cc, rgba(canvas.color)...)
     C.fill(cc)
 
     C.translate(cc, (canvas.size ./ 2)...)
@@ -139,7 +139,7 @@ function draw_svg(canvas::Canvas, filename::String)
     cc = C.CairoContext(c);
 
     C.rectangle(cc, 0, 0, canvas.size...)
-    C.set_source_rgba(cc, rgba(canvas.bgcolor)...)
+    C.set_source_rgba(cc, rgba(canvas.color)...)
     C.fill(cc)
 
     C.translate(cc, (canvas.size./2)...)
@@ -158,7 +158,7 @@ function draw_pdf(canvas::Canvas, filename::String)
     cc = C.CairoContext(c);
 
     C.rectangle(cc, 0, 0, canvas.size...)
-    C.set_source_rgba(cc, rgba(canvas.bgcolor)...)
+    C.set_source_rgba(cc, rgba(canvas.color)...)
     C.fill(cc)
 
     C.translate(cc, (canvas.size./2)...)
@@ -170,7 +170,7 @@ function draw_pdf(canvas::Canvas, filename::String)
 end
 
 function draw_rgba(canvas::Canvas; px_per_pt=1/0.75)
-
+    
     size_pixel = round.(Int, canvas.size .* px_per_pt)
 
     c = C.CairoARGBSurface(size_pixel...);
@@ -213,7 +213,7 @@ function draw_rgba(canvas::Canvas; px_per_pt=1/0.75)
     end
 
     C.rectangle(cc, 0, 0, size_pixel...)
-    C.set_source_rgba(cc, rgba(canvas.bgcolor)...)
+    C.set_source_rgba(cc, rgba(canvas.color)...)
     C.fill(cc)
 
     C.scale(cc, px_per_pt, px_per_pt)

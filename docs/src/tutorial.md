@@ -7,7 +7,7 @@ using Layered
 
 defaultfont("Helvetica Neue Light")
 
-c, l = canvas(300, 300, bgcolor = "tomato")
+c, l = canvas(300, 300, color = "tomato")
 l + Linewidth(2)
 c
 ```
