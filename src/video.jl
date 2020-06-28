@@ -1,6 +1,5 @@
 # import VideoIO
 import Colors
-using ProgressMeter
 
 export record, rgb_array
 
