@@ -52,16 +52,14 @@ function pdf(c::Canvas, filename::String)
 end
 
 function Base.show(io::IO, ::MIME"image/svg+xml", c::Canvas)
-    println("svg show")
     svgbuffer = draw_svg(c)
     print(io, String(take!(svgbuffer)))
 end
 
-function Base.show(io::IO, ::MIME"image/png", c::Canvas)
-    println("png show")
-    mktempdir() do path
-        p = joinpath(path, "layered.png")
-        png(c, p)
-        write(io, read(p))
-    end
-end
+# function Base.show(io::IO, ::MIME"image/png", c::Canvas)
+#     mktempdir() do path
+#         p = joinpath(path, "layered.png")
+#         png(c, p)
+#         write(io, read(p))
+#     end
+# end
