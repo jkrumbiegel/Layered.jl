@@ -128,7 +128,9 @@ function draw_svg(canvas::Canvas)
     canvasmatrix = C.get_matrix(cc)
 
     draw!(cc, canvasmatrix, canvas.toplayer)
-    c, iobuffer
+    Cairo.finish(c)
+    Cairo.destroy(c)
+    iobuffer
 end
 
 function draw_svg(canvas::Canvas, filename::String)
@@ -147,7 +149,9 @@ function draw_svg(canvas::Canvas, filename::String)
     canvasmatrix = C.get_matrix(cc)
 
     draw!(cc, canvasmatrix, canvas.toplayer)
-    c
+    Cairo.finish(c)
+    Cairo.destroy(c)
+    nothing
 end
 
 function draw_pdf(canvas::Canvas, filename::String)

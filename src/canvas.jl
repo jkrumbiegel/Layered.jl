@@ -44,10 +44,7 @@ function png(c::Canvas, filename::String; dpi=200)
 end
 
 function svg(c::Canvas, filename::String)
-    csurface = draw_svg(c, filename)
-    Cairo.finish(csurface)
-    Cairo.destroy(csurface)
-    nothing
+    draw_svg(c, filename)
 end
 
 function pdf(c::Canvas, filename::String)
@@ -57,10 +54,10 @@ function pdf(c::Canvas, filename::String)
     nothing
 end
 
-# function Base.show(io::IO, ::MIME"image/svg+xml", c::Canvas)
-#     csurface, svgbuffer = draw_svg(c)
-#     print(io, String(take!(svgbuffer)))
-# end
+function Base.show(io::IO, ::MIME"image/svg+xml", c::Canvas)
+    svgbuffer = draw_svg(c)
+    print(io, String(take!(svgbuffer)))
+end
 
 function Base.show(io::IO, ::MIME"image/png", c::Canvas)
     p = "/tmp/layered.png"
