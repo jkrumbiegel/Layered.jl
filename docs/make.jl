@@ -2,12 +2,14 @@ using Documenter
 using Layered
 
 makedocs(
-    sitename = "Layered",
-    format = Documenter.HTML(),
+    sitename = "Layered.jl",
     pages = [
         "Start" => "index.md",
         "Tutorial" => "tutorial.md",
-    ]
+    ],
+    format = Documenter.HTML(
+        prettyurls = get(ENV, "CI", nothing) == "true"
+    )
 )
 
 # Documenter can also automatically deploy documentation to gh-pages.
