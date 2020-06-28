@@ -41,9 +41,8 @@ circ = circle!(l, O, 50)
 rect!(l, O, 120, 120, deg(45))
 line!(l, Y(100), Y(-100))
 
-Layered.svg(c, "1.svg")
 c
-nothing # hide
+Layered.svg(c, "1.svg") # hide
 ```
 ![](1.svg)
 
