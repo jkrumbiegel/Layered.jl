@@ -5,6 +5,8 @@ Tutorial
 ```@example tut
 using Layered
 
+defaultfont("Helvetica Neue Light")
+
 c, l = canvas(4, 4, bgcolor = "tomato")
 
 c
@@ -38,6 +40,16 @@ c
 txt!(l, c1, c2) do c1, c2
     Txt(between(c1.center, c2.center, 0.5), "hello", 14, :c, :c, deg(0))
 end + Textfill("white")
+
+c
+```
+
+```@example tut
+paths!(l) do
+    ps = P.(grid(-100:20:100, -100:20:100)...)
+
+    arrow.(ps, ps .+ X(10), 3, 3, 1, 1, 1)
+end + Stroke("black", 0.1)
 
 c
 ```

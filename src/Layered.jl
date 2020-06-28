@@ -27,11 +27,11 @@ for geom in geoms
 
     lowerc = Symbol(lowercase(String(geom)))
     lowerc_plural = Symbol(lowercase(String(geom)) * "s")
-    lowerc_exc = Symbol(lowercase(String(geom)) * "!")
-    lowerc_plural_exc = Symbol(lowercase(String(geom)) * "s!")
-    lowerc_first_exc = Symbol(lowercase(String(geom)) * "_first!")
-    lowerc_pre_exc = Symbol(lowercase(String(geom)) * "_pre!")
-    lowerc_post_exc = Symbol(lowercase(String(geom)) * "_post!")
+    lowerc_mutating = Symbol(lowercase(String(geom)) * "!")
+    lowerc_plural_mutating = Symbol(lowercase(String(geom)) * "s!")
+    lowerc_first_mutating = Symbol(lowercase(String(geom)) * "_first!")
+    lowerc_pre_mutating = Symbol(lowercase(String(geom)) * "_pre!")
+    lowerc_post_mutating = Symbol(lowercase(String(geom)) * "_post!")
 
 
     @eval begin
@@ -53,49 +53,49 @@ for geom in geoms
         $lowerc_plural(args...) = Shapes($geom, args...)
 
         """
-        $($lowerc_exc)(layer::Layer, args...)
+        $($lowerc_mutating)(layer::Layer, args...)
 
         Creates a shape containing a `GeometricObject` of type `$($geom)`,
         passing any trailing arguments to the constructor `$($geom)()`. Then
         appends the created shape to the given `Layer` `layer`."""
-        function $lowerc_exc(layer::Layer, args...)
+        function $lowerc_mutating(layer::Layer, args...)
             x = $lowerc(args...)
             push!(layer, x)
             x
         end
 
         """
-        $($lowerc_plural_exc)(layer::Layer, args...)
+        $($lowerc_plural_mutating)(layer::Layer, args...)
 
         Creates `Shapes` containing `GeometricObject`s of type `$($geom)`,
         passing any trailing arguments to the constructor `$($geom).()`. Then
         appends the created `Shapes` to the given `Layer` `layer`."""
-        function $lowerc_plural_exc(layer::Layer, args...)
+        function $lowerc_plural_mutating(layer::Layer, args...)
             x = $lowerc_plural(args...)
             push!(layer, x)
             x
         end
 
         """
-        $($lowerc_first_exc)(layer::Layer, args...)
+        $($lowerc_first_mutating)(layer::Layer, args...)
 
         Creates a shape containing a `GeometricObject` of type `$($geom)`,
         passing any trailing arguments to the constructor `$($geom)()`. Then
         prepends the created shape to the given `Layer` `layer`."""
-        function $lowerc_first_exc(layer::Layer, args...)
+        function $lowerc_first_mutating(layer::Layer, args...)
             x = $lowerc(args...)
             pushfirst!(layer, x)
             x
         end
 
         """
-        $($lowerc_pre_exc)(layer::Layer, pre::LayerContent, args...)
+        $($lowerc_pre_mutating)(layer::Layer, pre::LayerContent, args...)
 
         Creates a shape containing a `GeometricObject` of type `$($geom)`,
         passing any trailing arguments to the constructor `$($geom)()`. Then
         inserts the created shape into the given `Layer` `layer` before the given
         `LayerContent` object."""
-        function $lowerc_pre_exc(layer::Layer, pre::LayerContent, args...)
+        function $lowerc_pre_mutating(layer::Layer, pre::LayerContent, args...)
             x = $lowerc(args...)
             for (i, c) in enumerate(layer.content)
                 if c === pre
@@ -107,13 +107,13 @@ for geom in geoms
         end
 
         """
-        $($lowerc_post_exc)(layer::Layer, post::LayerContent, args...)
+        $($lowerc_post_mutating)(layer::Layer, post::LayerContent, args...)
 
         Creates a shape containing a `GeometricObject` of type `$($geom)`,
         passing any trailing arguments to the constructor `$($geom)()`. Then
         inserts the created shape into the given `Layer` `layer` after the given
         `LayerContent` object."""
-        function $lowerc_post_exc(layer::Layer, post::LayerContent, args...)
+        function $lowerc_post_mutating(layer::Layer, post::LayerContent, args...)
             x = $lowerc(args...)
             for (i, c) in enumerate(layer.content)
                 if c === post
@@ -146,28 +146,28 @@ for geom in geoms
 
 
         """
-        $($lowerc_exc)(f::Function, layer::Layer, args...)
+        $($lowerc_mutating)(f::Function, layer::Layer, args...)
 
         Creates a shape containing a `GeometricObject` of type `$($geom)`,
         storing any trailing arguments as dependencies, later to be passed as arguments
         to the given `Function` `f` that should return a `GeometricObject` of type `$($geom)`
         and will be evaluated when `solve!` is called on the shape during
         the drawing process. This function then appends the created shape to the given `Layer` `layer`."""
-        function $lowerc_exc(f::Function, layer::Layer, args...)
+        function $lowerc_mutating(f::Function, layer::Layer, args...)
             x = $lowerc(f, args...)
             push!(layer, x)
             x
         end
 
         """
-        $($lowerc_plural_exc)(f::Function, layer::Layer, args...)
+        $($lowerc_plural_mutating)(f::Function, layer::Layer, args...)
 
         Creates multiple shapes containing `GeometricObject`s of type `$($geom)`,
         storing any trailing arguments as dependencies, later to be passed as arguments
         to the given `Function` `f` that should return the `GeometricObject`s of type `$($geom)`
         and will be evaluated when `solve!` is called on the shapes during
         the drawing process. This function then appends the created shapes to the given `Layer` `layer`."""
-        function $lowerc_plural_exc(f::Function, layer::Layer, args...)
+        function $lowerc_plural_mutating(f::Function, layer::Layer, args...)
             x = $lowerc_plural(f, args...)
             push!(layer, x)
             x
@@ -175,21 +175,21 @@ for geom in geoms
 
 
         """
-        $($lowerc_first_exc)(f::Function, layer::Layer, args...)
+        $($lowerc_first_mutating)(f::Function, layer::Layer, args...)
 
         Creates a shape containing a `GeometricObject` of type `$($geom)`,
         storing any trailing arguments as dependencies, later to be passed as arguments
         to the given `Function` `f` that should return a `GeometricObject` of type `$($geom)`
         and will be evaluated when `solve!` is called on the shape during
         the drawing process. This function then prepends the created shape to the given `Layer` `layer`."""
-        function $lowerc_first_exc(f::Function, layer::Layer, args...)
+        function $lowerc_first_mutating(f::Function, layer::Layer, args...)
             x = $lowerc(f, args...)
             pushfirst!(layer, x)
             x
         end
 
         """
-        $($lowerc_pre_exc)(f::Function, layer::Layer,  pre::LayerContent, args...)
+        $($lowerc_pre_mutating)(f::Function, layer::Layer,  pre::LayerContent, args...)
 
         Creates a shape containing a `GeometricObject` of type `$($geom)`,
         storing any trailing arguments as dependencies, later to be passed as arguments
@@ -197,7 +197,7 @@ for geom in geoms
         and will be evaluated when `solve!` is called on the shape during
         the drawing process. This function then inserts the created shape into the given `Layer` `layer` before the given
         `LayerContent` object."""
-        function $lowerc_pre_exc(f::Function, layer::Layer, pre::LayerContent, args...)
+        function $lowerc_pre_mutating(f::Function, layer::Layer, pre::LayerContent, args...)
             x = $lowerc(f, args...)
             for (i, c) in enumerate(layer.content)
                 if c === pre
@@ -209,7 +209,7 @@ for geom in geoms
         end
 
         """
-        $($lowerc_post_exc)(f::Function, layer::Layer, post::LayerContent, args...)
+        $($lowerc_post_mutating)(f::Function, layer::Layer, post::LayerContent, args...)
 
         Creates a shape containing a `GeometricObject` of type `$($geom)`,
         storing any trailing arguments as dependencies, later to be passed as arguments
@@ -217,7 +217,7 @@ for geom in geoms
         and will be evaluated when `solve!` is called on the shape during
         the drawing process. This function then inserts the created shape into the given `Layer` `layer` after the given
         `LayerContent` object."""
-        function $lowerc_post_exc(f::Function, layer::Layer, post::LayerContent, args...)
+        function $lowerc_post_mutating(f::Function, layer::Layer, post::LayerContent, args...)
             x = $lowerc(f, args...)
             for (i, c) in enumerate(layer.content)
                 if c === post
@@ -228,7 +228,7 @@ for geom in geoms
             error("Could not find given shape in layer.")
         end
 
-        export $geom, $lowerc, $lowerc_exc, $lowerc_first_exc, $lowerc_pre_exc, $lowerc_post_exc, $lowerc_plural, $lowerc_plural_exc
+        export $geom, $lowerc, $lowerc_mutating, $lowerc_first_mutating, $lowerc_pre_mutating, $lowerc_post_mutating, $lowerc_plural, $lowerc_plural_mutating
 
     end
 end
