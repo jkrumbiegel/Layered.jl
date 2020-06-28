@@ -22,6 +22,9 @@ include("helpers.jl")
 
 Base.Broadcast.broadcastable(g::GeometricObject) = Ref(g)
 
+function add_shape!(shape, layer::Layer, args...)
+
+end
 
 for geom in geoms
 
@@ -29,9 +32,6 @@ for geom in geoms
     lowerc_plural = Symbol(lowercase(String(geom)) * "s")
     lowerc_mutating = Symbol(lowercase(String(geom)) * "!")
     lowerc_plural_mutating = Symbol(lowercase(String(geom)) * "s!")
-    lowerc_first_mutating = Symbol(lowercase(String(geom)) * "_first!")
-    lowerc_pre_mutating = Symbol(lowercase(String(geom)) * "_pre!")
-    lowerc_post_mutating = Symbol(lowercase(String(geom)) * "_post!")
 
 
     @eval begin
@@ -74,54 +74,6 @@ for geom in geoms
             x = $lowerc_plural(args...)
             push!(layer, x)
             x
-        end
-
-        """
-        $($lowerc_first_mutating)(layer::Layer, args...)
-
-        Creates a shape containing a `GeometricObject` of type `$($geom)`,
-        passing any trailing arguments to the constructor `$($geom)()`. Then
-        prepends the created shape to the given `Layer` `layer`."""
-        function $lowerc_first_mutating(layer::Layer, args...)
-            x = $lowerc(args...)
-            pushfirst!(layer, x)
-            x
-        end
-
-        """
-        $($lowerc_pre_mutating)(layer::Layer, pre::LayerContent, args...)
-
-        Creates a shape containing a `GeometricObject` of type `$($geom)`,
-        passing any trailing arguments to the constructor `$($geom)()`. Then
-        inserts the created shape into the given `Layer` `layer` before the given
-        `LayerContent` object."""
-        function $lowerc_pre_mutating(layer::Layer, pre::LayerContent, args...)
-            x = $lowerc(args...)
-            for (i, c) in enumerate(layer.content)
-                if c === pre
-                    insert!(layer, i, x)
-                    return x
-                end
-            end
-            error("Could not find given shape in layer.")
-        end
-
-        """
-        $($lowerc_post_mutating)(layer::Layer, post::LayerContent, args...)
-
-        Creates a shape containing a `GeometricObject` of type `$($geom)`,
-        passing any trailing arguments to the constructor `$($geom)()`. Then
-        inserts the created shape into the given `Layer` `layer` after the given
-        `LayerContent` object."""
-        function $lowerc_post_mutating(layer::Layer, post::LayerContent, args...)
-            x = $lowerc(args...)
-            for (i, c) in enumerate(layer.content)
-                if c === post
-                    insert!(layer, i+1, x)
-                    return x
-                end
-            end
-            error("Could not find given shape in layer.")
         end
 
         """
@@ -173,62 +125,7 @@ for geom in geoms
             x
         end
 
-
-        """
-        $($lowerc_first_mutating)(f::Function, layer::Layer, args...)
-
-        Creates a shape containing a `GeometricObject` of type `$($geom)`,
-        storing any trailing arguments as dependencies, later to be passed as arguments
-        to the given `Function` `f` that should return a `GeometricObject` of type `$($geom)`
-        and will be evaluated when `solve!` is called on the shape during
-        the drawing process. This function then prepends the created shape to the given `Layer` `layer`."""
-        function $lowerc_first_mutating(f::Function, layer::Layer, args...)
-            x = $lowerc(f, args...)
-            pushfirst!(layer, x)
-            x
-        end
-
-        """
-        $($lowerc_pre_mutating)(f::Function, layer::Layer,  pre::LayerContent, args...)
-
-        Creates a shape containing a `GeometricObject` of type `$($geom)`,
-        storing any trailing arguments as dependencies, later to be passed as arguments
-        to the given `Function` `f` that should return a `GeometricObject` of type `$($geom)`
-        and will be evaluated when `solve!` is called on the shape during
-        the drawing process. This function then inserts the created shape into the given `Layer` `layer` before the given
-        `LayerContent` object."""
-        function $lowerc_pre_mutating(f::Function, layer::Layer, pre::LayerContent, args...)
-            x = $lowerc(f, args...)
-            for (i, c) in enumerate(layer.content)
-                if c === pre
-                    insert!(layer, i, x)
-                    return x
-                end
-            end
-            error("Could not find given shape in layer.")
-        end
-
-        """
-        $($lowerc_post_mutating)(f::Function, layer::Layer, post::LayerContent, args...)
-
-        Creates a shape containing a `GeometricObject` of type `$($geom)`,
-        storing any trailing arguments as dependencies, later to be passed as arguments
-        to the given `Function` `f` that should return a `GeometricObject` of type `$($geom)`
-        and will be evaluated when `solve!` is called on the shape during
-        the drawing process. This function then inserts the created shape into the given `Layer` `layer` after the given
-        `LayerContent` object."""
-        function $lowerc_post_mutating(f::Function, layer::Layer, post::LayerContent, args...)
-            x = $lowerc(f, args...)
-            for (i, c) in enumerate(layer.content)
-                if c === post
-                    insert!(layer, i+1, x)
-                    return x
-                end
-            end
-            error("Could not find given shape in layer.")
-        end
-
-        export $geom, $lowerc, $lowerc_mutating, $lowerc_first_mutating, $lowerc_pre_mutating, $lowerc_post_mutating, $lowerc_plural, $lowerc_plural_mutating
+        export $geom, $lowerc, $lowerc_mutating, $lowerc_plural, $lowerc_plural_mutating
 
     end
 end

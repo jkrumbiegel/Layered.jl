@@ -8,7 +8,7 @@ using Layered
 defaultfont("Helvetica Neue Light")
 
 c, l = canvas(4, 4, bgcolor = "tomato")
-
+l + Linewidth(2)
 c
 ```
 
@@ -48,8 +48,8 @@ c
 paths!(l) do
     ps = P.(grid(-100:20:100, -100:20:100)...)
 
-    arrow.(ps, ps .+ X(10), 3, 3, 1, 1, 1)
-end + Stroke("black", 0.1)
+    arrow.(ps, ps .+ X(10), 5, 5, 3, 3, 0)
+end + Fill("black", 0.1) + Stroke(nothing)
 
 c
 ```
