@@ -1,7 +1,9 @@
 module Layered
 
 using StaticArrays
-import Colors
+
+using Reexport
+@reexport using Colors
 using Match
 import Cairo
 
