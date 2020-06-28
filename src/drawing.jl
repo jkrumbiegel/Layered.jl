@@ -255,6 +255,7 @@ function draw!(cc::C.CairoContext, canvasmatrix, l::Layer)
 
     gr = C.pop_group(cc)
     C.set_source(cc, gr);
+    C.destroy(gr)
 
     # I guess this should go here so it only takes effect on the layer after
     # that is drawn, so there will be better fringes than if two antialiased clips
@@ -299,11 +300,13 @@ function draw!(cc, canvasmatrix, s::Shape)
     end
 
     C.save(cc)
+
     C.push_group(cc)
     draw!(cc, canvasmatrix, geom, attributes)
     gr = C.pop_group(cc)
+    C.set_source(cc, gr)
+    C.destroy(gr)
 
-    C.set_source(cc, gr);
     setclippath!(cc, s)
 
     C.set_operator(cc, Base.convert(Int32, s.operator))
@@ -358,8 +361,9 @@ function draw!(cc, canvasmatrix, s::Shapes)
     end
 
     gr = C.pop_group(cc)
-
     C.set_source(cc, gr);
+    C.destroy(gr)
+
     setclippath!(cc, s)
 
     C.set_operator(cc, Base.convert(Int32, s.operator))
