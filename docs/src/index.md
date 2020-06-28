@@ -35,18 +35,24 @@ Shapes have attributes such as linewidth, fill color, and line style. Unspecifie
 ```@example attrs
 using Layered
 
-c, l = canvas(300, 300)
+c, l = canvas(300, 300, color = Gray(0.95))
 
 circ = circle!(l, O, 50)
 rect!(l, O, 120, 120, deg(45))
 line!(l, Y(100), Y(-100))
 
+Layered.svg(c, "1.svg")
 c
+nothing # hide
 ```
+![](1.svg)
 
 ```@example attrs
 circ + Stroke("red")
 l + Linewidth(4) + Stroke("blue")
 
 c
+Layered.svg(c, "2.svg") # hide
 ```
+
+![](2.svg)
