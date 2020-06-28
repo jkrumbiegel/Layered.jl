@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Start · Layered.jl</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="assets/documenter.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-dark.css" data-theme-name="documenter-dark"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit">Layered.jl</span></div><form class="docs-search" action="search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li class="is-active"><a class="tocitem" href>Start</a><ul class="internal"><li><a class="tocitem" href="#Assemble-first,-then-draw-1"><span>Assemble first, then draw</span></a></li><li><a class="tocitem" href="#Transforms-and-relative-shapes-1"><span>Transforms and relative shapes</span></a></li><li><a class="tocitem" href="#Attributes-1"><span>Attributes</span></a></li></ul></li><li><a class="tocitem" href="tutorial/">Tutorial</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Start</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Start</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/jkrumbiegel/Layered.jl/blob/master/docs/src/index.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Layered.jl-1"><a class="docs-heading-anchor" href="#Layered.jl-1">Layered.jl</a><a class="docs-heading-anchor-permalink" href="#Layered.jl-1" title="Permalink"></a></h1><p><code>Layered.jl</code> is a library for creating layer-based 2D vector graphics.</p><h2 id="Assemble-first,-then-draw-1"><a class="docs-heading-anchor" href="#Assemble-first,-then-draw-1">Assemble first, then draw</a><a class="docs-heading-anchor-permalink" href="#Assemble-first,-then-draw-1" title="Permalink"></a></h2><p>Opposed to imperative packages like <code>Luxor.jl</code> or <code>Cairo.jl</code> (which <code>Layered.jl</code> is based on) you assemble a graphic out of layers and shapes before drawing it. This frees you from having to draw all shapes sequentially, from bottom to top.</p><pre><code class="language-julia">using Layered
+
+c, l = canvas(200, 200)
+
+l + Stroke(nothing)
+
+l1 = layer!(l)
+l2 = layer!(l)
+
+rect!(l2, O, 100, 100, deg(0)) + Fill(&quot;teal&quot;)
+circle!(l1, O, 100) + Fill(&quot;tomato&quot;)
+circle!(l2, O, 20) + Fill(&quot;yellow&quot;)
+
+c</code></pre><?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="200pt" height="200pt" viewBox="0 0 200 200" version="1.1">
+<defs>
+<clipPath id="clip3">
+  <rect x="0" y="0" width="200" height="200"/>
+</clipPath>
+<g id="surface7" clip-path="url(#clip3)">
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,38.823529%,27.843137%);fill-opacity:1;" d="M 200 100 C 200 44.773438 155.226562 0 100 0 C 44.773438 0 0 44.773438 0 100 C 0 155.226562 44.773438 200 100 200 C 155.226562 200 200 155.226562 200 100 "/>
+</g>
+<clipPath id="clip2">
+  <rect x="0" y="0" width="200" height="200"/>
+</clipPath>
+<g id="surface9" clip-path="url(#clip2)">
+<use xlink:href="#surface7"/>
+</g>
+<clipPath id="clip5">
+  <rect x="0" y="0" width="200" height="200"/>
+</clipPath>
+<g id="surface13" clip-path="url(#clip5)">
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(0%,50.196078%,50.196078%);fill-opacity:1;" d="M 50 50 L 150 50 L 150 150 L 50 150 Z M 50 50 "/>
+</g>
+<clipPath id="clip6">
+  <rect x="0" y="0" width="200" height="200"/>
+</clipPath>
+<g id="surface16" clip-path="url(#clip6)">
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,100%,0%);fill-opacity:1;" d="M 120 100 C 120 88.953125 111.046875 80 100 80 C 88.953125 80 80 88.953125 80 100 C 80 111.046875 88.953125 120 100 120 C 111.046875 120 120 111.046875 120 100 "/>
+</g>
+<clipPath id="clip4">
+  <rect x="0" y="0" width="200" height="200"/>
+</clipPath>
+<g id="surface18" clip-path="url(#clip4)">
+<use xlink:href="#surface13"/>
+<use xlink:href="#surface16"/>
+</g>
+<clipPath id="clip1">
+  <rect x="0" y="0" width="200" height="200"/>
+</clipPath>
+<g id="surface20" clip-path="url(#clip1)">
+<use xlink:href="#surface9"/>
+<use xlink:href="#surface18"/>
+</g>
+</defs>
+<g id="surface1">
+<rect x="0" y="0" width="200" height="200" style="fill:rgb(100%,100%,100%);fill-opacity:1;stroke:none;"/>
+<use xlink:href="#surface20"/>
+</g>
+</svg>
+<h2 id="Transforms-and-relative-shapes-1"><a class="docs-heading-anchor" href="#Transforms-and-relative-shapes-1">Transforms and relative shapes</a><a class="docs-heading-anchor-permalink" href="#Transforms-and-relative-shapes-1" title="Permalink"></a></h2><p><code>Layered.jl</code> uses simple transforms for each layer. You can uniformly scale, translate and rotate, but not skew. This restriction is applied because it makes a circle stay a circle, no matter what layer it is in. Because you can create new shapes based on their relationships to existing shapes, like a tangent from a point in one layer to a circle in another, it&#39;s desirable that circles don&#39;t turn into ovals along the way.</p><h2 id="Attributes-1"><a class="docs-heading-anchor" href="#Attributes-1">Attributes</a><a class="docs-heading-anchor-permalink" href="#Attributes-1" title="Permalink"></a></h2><p>Shapes have attributes such as linewidth, fill color, and line style. Unspecified attributes are inherited from parent layers, freeing you from copying common attributes all over your code.</p><pre><code class="language-julia">using Layered
+
+c, l = canvas(300, 300, color = Gray(0.95))
+
+circ = circle!(l, O, 50)
+rect!(l, O, 120, 120, deg(45))
+line!(l, Y(100), Y(-100))
+
+Layered.svg(c, &quot;1.svg&quot;)
+c</code></pre><p><img src="1.svg" alt/></p><pre><code class="language-julia">circ + Stroke(&quot;red&quot;)
+l + Linewidth(4) + Stroke(&quot;blue&quot;)
+
+c</code></pre><p><img src="2.svg" alt/></p></article><nav class="docs-footer"><a class="docs-footer-nextpage" href="tutorial/">Tutorial »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Sunday 28 June 2020 16:11">Sunday 28 June 2020</span>. Using Julia version 1.4.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
