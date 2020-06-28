@@ -1,7 +1,7 @@
 export Canvas, canvas, png, svg, pdf
 
 mutable struct Canvas
-    size_in::Tuple{Float64, Float64}
+    size::Tuple{Int, Int}
     toplayer::Layer
     rect::Shape{Rect}
     bgcolor::Colors.Colorant
@@ -9,10 +9,7 @@ end
 
 
 function canvas(
-    width::Real, height::Real, toplayer::Union{Layer,Nothing}=nothing; bgcolor::Union{String, Colors.Colorant}="white")
-    pt_per_in = 72
-    size_in = (width, height)
-    size_pt = size_in .* pt_per_in
+    width, height, toplayer::Union{Layer,Nothing}=nothing; bgcolor::Union{String, Colors.Colorant}="white")
 
     l = if isnothing(toplayer)
         layer() +
@@ -27,13 +24,13 @@ function canvas(
     else
         toplayer
     end
-    r = rect!(l, (0, 0), size_pt..., deg(0)) + Visible(false)
+    r = rect!(l, (0, 0), width, height, deg(0)) + Visible(false)
     bgcolor = typeof(bgcolor) <: String ? parse(Colors.Colorant, bgcolor) : bgcolor
     Canvas((width, height), l, r, bgcolor), l
 end
 
-function png(c::Canvas, filename::String; dpi=200)
-    csurface = draw_rgba(c, dpi=dpi)
+function png(c::Canvas, filename::String; px_per_pt=1/0.75)
+    csurface = draw_rgba(c, px_per_pt=px_per_pt)
     bufdata = UInt8[]
     iobuf = IOBuffer(bufdata, read=true, write=true)
     Cairo.write_to_png(csurface, iobuf)
@@ -61,6 +58,6 @@ end
 
 function Base.show(io::IO, ::MIME"image/png", c::Canvas)
     p = "/tmp/layered.png"
-    png(c, p, dpi=100)
+    png(c, p)
     write(io, read(p))
 end

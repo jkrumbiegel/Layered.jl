@@ -110,20 +110,18 @@ end
 
 
 function draw_svg(canvas::Canvas)
-    pt_per_in = 72
-    size_pt = canvas.size_in .* pt_per_in
 
     bufferdata = UInt8[]
     iobuffer = IOBuffer(bufferdata, read=true, write=true)
 
-    c = C.CairoSVGSurface(iobuffer, size_pt...);
+    c = C.CairoSVGSurface(iobuffer, canvas.size...);
     cc = C.CairoContext(c);
 
-    C.rectangle(cc, 0, 0, size_pt...)
+    C.rectangle(cc, 0, 0, canvas.size...)
     C.set_source_rgba(cc, rgba(canvas.bgcolor)...)
     C.fill(cc)
 
-    C.translate(cc, (size_pt./2)...)
+    C.translate(cc, (canvas.size ./ 2)...)
     # flip all y-coordinates
     C.scale(cc, 1, -1)
 
@@ -136,17 +134,15 @@ function draw_svg(canvas::Canvas)
 end
 
 function draw_svg(canvas::Canvas, filename::String)
-    pt_per_in = 72
-    size_pt = canvas.size_in .* pt_per_in
 
-    c = C.CairoSVGSurface(filename, size_pt...);
+    c = C.CairoSVGSurface(filename, canvas.size...);
     cc = C.CairoContext(c);
 
-    C.rectangle(cc, 0, 0, size_pt...)
+    C.rectangle(cc, 0, 0, canvas.size...)
     C.set_source_rgba(cc, rgba(canvas.bgcolor)...)
     C.fill(cc)
 
-    C.translate(cc, (size_pt./2)...)
+    C.translate(cc, (canvas.size./2)...)
 
     canvasmatrix = C.get_matrix(cc)
 
@@ -157,17 +153,15 @@ function draw_svg(canvas::Canvas, filename::String)
 end
 
 function draw_pdf(canvas::Canvas, filename::String)
-    pt_per_in = 72
-    size_pt = canvas.size_in .* pt_per_in
 
-    c = C.CairoPDFSurface(filename, size_pt...);
+    c = C.CairoPDFSurface(filename, canvas.size...);
     cc = C.CairoContext(c);
 
-    C.rectangle(cc, 0, 0, size_pt...)
+    C.rectangle(cc, 0, 0, canvas.size...)
     C.set_source_rgba(cc, rgba(canvas.bgcolor)...)
     C.fill(cc)
 
-    C.translate(cc, (size_pt./2)...)
+    C.translate(cc, (canvas.size./2)...)
 
     canvasmatrix = C.get_matrix(cc)
 
@@ -175,11 +169,9 @@ function draw_pdf(canvas::Canvas, filename::String)
     c
 end
 
-function draw_rgba(canvas::Canvas; dpi=100)
+function draw_rgba(canvas::Canvas; px_per_pt=1/0.75)
 
-    pt_per_in = 72
-    size_pt = canvas.size_in .* pt_per_in
-    size_pixel = canvas.size_in .* dpi
+    size_pixel = round.(Int, canvas.size .* px_per_pt)
 
     c = C.CairoARGBSurface(size_pixel...);
     cc = C.CairoContext(c);
@@ -224,8 +216,8 @@ function draw_rgba(canvas::Canvas; dpi=100)
     C.set_source_rgba(cc, rgba(canvas.bgcolor)...)
     C.fill(cc)
 
-    C.scale(cc, dpi / pt_per_in, dpi / pt_per_in)
-    C.translate(cc, (size_pt./2)...)
+    C.scale(cc, px_per_pt, px_per_pt)
+    C.translate(cc, (size_pixel./2)...)
 
     canvasmatrix = C.get_matrix(cc)
 
