@@ -332,14 +332,14 @@ function getattributes(attr::Attributes, i::Int, n::Int, geom::GeometricObject)
                     :geom => func(geom)
                     _ => error("Not implemented")
                 end
-                add!(singleattrs, typ(value))
+                insert!(singleattrs, typ(value))
             elseif typeof(a.val) <: AbstractArray
-                add!(singleattrs, typ(a.val[i]))
+                insert!(singleattrs, typ(a.val[i]))
             else
                 error("Not implemented")
             end
         else
-            add!(singleattrs, a)
+            insert!(singleattrs, a)
         end
     end
     singleattrs

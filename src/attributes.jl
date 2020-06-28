@@ -24,16 +24,13 @@ parameterlesstypeof(a::Attribute) = typeof(a).name.wrapper
 function Attributes(att::Attribute, varargs::Vararg{Attribute, N}) where N
     attributes = Attributes()
     for a in (att, varargs...)
-        add!(attributes, a)
+        insert!(attributes, a)
     end
     attributes
 end
 
-function add!(attrs::Attributes, a::Attribute)
+function Base.insert!(attrs::Attributes, a::Attribute)
     pltype = parameterlesstypeof(a)
-    if haskey(attrs, pltype)
-        error("Attribute of type $pltype was added more than once.")
-    end
     attrs[pltype] = a
 end
 
