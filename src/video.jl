@@ -51,31 +51,31 @@ end
 #     nothing
 # end
 
-function record(canvas_func, filename, framerate::Real, duration::Real; excludelast=false, dpi=200)
+# function record(canvas_func, filename, framerate::Real, duration::Real; excludelast=false, dpi=200)
 
-    VideoClip = PyCall.pyimport_conda("moviepy.video.VideoClip", "moviepy").VideoClip
+#     VideoClip = PyCall.pyimport_conda("moviepy.video.VideoClip", "moviepy").VideoClip
 
-    function arrfunc(t)
-        canv = canvas_func(t)
-        csurf = draw_rgba(canv, dpi=dpi)
-        rgba = rgb_array(csurf)
-        result = permutedims(reshape(reinterpret(UInt8, rgba), 3, size(rgba)...), [2,3,1])
-    end
+#     function arrfunc(t)
+#         canv = canvas_func(t)
+#         csurf = draw_rgba(canv, dpi=dpi)
+#         rgba = rgb_array(csurf)
+#         result = permutedims(reshape(reinterpret(UInt8, rgba), 3, size(rgba)...), [2,3,1])
+#     end
 
-    duration = excludelast ? (0:1/framerate:duration)[end-1] : duration
+#     duration = excludelast ? (0:1/framerate:duration)[end-1] : duration
 
-    clip = VideoClip(arrfunc, duration=duration)
+#     clip = VideoClip(arrfunc, duration=duration)
 
-    rest, extension = splitext(filename)
+#     rest, extension = splitext(filename)
 
-    if extension == ".gif"
-        clip.write_gif(filename, fps=framerate)
-    else
-        clip.write_videofile(filename, fps=framerate)
-    end
+#     if extension == ".gif"
+#         clip.write_gif(filename, fps=framerate)
+#     else
+#         clip.write_videofile(filename, fps=framerate)
+#     end
 
-    nothing
-end
+#     nothing
+# end
 
 # function record(figure_func, filename, framerate::Real, duration::Real; excludelast=false, kwargs...)
 #     frames = 0:1//framerate:duration
