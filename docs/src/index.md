@@ -1,58 +1,15 @@
 # Layered.jl
 
-Tutorial
+`Layered.jl` is a library for creating layer-based 2D vector graphics.
 
-```@example tut
-using Layered
+## Assemble first, then draw
 
-defaultfont("Helvetica Neue Light")
+Opposed to imperative packages like `Luxor.jl` or `Cairo.jl` (which `Layered.jl` is based on) you assemble a graphic out of layers and shapes before drawing it. This frees you from having to draw all shapes sequentially, from bottom to top.
 
-c, l = canvas(4, 4, bgcolor = "tomato")
-l + Linewidth(2)
-c
-```
+## Transforms and relative shapes
 
-```@example tut
-c1 = circle!(l, O, 50) + Fill("teal")
+`Layered.jl` uses simple transforms for each layer. You can uniformly scale, translate and rotate, but not skew. This keeps any circle a circle, no matter what layer it is in. That in turn allows you to refer to geometric objects across different layers to build up your graphic.
 
-c
-```
+## Attributes
 
-```@example tut
-c2 = circle_first!(l, -X(50), 50) + Fill("orange")
-
-c
-```
-
-```@example tut
-c3 = circle!(l, Y(80), 20) + Fill("red")
-
-c
-```
-
-```@example tut
-lines!(outertangents, l, c1, c3)
-
-c
-```
-
-```@example tut
-txt!(l, c1, c2) do c1, c2
-    Txt(between(c1.center, c2.center, 0.5), "hello", 14, :c, :c, deg(0))
-end + Textfill("white")
-
-c
-```
-
-```@example tut
-paths!(l) do
-    ps = P.(grid(-100:20:100, -100:20:100)...)
-
-    arrow.(ps, ps .+ X(10), 5, 5, 3, 3, 0)
-end + Fill("black", 0.1) + Stroke(nothing)
-
-c
-```
-
-
-
+Things like linewidths, fill colors, and so on can be assigned to each shape. Unspecified attributes are inherited from parent layers, freeing you from copying common attributes all over your code.
