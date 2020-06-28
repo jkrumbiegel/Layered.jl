@@ -124,6 +124,8 @@ function draw_svg(canvas::Canvas)
     C.fill(cc)
 
     C.translate(cc, (size_pt./2)...)
+    # flip all y-coordinates
+    C.scale(cc, 1, -1)
 
     canvasmatrix = C.get_matrix(cc)
 
@@ -537,43 +539,6 @@ function draw!(cc, canvasmatrix, t::Txt, a::Attributes)
     C.set_text(cc, t.text, false)
     C.update_layout(cc)
 
-    # font_options_ptr = ccall((:cairo_font_options_create, C.libcairo), Ptr{Nothing}, ())
-    #
-    # CAIRO_HINT_STYLE_NONE = 1
-    # CAIRO_HINT_STYLE_FULL = 4
-    # ccall(
-    #     (:cairo_font_options_set_hint_style, C.libcairo), Nothing,
-    #     (Ptr{Nothing}, Int32),
-    #     font_options_ptr, CAIRO_HINT_STYLE_NONE)
-    #
-    # CAIRO_HINT_METRICS_DEFAULT = 0
-    # CAIRO_HINT_METRICS_OFF = 1
-    # CAIRO_HINT_METRICS_ON = 2
-    #
-    # ccall(
-    #     (:cairo_font_options_set_hint_metrics, C.libcairo), Nothing,
-    #     (Ptr{Nothing}, Int32),
-    #     font_options_ptr, CAIRO_HINT_METRICS_OFF)
-    #
-    # # cc is a cairo context
-    # # ccall(
-    # #     (:cairo_set_font_options, C.libcairo), Nothing,
-    # #     (Ptr{Nothing}, Ptr{Nothing}),
-    # #     cc.ptr, font_options_ptr)
-    #
-    # pango_ctx = ccall((:pango_layout_get_context, C.libpango), Ptr{Nothing}, (Ptr{Nothing},), cc.layout)
-    #
-    # ccall((:pango_cairo_context_set_font_options, C.libpangocairo), Nothing,
-    #     (Ptr{Nothing}, Ptr{Nothing}),
-    #     pango_ctx, font_options_ptr
-    #     )
-    #
-    # ccall((:pango_layout_context_changed, C.libpango), Nothing, (Ptr{Nothing},), cc.layout)
-    #
-    # ccall(
-    #     (:cairo_font_options_destroy, C.libcairo), Nothing,
-    #     (Ptr{Nothing},),
-    #     font_options_ptr)
 
     function get_layout_size(ctx::C.CairoContext)
         w = Vector{Int32}(undef, 2)
@@ -603,15 +568,17 @@ function draw!(cc, canvasmatrix, t::Txt, a::Attributes)
         # :b => -(ex.ybearing + ex.height)
     end
 
-    shift = rotate(P(shiftx, shifty), t.angle)
+    shift = rotate(P(shiftx, shifty), -t.angle)
 
     pos = t.pos + shift
 
+    C.save(cc) # this is needed if multiple texts are drawn in one go
+
+    C.scale(cc, 1, -1)
 
     C.move_to(cc, pos.xy...)
 
-    C.save(cc) # this is needed if multiple texts are drawn in one go
-    C.rotate(cc, rad(t.angle))
+    C.rotate(cc, rad(-t.angle))
 
     C.show_layout(cc)
     C.restore(cc)
