@@ -4,6 +4,10 @@ using Layered
 makedocs(
     sitename = "Layered",
     format = Documenter.HTML(),
+    pages = [
+        "Start" => "index.md",
+        "Tutorial" => "tutorial.md",
+    ]
 )
 
 # Documenter can also automatically deploy documentation to gh-pages.
