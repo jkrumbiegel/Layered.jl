@@ -80,5 +80,36 @@ c
 
 A piece of art, really.
 
+Let's use a clipping mask. A clipping mask is a shape outside of which nothing is drawn.
+First, we create a diamond shape with a rotated square:
 
 
+```@example tut
+diamond = rect!(l, O, 140, 140, deg(45))
+
+c
+```
+
+We don't want to see the square, though, but only use it as a clipping mask.
+First, we can make it invisible by adding the `Invisible` attribute (a shorthand for `Visible(false)`):
+
+```@example tut
+diamond + Invisible
+
+c
+```
+
+Now we assign a clip to the top layer using the diamond as the clipping shape.
+
+```@example tut
+l + Clip(diamond)
+
+c
+svg(c, "diamond.svg") # hide
+```
+
+```@meta
+# for some reason there is a bug with direct svg interpolation because svgs on the same page influence each other?
+# that means the clipping doesn't work
+```
+![](diamond.svg)
