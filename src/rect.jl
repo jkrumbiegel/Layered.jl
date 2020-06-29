@@ -1,5 +1,8 @@
 export topright, topleft, bottomright, bottomleft, topline, rightline, bottomline, leftline
 
+
+Rect(p, w, h) = Rect(p, w, h, deg(0))
+
 needed_attributes(::Type{Rect}) = needed_attributes(Circle)
 
 function bottomleft(r::Rect)
