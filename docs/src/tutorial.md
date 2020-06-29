@@ -22,6 +22,8 @@ c1 = circle!(l, O, 50) + Fill("teal")
 c
 ```
 
+You can see that the circle also has a black stroke, which it inherited from the default attributes of the top layer.
+
 We add another circle, this time with a non-mutating syntax. The returned object is not yet placed in any layer, but we can add it via `push!` or, as in this example `pushfirst!`, which means it is placed below the first circle and therefore partially occluded by it.
 
 There's another attribute `Linestyle` which we can just add after `Fill`.
