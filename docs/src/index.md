@@ -48,7 +48,7 @@ p = point!(l, Y(90)) + Fill("orange")
 
 arrs = map(rs) do r
     path!(l, r, p) do r, p
-        l = Line(p, topleft(r))
+        l = Line(p, center(topline(r)))
         arrow(extend(l, -7, 0.5), 6, 2)
     end
 end .+ Fill("black") .+ Stroke(nothing)
