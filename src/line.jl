@@ -1,4 +1,4 @@
-export move, normal, normfrom, direction, vector
+export move, normal, normfrom, direction, vector, extend
 
 
 xs(l::Line) = SVector(l.from.x, l.to.x)
@@ -45,10 +45,10 @@ function scaleto(l::Line, len::Real)
     scale(l, scalar)
 end
 
-function extend(l::Line, len::Real, fraction_to::Real=0.5)
+function extend(l::Line, len::Real, fraction_forward::Real=1)
     vec = len * direction(l)
-    movement_to = fraction_to * vec
-    movement_from = (1 - fraction_to) * vec
+    movement_to = fraction_forward * vec
+    movement_from = (1 - fraction_forward) * vec
     Line(l.from - movement_from, l.to + movement_to)
 end
 
