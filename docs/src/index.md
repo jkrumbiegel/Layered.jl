@@ -25,7 +25,7 @@ c
 
 ## Transforms and relative shapes
 
-`Layered.jl` uses simple transforms for each layer. You can uniformly scale, translate and rotate, but not skew. This restriction is applied because it makes a circle stay a circle, no matter what layer it is in. Because you can create new shapes based on their relationships to existing shapes, like a tangent from a point in one layer to a circle in another, it's desirable that circles don't turn into ovals along the way.
+`Layered.jl` uses simple transforms for each layer. You can uniformly scale, translate and rotate, but not skew. This restriction is applied because it makes a circle stay a circle, no matter what layer it is in. Because you can create new shapes based on their relationships to existing shapes, like a tangent from a point in one layer to a circle in another, it's desirable that circles don't turn into ovals along the way. That could have unexpected geometric effects.
 
 ```@example
 using Layered
@@ -68,7 +68,7 @@ c, l = canvas(200, 200, color = Gray(0.95))
 
 circ = circle!(l, O, 50)
 rect!(l, O, 120, 120, deg(45))
-line!(l, Y(100), Y(-100))
+line!(l, P(80, 80), P(-80, -80))
 
 c
 Layered.svg(c, "1.svg") # hide
