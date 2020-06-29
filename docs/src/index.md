@@ -27,6 +27,34 @@ c
 
 `Layered.jl` uses simple transforms for each layer. You can uniformly scale, translate and rotate, but not skew. This restriction is applied because it makes a circle stay a circle, no matter what layer it is in. Because you can create new shapes based on their relationships to existing shapes, like a tangent from a point in one layer to a circle in another, it's desirable that circles don't turn into ovals along the way.
 
+```@example
+using Layered
+
+c, l = canvas(200, 200)
+
+layers = map(-50:50:50, -15:15:15) do x, ang
+    layer!(l, translation = X(x), rotation = deg(ang))
+end
+
+rs = map(layers) do l
+    rect!(l, O, 50, 50)
+end .+ Fill.(["tomato", "teal", "bisque"])
+
+ts = map(layers, ["one", "two", "three"]) do l, s
+    txt!(l, O, s, 14, :c, :c)
+end
+
+p = point!(l, Y(90)) + Fill("orange")
+
+arrs = map(rs) do r
+    path!(l, r, p) do r, p
+        arrow(p, topleft(r), 6, 6, 2, 2, 0)
+    end
+end .+ Fill("black") .+ Stroke(nothing)
+
+c
+```
+
 ## Attributes
 
 Shapes have attributes such as linewidth, fill color, and line style. Unspecified attributes are inherited from parent layers, freeing you from copying common attributes all over your code.
