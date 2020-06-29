@@ -31,7 +31,7 @@ c</code></pre><?xml version="1.0" encoding="UTF-8"?>
   <rect x="0" y="0" width="200" height="200"/>
 </clipPath>
 <g id="surface13" clip-path="url(#clip5)">
-<path style=" stroke:none;fill-rule:nonzero;fill:rgb(0%,50.196078%,50.196078%);fill-opacity:1;" d="M 50 50 L 150 50 L 150 150 L 50 150 Z M 50 50 "/>
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(0%,50.196078%,50.196078%);fill-opacity:1;" d="M 50 150 L 150 150 L 150 50 L 50 50 Z M 50 150 "/>
 </g>
 <clipPath id="clip6">
   <rect x="0" y="0" width="200" height="200"/>
@@ -59,15 +59,197 @@ c</code></pre><?xml version="1.0" encoding="UTF-8"?>
 <use xlink:href="#surface20"/>
 </g>
 </svg>
-<h2 id="Transforms-and-relative-shapes-1"><a class="docs-heading-anchor" href="#Transforms-and-relative-shapes-1">Transforms and relative shapes</a><a class="docs-heading-anchor-permalink" href="#Transforms-and-relative-shapes-1" title="Permalink"></a></h2><p><code>Layered.jl</code> uses simple transforms for each layer. You can uniformly scale, translate and rotate, but not skew. This restriction is applied because it makes a circle stay a circle, no matter what layer it is in. Because you can create new shapes based on their relationships to existing shapes, like a tangent from a point in one layer to a circle in another, it&#39;s desirable that circles don&#39;t turn into ovals along the way.</p><h2 id="Attributes-1"><a class="docs-heading-anchor" href="#Attributes-1">Attributes</a><a class="docs-heading-anchor-permalink" href="#Attributes-1" title="Permalink"></a></h2><p>Shapes have attributes such as linewidth, fill color, and line style. Unspecified attributes are inherited from parent layers, freeing you from copying common attributes all over your code.</p><pre><code class="language-julia">using Layered
+<h2 id="Transforms-and-relative-shapes-1"><a class="docs-heading-anchor" href="#Transforms-and-relative-shapes-1">Transforms and relative shapes</a><a class="docs-heading-anchor-permalink" href="#Transforms-and-relative-shapes-1" title="Permalink"></a></h2><p><code>Layered.jl</code> uses simple transforms for each layer. You can uniformly scale, translate and rotate, but not skew. This restriction is applied because it makes a circle stay a circle, no matter what layer it is in. Because you can create new shapes based on their relationships to existing shapes, like a tangent from a point in one layer to a circle in another, it&#39;s desirable that circles don&#39;t turn into ovals along the way. That could have unexpected geometric effects.</p><pre><code class="language-julia">using Layered
 
-c, l = canvas(300, 300, color = Gray(0.95))
+c, l = canvas(200, 200)
+
+layers = map([-45, 0, 50], -15:15:15, 0.8:0.2:1.2) do x, ang, scale
+    layer!(l, translation = X(x), rotation = deg(ang), scale = scale)
+end
+
+rs = map(layers) do l
+    rect!(l, O, 50, 50)
+end .+ Fill.([&quot;tomato&quot;, &quot;teal&quot;, &quot;bisque&quot;])
+
+ts = map(layers, [&quot;one&quot;, &quot;two&quot;, &quot;three&quot;]) do l, s
+    txt!(l, O, s, 14, :c, :c)
+end
+
+p = point!(l, Y(90)) + Fill(&quot;orange&quot;)
+
+arrs = map(rs) do r
+    path!(l, r, p) do r, p
+        l = Line(p, topleft(r))
+        arrow(extend(l, -7, 0.5), 6, 2)
+    end
+end .+ Fill(&quot;black&quot;) .+ Stroke(nothing)
+
+c</code></pre><?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="200pt" height="200pt" viewBox="0 0 200 200" version="1.1">
+<defs>
+<g>
+<symbol overflow="visible" id="glyph0-0">
+<path style="stroke:none;" d="M 0.03125 2.734375 L 3.4375 -9.984375 L 10.65625 -8.046875 L 7.25 4.671875 Z M 1.0625 2.15625 L 6.65625 3.65625 L 9.625 -7.453125 L 4.03125 -8.953125 Z M 1.0625 2.15625 "/>
+</symbol>
+<symbol overflow="visible" id="glyph0-1">
+<path style="stroke:none;" d="M 6.296875 -5.796875 C 5.597656 -5.984375 4.972656 -5.859375 4.421875 -5.421875 C 3.867188 -4.992188 3.46875 -4.304688 3.21875 -3.359375 C 2.957031 -2.410156 2.953125 -1.609375 3.203125 -0.953125 C 3.460938 -0.304688 3.945312 0.109375 4.65625 0.296875 C 5.34375 0.472656 5.960938 0.34375 6.515625 -0.09375 C 7.066406 -0.53125 7.472656 -1.21875 7.734375 -2.15625 C 7.984375 -3.09375 7.976562 -3.890625 7.71875 -4.546875 C 7.457031 -5.203125 6.984375 -5.617188 6.296875 -5.796875 Z M 6.578125 -6.890625 C 7.703125 -6.585938 8.488281 -5.984375 8.9375 -5.078125 C 9.394531 -4.179688 9.453125 -3.082031 9.109375 -1.78125 C 8.753906 -0.488281 8.15625 0.4375 7.3125 1 C 6.46875 1.570312 5.484375 1.707031 4.359375 1.40625 C 3.222656 1.101562 2.429688 0.5 1.984375 -0.40625 C 1.546875 -1.320312 1.503906 -2.425781 1.859375 -3.71875 C 2.203125 -5.019531 2.789062 -5.945312 3.625 -6.5 C 4.457031 -7.0625 5.441406 -7.191406 6.578125 -6.890625 Z M 6.578125 -6.890625 "/>
+</symbol>
+<symbol overflow="visible" id="glyph0-2">
+<path style="stroke:none;" d="M 9.203125 -2.640625 L 7.921875 2.125 L 6.625 1.78125 L 7.890625 -2.9375 C 8.085938 -3.6875 8.085938 -4.285156 7.890625 -4.734375 C 7.703125 -5.179688 7.316406 -5.484375 6.734375 -5.640625 C 6.023438 -5.835938 5.410156 -5.765625 4.890625 -5.421875 C 4.367188 -5.078125 4.003906 -4.519531 3.796875 -3.75 L 2.609375 0.703125 L 1.3125 0.359375 L 3.421875 -7.53125 L 4.71875 -7.1875 L 4.390625 -5.96875 C 4.835938 -6.351562 5.300781 -6.601562 5.78125 -6.71875 C 6.257812 -6.84375 6.769531 -6.832031 7.3125 -6.6875 C 8.21875 -6.445312 8.832031 -5.984375 9.15625 -5.296875 C 9.476562 -4.617188 9.492188 -3.734375 9.203125 -2.640625 Z M 9.203125 -2.640625 "/>
+</symbol>
+<symbol overflow="visible" id="glyph0-3">
+<path style="stroke:none;" d="M 9.25 -2.09375 L 9.078125 -1.46875 L 3.109375 -3.0625 C 2.929688 -2.15625 3.019531 -1.398438 3.375 -0.796875 C 3.738281 -0.203125 4.347656 0.207031 5.203125 0.4375 C 5.703125 0.570312 6.203125 0.640625 6.703125 0.640625 C 7.203125 0.640625 7.710938 0.582031 8.234375 0.46875 L 7.90625 1.6875 C 7.394531 1.757812 6.878906 1.785156 6.359375 1.765625 C 5.835938 1.742188 5.328125 1.664062 4.828125 1.53125 C 3.566406 1.195312 2.664062 0.5625 2.125 -0.375 C 1.59375 -1.3125 1.492188 -2.398438 1.828125 -3.640625 C 2.179688 -4.941406 2.800781 -5.878906 3.6875 -6.453125 C 4.582031 -7.023438 5.625 -7.148438 6.8125 -6.828125 C 7.882812 -6.546875 8.640625 -5.976562 9.078125 -5.125 C 9.515625 -4.28125 9.570312 -3.269531 9.25 -2.09375 Z M 8.0625 -2.828125 C 8.238281 -3.546875 8.1875 -4.164062 7.90625 -4.6875 C 7.632812 -5.207031 7.179688 -5.554688 6.546875 -5.734375 C 5.828125 -5.921875 5.195312 -5.867188 4.65625 -5.578125 C 4.113281 -5.285156 3.707031 -4.78125 3.4375 -4.0625 Z M 8.0625 -2.828125 "/>
+</symbol>
+<symbol overflow="visible" id="glyph1-0">
+<path style="stroke:none;" d="M 0.9375 3.296875 L 0.9375 -13.171875 L 10.265625 -13.171875 L 10.265625 3.296875 Z M 1.984375 2.265625 L 9.21875 2.265625 L 9.21875 -12.109375 L 1.984375 -12.109375 Z M 1.984375 2.265625 "/>
+</symbol>
+<symbol overflow="visible" id="glyph1-1">
+<path style="stroke:none;" d="M 3.421875 -13.109375 L 3.421875 -10.21875 L 6.875 -10.21875 L 6.875 -8.90625 L 3.421875 -8.90625 L 3.421875 -3.359375 C 3.421875 -2.523438 3.535156 -1.988281 3.765625 -1.75 C 3.992188 -1.519531 4.457031 -1.40625 5.15625 -1.40625 L 6.875 -1.40625 L 6.875 0 L 5.15625 0 C 3.851562 0 2.957031 -0.238281 2.46875 -0.71875 C 1.976562 -1.207031 1.734375 -2.085938 1.734375 -3.359375 L 1.734375 -8.90625 L 0.5 -8.90625 L 0.5 -10.21875 L 1.734375 -10.21875 L 1.734375 -13.109375 Z M 3.421875 -13.109375 "/>
+</symbol>
+<symbol overflow="visible" id="glyph1-2">
+<path style="stroke:none;" d="M 0.78125 -10.21875 L 2.46875 -10.21875 L 4.5625 -2.25 L 6.640625 -10.21875 L 8.625 -10.21875 L 10.71875 -2.25 L 12.8125 -10.21875 L 14.484375 -10.21875 L 11.8125 0 L 9.84375 0 L 7.640625 -8.375 L 5.4375 0 L 3.453125 0 Z M 0.78125 -10.21875 "/>
+</symbol>
+<symbol overflow="visible" id="glyph1-3">
+<path style="stroke:none;" d="M 5.71875 -9.03125 C 4.8125 -9.03125 4.097656 -8.675781 3.578125 -7.96875 C 3.054688 -7.269531 2.796875 -6.3125 2.796875 -5.09375 C 2.796875 -3.875 3.054688 -2.910156 3.578125 -2.203125 C 4.097656 -1.503906 4.8125 -1.15625 5.71875 -1.15625 C 6.613281 -1.15625 7.320312 -1.503906 7.84375 -2.203125 C 8.363281 -2.910156 8.625 -3.875 8.625 -5.09375 C 8.625 -6.300781 8.363281 -7.257812 7.84375 -7.96875 C 7.320312 -8.675781 6.613281 -9.03125 5.71875 -9.03125 Z M 5.71875 -10.453125 C 7.175781 -10.453125 8.320312 -9.976562 9.15625 -9.03125 C 9.988281 -8.082031 10.40625 -6.769531 10.40625 -5.09375 C 10.40625 -3.425781 9.988281 -2.113281 9.15625 -1.15625 C 8.320312 -0.207031 7.175781 0.265625 5.71875 0.265625 C 4.25 0.265625 3.097656 -0.207031 2.265625 -1.15625 C 1.441406 -2.113281 1.03125 -3.425781 1.03125 -5.09375 C 1.03125 -6.769531 1.441406 -8.082031 2.265625 -9.03125 C 3.097656 -9.976562 4.25 -10.453125 5.71875 -10.453125 Z M 5.71875 -10.453125 "/>
+</symbol>
+<symbol overflow="visible" id="glyph2-0">
+<path style="stroke:none;" d="M 2.09375 3.53125 L -3.015625 -15.546875 L 7.796875 -18.453125 L 12.90625 0.625 Z M 3 2.015625 L 11.40625 -0.234375 L 6.9375 -16.90625 L -1.46875 -14.65625 Z M 3 2.015625 "/>
+</symbol>
+<symbol overflow="visible" id="glyph2-1">
+<path style="stroke:none;" d="M -0.109375 -16.265625 L 0.796875 -12.890625 L 4.796875 -13.96875 L 5.203125 -12.46875 L 1.203125 -11.390625 L 2.921875 -4.953125 C 3.179688 -3.984375 3.476562 -3.398438 3.8125 -3.203125 C 4.144531 -3.003906 4.722656 -3.007812 5.546875 -3.21875 L 7.53125 -3.765625 L 7.96875 -2.140625 L 5.984375 -1.59375 C 4.472656 -1.195312 3.351562 -1.195312 2.625 -1.59375 C 1.90625 -2 1.347656 -2.941406 0.953125 -4.421875 L -0.765625 -10.859375 L -2.171875 -10.484375 L -2.578125 -11.984375 L -1.171875 -12.359375 L -2.078125 -15.734375 Z M -0.109375 -16.265625 "/>
+</symbol>
+<symbol overflow="visible" id="glyph2-2">
+<path style="stroke:none;" d="M 9.96875 -10.328125 L 11.875 -3.1875 L 9.9375 -2.65625 L 8.046875 -9.734375 C 7.742188 -10.847656 7.296875 -11.625 6.703125 -12.0625 C 6.117188 -12.507812 5.390625 -12.617188 4.515625 -12.390625 C 3.460938 -12.097656 2.722656 -11.535156 2.296875 -10.703125 C 1.878906 -9.878906 1.820312 -8.890625 2.125 -7.734375 L 3.921875 -1.046875 L 1.96875 -0.53125 L -2.4375 -16.984375 L -0.484375 -17.5 L 1.25 -11.03125 C 1.519531 -11.875 1.921875 -12.554688 2.453125 -13.078125 C 2.984375 -13.609375 3.664062 -13.984375 4.5 -14.203125 C 5.851562 -14.566406 6.988281 -14.421875 7.90625 -13.765625 C 8.832031 -13.109375 9.519531 -11.960938 9.96875 -10.328125 Z M 9.96875 -10.328125 "/>
+</symbol>
+<symbol overflow="visible" id="glyph2-3">
+<path style="stroke:none;" d="M 6.21875 -12.40625 C 5.96875 -12.46875 5.703125 -12.492188 5.421875 -12.484375 C 5.148438 -12.484375 4.859375 -12.441406 4.546875 -12.359375 C 3.453125 -12.066406 2.707031 -11.476562 2.3125 -10.59375 C 1.914062 -9.71875 1.894531 -8.613281 2.25 -7.28125 L 3.921875 -1.046875 L 1.96875 -0.53125 L -1.203125 -12.359375 L 0.75 -12.875 L 1.25 -11.03125 C 1.457031 -11.875 1.84375 -12.554688 2.40625 -13.078125 C 2.96875 -13.609375 3.71875 -14 4.65625 -14.25 C 4.789062 -14.28125 4.941406 -14.304688 5.109375 -14.328125 C 5.273438 -14.359375 5.460938 -14.378906 5.671875 -14.390625 Z M 6.21875 -12.40625 "/>
+</symbol>
+<symbol overflow="visible" id="glyph2-4">
+<path style="stroke:none;" d="M 10.453125 -9.671875 L 10.71875 -8.71875 L 1.78125 -6.3125 C 2.207031 -4.988281 2.878906 -4.078125 3.796875 -3.578125 C 4.710938 -3.078125 5.8125 -3 7.09375 -3.34375 C 7.84375 -3.539062 8.539062 -3.820312 9.1875 -4.1875 C 9.84375 -4.5625 10.46875 -5.023438 11.0625 -5.578125 L 11.5625 -3.75 C 10.925781 -3.269531 10.265625 -2.851562 9.578125 -2.5 C 8.890625 -2.144531 8.164062 -1.867188 7.40625 -1.671875 C 5.519531 -1.160156 3.878906 -1.300781 2.484375 -2.09375 C 1.085938 -2.894531 0.140625 -4.234375 -0.359375 -6.109375 C -0.878906 -8.046875 -0.769531 -9.722656 -0.03125 -11.140625 C 0.707031 -12.566406 1.96875 -13.519531 3.75 -14 C 5.34375 -14.425781 6.738281 -14.25 7.9375 -13.46875 C 9.144531 -12.695312 9.984375 -11.429688 10.453125 -9.671875 Z M 8.34375 -9.703125 C 8.050781 -10.773438 7.523438 -11.546875 6.765625 -12.015625 C 6.015625 -12.492188 5.160156 -12.601562 4.203125 -12.34375 C 3.117188 -12.050781 2.332031 -11.515625 1.84375 -10.734375 C 1.363281 -9.953125 1.226562 -8.984375 1.4375 -7.828125 Z M 8.34375 -9.703125 "/>
+</symbol>
+</g>
+<clipPath id="clip3">
+  <rect x="0" y="0" width="200" height="200"/>
+</clipPath>
+<g id="surface60" clip-path="url(#clip3)">
+<path style="fill-rule:nonzero;fill:rgb(100%,38.823529%,27.843137%);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M -69.496094 -14.140625 L -30.859375 -24.496094 L -20.503906 14.140625 L -59.140625 24.496094 Z M -69.496094 -14.140625 " transform="matrix(1,0,0,-1,100,100)"/>
+</g>
+<clipPath id="clip4">
+  <rect x="0" y="0" width="200" height="200"/>
+</clipPath>
+<g id="surface63" clip-path="url(#clip4)">
+<g style="fill:rgb(0%,0%,0%);fill-opacity:1;">
+  <use xlink:href="#glyph0-1" x="40.240448" y="101.397205"/>
+  <use xlink:href="#glyph0-2" x="49.065841" y="103.761961"/>
+  <use xlink:href="#glyph0-3" x="58.208178" y="106.211643"/>
+</g>
+</g>
+<clipPath id="clip2">
+  <rect x="0" y="0" width="200" height="200"/>
+</clipPath>
+<g id="surface65" clip-path="url(#clip2)">
+<use xlink:href="#surface60" transform="matrix(1,0.000000000000000028,-0.000000000000000028,1,-0,0.000000000000014211)"/>
+<use xlink:href="#surface63" transform="matrix(1,0.000000000000000028,-0.000000000000000028,1,-0,0.000000000000014211)"/>
+</g>
+<clipPath id="clip6">
+  <rect x="0" y="0" width="200" height="200"/>
+</clipPath>
+<g id="surface69" clip-path="url(#clip6)">
+<path style="fill-rule:nonzero;fill:rgb(0%,50.196078%,50.196078%);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M -25 -25 L 25 -25 L 25 25 L -25 25 Z M -25 -25 " transform="matrix(1,0,0,-1,100,100)"/>
+</g>
+<clipPath id="clip7">
+  <rect x="0" y="0" width="200" height="200"/>
+</clipPath>
+<g id="surface72" clip-path="url(#clip7)">
+<g style="fill:rgb(0%,0%,0%);fill-opacity:1;">
+  <use xlink:href="#glyph1-1" x="82.996094" y="106.463867"/>
+  <use xlink:href="#glyph1-2" x="90.31543" y="106.463867"/>
+  <use xlink:href="#glyph1-3" x="105.583008" y="106.463867"/>
+</g>
+</g>
+<clipPath id="clip5">
+  <rect x="0" y="0" width="200" height="200"/>
+</clipPath>
+<g id="surface74" clip-path="url(#clip5)">
+<use xlink:href="#surface69"/>
+<use xlink:href="#surface72"/>
+</g>
+<clipPath id="clip9">
+  <rect x="0" y="0" width="200" height="200"/>
+</clipPath>
+<g id="surface78" clip-path="url(#clip9)">
+<path style="fill-rule:nonzero;fill:rgb(100%,89.411765%,76.862745%);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 28.785156 -36.742188 L 86.742188 -21.214844 L 71.214844 36.742188 L 13.257812 21.214844 Z M 28.785156 -36.742188 " transform="matrix(1,0,0,-1,100,100)"/>
+</g>
+<clipPath id="clip10">
+  <rect x="0" y="0" width="200" height="200"/>
+</clipPath>
+<g id="surface81" clip-path="url(#clip10)">
+<g style="fill:rgb(0%,0%,0%);fill-opacity:1;">
+  <use xlink:href="#glyph2-1" x="123.385421" y="115.158307"/>
+  <use xlink:href="#glyph2-2" x="131.869344" y="112.885047"/>
+  <use xlink:href="#glyph2-3" x="145.58285" y="109.210524"/>
+  <use xlink:href="#glyph2-4" x="154.002252" y="106.954552"/>
+  <use xlink:href="#glyph2-4" x="167.313917" y="103.387702"/>
+</g>
+</g>
+<clipPath id="clip8">
+  <rect x="0" y="0" width="200" height="200"/>
+</clipPath>
+<g id="surface83" clip-path="url(#clip8)">
+<use xlink:href="#surface78" transform="matrix(1,0,0,1,0,0.000000000000028422)"/>
+<use xlink:href="#surface81" transform="matrix(1,0,0,1,0,0.000000000000028422)"/>
+</g>
+<clipPath id="clip11">
+  <rect x="0" y="0" width="200" height="200"/>
+</clipPath>
+<g id="surface86" clip-path="url(#clip11)">
+<path style="fill-rule:nonzero;fill:rgb(100%,64.705882%,0%);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 1.5 90 C 1.5 92 -1.5 92 -1.5 90 C -1.5 88 1.5 88 1.5 90 " transform="matrix(1,0,0,-1,100,100)"/>
+</g>
+<clipPath id="clip12">
+  <rect x="0" y="0" width="200" height="200"/>
+</clipPath>
+<g id="surface89" clip-path="url(#clip12)">
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(0%,0%,0%);fill-opacity:1;" d="M 98.398438 13.269531 L 47.964844 69.125 L 49.449219 70.464844 L 43.203125 72.90625 L 44.996094 66.445312 L 46.480469 67.785156 L 96.914062 11.925781 Z M 98.398438 13.269531 "/>
+</g>
+<clipPath id="clip13">
+  <rect x="0" y="0" width="200" height="200"/>
+</clipPath>
+<g id="surface92" clip-path="url(#clip13)">
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(0%,0%,0%);fill-opacity:1;" d="M 99.675781 13.625 L 79.34375 66.492188 L 81.210938 67.210938 L 76.257812 71.734375 L 75.609375 65.054688 L 77.476562 65.773438 L 97.808594 12.90625 Z M 99.675781 13.625 "/>
+</g>
+<clipPath id="clip14">
+  <rect x="0" y="0" width="200" height="200"/>
+</clipPath>
+<g id="surface95" clip-path="url(#clip14)">
+<path style=" stroke:none;fill-rule:nonzero;fill:rgb(0%,0%,0%);fill-opacity:1;" d="M 101.644531 13.246094 L 112.441406 69.269531 L 114.40625 68.890625 L 112.59375 75.351562 L 108.515625 70.027344 L 110.476562 69.648438 L 99.679688 13.625 Z M 101.644531 13.246094 "/>
+</g>
+<clipPath id="clip1">
+  <rect x="0" y="0" width="200" height="200"/>
+</clipPath>
+<g id="surface97" clip-path="url(#clip1)">
+<use xlink:href="#surface65"/>
+<use xlink:href="#surface74"/>
+<use xlink:href="#surface83"/>
+<use xlink:href="#surface86"/>
+<use xlink:href="#surface89"/>
+<use xlink:href="#surface92"/>
+<use xlink:href="#surface95"/>
+</g>
+</defs>
+<g id="surface54">
+<rect x="0" y="0" width="200" height="200" style="fill:rgb(100%,100%,100%);fill-opacity:1;stroke:none;"/>
+<use xlink:href="#surface97"/>
+</g>
+</svg>
+<h2 id="Attributes-1"><a class="docs-heading-anchor" href="#Attributes-1">Attributes</a><a class="docs-heading-anchor-permalink" href="#Attributes-1" title="Permalink"></a></h2><p>Shapes have attributes such as linewidth, fill color, and line style. Unspecified attributes are inherited from parent layers, freeing you from copying common attributes all over your code.</p><pre><code class="language-julia">using Layered
+
+c, l = canvas(200, 200, color = Gray(0.95))
 
 circ = circle!(l, O, 50)
 rect!(l, O, 120, 120, deg(45))
-line!(l, Y(100), Y(-100))
+line!(l, P(80, 80), P(-80, -80))
 
 c</code></pre><p><img src="1.svg" alt/></p><pre><code class="language-julia">circ + Stroke(&quot;red&quot;)
 l + Linewidth(4) + Stroke(&quot;blue&quot;)
 
-c</code></pre><p><img src="2.svg" alt/></p></article><nav class="docs-footer"><a class="docs-footer-nextpage" href="tutorial/">Tutorial »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Sunday 28 June 2020 18:51">Sunday 28 June 2020</span>. Using Julia version 1.4.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+c</code></pre><p><img src="2.svg" alt/></p></article><nav class="docs-footer"><a class="docs-footer-nextpage" href="tutorial/">Tutorial »</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Monday 29 June 2020 08:23">Monday 29 June 2020</span>. Using Julia version 1.4.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
