@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Tutorial · Layered.jl</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit">Layered.jl</span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Start</a></li><li class="is-active"><a class="tocitem" href>Tutorial</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Tutorial</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Tutorial</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/jkrumbiegel/Layered.jl/blob/master/docs/src/tutorial.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Layered.jl-1"><a class="docs-heading-anchor" href="#Layered.jl-1">Layered.jl</a><a class="docs-heading-anchor-permalink" href="#Layered.jl-1" title="Permalink"></a></h1><p>First, we create a square canvas. The <code>canvas</code> function returns the canvas and the top layer. There is only one top layer and we add all other layers and shapes to it.</p><pre><code class="language-julia">using Layered
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Tutorial · Layered.jl</title><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../"><img src="../assets/logo.png" alt="Layered.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit">Layered.jl</span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Start</a></li><li class="is-active"><a class="tocitem" href>Tutorial</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Tutorial</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Tutorial</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/jkrumbiegel/Layered.jl/blob/master/docs/src/tutorial.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Layered.jl-1"><a class="docs-heading-anchor" href="#Layered.jl-1">Layered.jl</a><a class="docs-heading-anchor-permalink" href="#Layered.jl-1" title="Permalink"></a></h1><p>First, we create a square canvas. The <code>canvas</code> function returns the canvas and the top layer. There is only one top layer and we add all other layers and shapes to it.</p><pre><code class="language-julia">using Layered
 
 defaultfont(&quot;Arial&quot;)
 
 c, l = canvas(250, 250, color = &quot;tomato&quot;)
 c</code></pre><?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="250pt" height="250pt" viewBox="0 0 250 250" version="1.1">
-<g id="surface245">
+<g id="surface278">
 <rect x="0" y="0" width="250" height="250" style="fill:rgb(100%,38.823529%,27.843137%);fill-opacity:1;stroke:none;"/>
 </g>
 </svg>
@@ -18,19 +18,19 @@ c</code></pre><?xml version="1.0" encoding="UTF-8"?>
 <clipPath id="clip2">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface256" clip-path="url(#clip2)">
+<g id="surface289" clip-path="url(#clip2)">
 <path style="fill-rule:nonzero;fill:rgb(0%,50.196078%,50.196078%);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 50 0 C 50 27.613281 27.613281 50 0 50 C -27.613281 50 -50 27.613281 -50 0 C -50 -27.613281 -27.613281 -50 0 -50 C 27.613281 -50 50 -27.613281 50 0 " transform="matrix(1,0,0,-1,125,125)"/>
 </g>
 <clipPath id="clip1">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface258" clip-path="url(#clip1)">
-<use xlink:href="#surface256"/>
+<g id="surface291" clip-path="url(#clip1)">
+<use xlink:href="#surface289"/>
 </g>
 </defs>
-<g id="surface251">
+<g id="surface284">
 <rect x="0" y="0" width="250" height="250" style="fill:rgb(100%,38.823529%,27.843137%);fill-opacity:1;stroke:none;"/>
-<use xlink:href="#surface258"/>
+<use xlink:href="#surface291"/>
 </g>
 </svg>
 <p>You can see that the circle also has a black stroke, which it inherited from the default attributes of the top layer.</p><p>We add another circle, this time with a non-mutating syntax. The returned object is not yet placed in any layer, but we can add it via <code>push!</code> or, as in this example <code>pushfirst!</code>, which means it is placed below the first circle and therefore partially occluded by it.</p><p>There&#39;s another attribute <code>Linestyle</code> which we can just add after <code>Fill</code>.</p><p><code>X(50)</code> is a shorthand for <code>P(50, 0)</code>.</p><pre><code class="language-julia">c2 = circle(-X(50), 50) + Fill(&quot;orange&quot;) + Linestyle(:dashed)
@@ -42,26 +42,26 @@ c</code></pre><?xml version="1.0" encoding="UTF-8"?>
 <clipPath id="clip2">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface277" clip-path="url(#clip2)">
+<g id="surface310" clip-path="url(#clip2)">
 <path style="fill-rule:nonzero;fill:rgb(100%,64.705882%,0%);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-dasharray:4,2;stroke-miterlimit:10;" d="M 0 0 C 0 27.613281 -22.386719 50 -50 50 C -77.613281 50 -100 27.613281 -100 0 C -100 -27.613281 -77.613281 -50 -50 -50 C -22.386719 -50 0 -27.613281 0 0 " transform="matrix(1,0,0,-1,125,125)"/>
 </g>
 <clipPath id="clip3">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface280" clip-path="url(#clip3)">
+<g id="surface313" clip-path="url(#clip3)">
 <path style="fill-rule:nonzero;fill:rgb(0%,50.196078%,50.196078%);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 50 0 C 50 27.613281 27.613281 50 0 50 C -27.613281 50 -50 27.613281 -50 0 C -50 -27.613281 -27.613281 -50 0 -50 C 27.613281 -50 50 -27.613281 50 0 " transform="matrix(1,0,0,-1,125,125)"/>
 </g>
 <clipPath id="clip1">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface282" clip-path="url(#clip1)">
-<use xlink:href="#surface277"/>
-<use xlink:href="#surface280"/>
+<g id="surface315" clip-path="url(#clip1)">
+<use xlink:href="#surface310"/>
+<use xlink:href="#surface313"/>
 </g>
 </defs>
-<g id="surface272">
+<g id="surface305">
 <rect x="0" y="0" width="250" height="250" style="fill:rgb(100%,38.823529%,27.843137%);fill-opacity:1;stroke:none;"/>
-<use xlink:href="#surface282"/>
+<use xlink:href="#surface315"/>
 </g>
 </svg>
 <p>Let&#39;s add another circle. <code>Y(80)</code> is a shorthand for <code>P(0, 80)</code>.</p><pre><code class="language-julia">c3 = circle!(l, Y(80), 20) + Fill(&quot;red&quot;)
@@ -72,33 +72,33 @@ c</code></pre><?xml version="1.0" encoding="UTF-8"?>
 <clipPath id="clip2">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface306" clip-path="url(#clip2)">
+<g id="surface339" clip-path="url(#clip2)">
 <path style="fill-rule:nonzero;fill:rgb(100%,64.705882%,0%);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-dasharray:4,2;stroke-miterlimit:10;" d="M 0 0 C 0 27.613281 -22.386719 50 -50 50 C -77.613281 50 -100 27.613281 -100 0 C -100 -27.613281 -77.613281 -50 -50 -50 C -22.386719 -50 0 -27.613281 0 0 " transform="matrix(1,0,0,-1,125,125)"/>
 </g>
 <clipPath id="clip3">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface309" clip-path="url(#clip3)">
+<g id="surface342" clip-path="url(#clip3)">
 <path style="fill-rule:nonzero;fill:rgb(0%,50.196078%,50.196078%);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 50 0 C 50 27.613281 27.613281 50 0 50 C -27.613281 50 -50 27.613281 -50 0 C -50 -27.613281 -27.613281 -50 0 -50 C 27.613281 -50 50 -27.613281 50 0 " transform="matrix(1,0,0,-1,125,125)"/>
 </g>
 <clipPath id="clip4">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface312" clip-path="url(#clip4)">
+<g id="surface345" clip-path="url(#clip4)">
 <path style="fill-rule:nonzero;fill:rgb(100%,0%,0%);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 20 80 C 20 91.046875 11.046875 100 0 100 C -11.046875 100 -20 91.046875 -20 80 C -20 68.953125 -11.046875 60 0 60 C 11.046875 60 20 68.953125 20 80 " transform="matrix(1,0,0,-1,125,125)"/>
 </g>
 <clipPath id="clip1">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface314" clip-path="url(#clip1)">
-<use xlink:href="#surface306"/>
-<use xlink:href="#surface309"/>
-<use xlink:href="#surface312"/>
+<g id="surface347" clip-path="url(#clip1)">
+<use xlink:href="#surface339"/>
+<use xlink:href="#surface342"/>
+<use xlink:href="#surface345"/>
 </g>
 </defs>
-<g id="surface301">
+<g id="surface334">
 <rect x="0" y="0" width="250" height="250" style="fill:rgb(100%,38.823529%,27.843137%);fill-opacity:1;stroke:none;"/>
-<use xlink:href="#surface314"/>
+<use xlink:href="#surface347"/>
 </g>
 </svg>
 <p>We can also pass a function as a first argument to shape methods like <code>circle</code> or <code>lines</code>. The <code>lines</code> function expects an array of <code>Line</code> objects as input. This is returned by the function <code>outertangents</code>, which is called at drawing time with the <code>Circle</code> objects inside <code>c1</code> and <code>c3</code>.</p><p>All geometric objects used as arguments for such closures are first transformed into the reference space of the layer in which the new shape is placed. In this case, that is just <code>l</code>, so really no transformation is necessary. But through this technique, the two circles could theoretically be in two different layers, and the lines drawn into a third layer, and it would still work.</p><pre><code class="language-julia">lines!(outertangents, l, c1, c3) + Linestyle(:dashed)
@@ -109,41 +109,41 @@ c</code></pre><?xml version="1.0" encoding="UTF-8"?>
 <clipPath id="clip2">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface343" clip-path="url(#clip2)">
+<g id="surface376" clip-path="url(#clip2)">
 <path style="fill-rule:nonzero;fill:rgb(100%,64.705882%,0%);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-dasharray:4,2;stroke-miterlimit:10;" d="M 0 0 C 0 27.613281 -22.386719 50 -50 50 C -77.613281 50 -100 27.613281 -100 0 C -100 -27.613281 -77.613281 -50 -50 -50 C -22.386719 -50 0 -27.613281 0 0 " transform="matrix(1,0,0,-1,125,125)"/>
 </g>
 <clipPath id="clip3">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface346" clip-path="url(#clip3)">
+<g id="surface379" clip-path="url(#clip3)">
 <path style="fill-rule:nonzero;fill:rgb(0%,50.196078%,50.196078%);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 50 0 C 50 27.613281 27.613281 50 0 50 C -27.613281 50 -50 27.613281 -50 0 C -50 -27.613281 -27.613281 -50 0 -50 C 27.613281 -50 50 -27.613281 50 0 " transform="matrix(1,0,0,-1,125,125)"/>
 </g>
 <clipPath id="clip4">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface349" clip-path="url(#clip4)">
+<g id="surface382" clip-path="url(#clip4)">
 <path style="fill-rule:nonzero;fill:rgb(100%,0%,0%);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 20 80 C 20 91.046875 11.046875 100 0 100 C -11.046875 100 -20 91.046875 -20 80 C -20 68.953125 -11.046875 60 0 60 C 11.046875 60 20 68.953125 20 80 " transform="matrix(1,0,0,-1,125,125)"/>
 </g>
 <clipPath id="clip5">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface352" clip-path="url(#clip5)">
+<g id="surface385" clip-path="url(#clip5)">
 <path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-dasharray:4,2;stroke-miterlimit:10;" d="M 18.539062 87.5 L 46.351562 18.75 " transform="matrix(1,0,0,-1,125,125)"/>
 <path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-dasharray:4,2;stroke-miterlimit:10;" d="M -18.539062 87.5 L -46.351562 18.75 " transform="matrix(1,0,0,-1,125,125)"/>
 </g>
 <clipPath id="clip1">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface354" clip-path="url(#clip1)">
-<use xlink:href="#surface343"/>
-<use xlink:href="#surface346"/>
-<use xlink:href="#surface349"/>
-<use xlink:href="#surface352"/>
+<g id="surface387" clip-path="url(#clip1)">
+<use xlink:href="#surface376"/>
+<use xlink:href="#surface379"/>
+<use xlink:href="#surface382"/>
+<use xlink:href="#surface385"/>
 </g>
 </defs>
-<g id="surface338">
+<g id="surface371">
 <rect x="0" y="0" width="250" height="250" style="fill:rgb(100%,38.823529%,27.843137%);fill-opacity:1;stroke:none;"/>
-<use xlink:href="#surface354"/>
+<use xlink:href="#surface387"/>
 </g>
 </svg>
 <p>We can also add text. This time we pass the first argument function using the <code>do</code> syntax. In this case, we refer to the <code>c1</code> circle and we use its center as the text&#39;s anchor point.</p><pre><code class="language-julia">txt!(l, c1) do c1
@@ -188,32 +188,32 @@ c</code></pre><?xml version="1.0" encoding="UTF-8"?>
 <clipPath id="clip2">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface388" clip-path="url(#clip2)">
+<g id="surface421" clip-path="url(#clip2)">
 <path style="fill-rule:nonzero;fill:rgb(100%,64.705882%,0%);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-dasharray:4,2;stroke-miterlimit:10;" d="M 0 0 C 0 27.613281 -22.386719 50 -50 50 C -77.613281 50 -100 27.613281 -100 0 C -100 -27.613281 -77.613281 -50 -50 -50 C -22.386719 -50 0 -27.613281 0 0 " transform="matrix(1,0,0,-1,125,125)"/>
 </g>
 <clipPath id="clip3">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface391" clip-path="url(#clip3)">
+<g id="surface424" clip-path="url(#clip3)">
 <path style="fill-rule:nonzero;fill:rgb(0%,50.196078%,50.196078%);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 50 0 C 50 27.613281 27.613281 50 0 50 C -27.613281 50 -50 27.613281 -50 0 C -50 -27.613281 -27.613281 -50 0 -50 C 27.613281 -50 50 -27.613281 50 0 " transform="matrix(1,0,0,-1,125,125)"/>
 </g>
 <clipPath id="clip4">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface394" clip-path="url(#clip4)">
+<g id="surface427" clip-path="url(#clip4)">
 <path style="fill-rule:nonzero;fill:rgb(100%,0%,0%);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 20 80 C 20 91.046875 11.046875 100 0 100 C -11.046875 100 -20 91.046875 -20 80 C -20 68.953125 -11.046875 60 0 60 C 11.046875 60 20 68.953125 20 80 " transform="matrix(1,0,0,-1,125,125)"/>
 </g>
 <clipPath id="clip5">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface397" clip-path="url(#clip5)">
+<g id="surface430" clip-path="url(#clip5)">
 <path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-dasharray:4,2;stroke-miterlimit:10;" d="M 18.539062 87.5 L 46.351562 18.75 " transform="matrix(1,0,0,-1,125,125)"/>
 <path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-dasharray:4,2;stroke-miterlimit:10;" d="M -18.539062 87.5 L -46.351562 18.75 " transform="matrix(1,0,0,-1,125,125)"/>
 </g>
 <clipPath id="clip6">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface400" clip-path="url(#clip6)">
+<g id="surface433" clip-path="url(#clip6)">
 <g style="fill:rgb(100%,100%,100%);fill-opacity:1;">
   <use xlink:href="#glyph0-1" x="79.363281" y="131.463867"/>
   <use xlink:href="#glyph0-2" x="89.763672" y="131.463867"/>
@@ -230,17 +230,17 @@ c</code></pre><?xml version="1.0" encoding="UTF-8"?>
 <clipPath id="clip1">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface402" clip-path="url(#clip1)">
-<use xlink:href="#surface388"/>
-<use xlink:href="#surface391"/>
-<use xlink:href="#surface394"/>
-<use xlink:href="#surface397"/>
-<use xlink:href="#surface400"/>
+<g id="surface435" clip-path="url(#clip1)">
+<use xlink:href="#surface421"/>
+<use xlink:href="#surface424"/>
+<use xlink:href="#surface427"/>
+<use xlink:href="#surface430"/>
+<use xlink:href="#surface433"/>
 </g>
 </defs>
-<g id="surface383">
+<g id="surface416">
 <rect x="0" y="0" width="250" height="250" style="fill:rgb(100%,38.823529%,27.843137%);fill-opacity:1;stroke:none;"/>
-<use xlink:href="#surface402"/>
+<use xlink:href="#surface435"/>
 </g>
 </svg>
 <p>You can also pass a function without arguments if that helps you organize your code a little more neatly. In this case, we create a 2D <code>grid</code> of points and place crosses at these points. The array of cross point vectors is drawn by the <code>polygons</code> function. We use <code>pushfirst!</code> again to put the stars below the other content.</p><pre><code class="language-julia">polys = polygons() do
@@ -287,7 +287,7 @@ c</code></pre><?xml version="1.0" encoding="UTF-8"?>
 <clipPath id="clip2">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface441" clip-path="url(#clip2)">
+<g id="surface474" clip-path="url(#clip2)">
 <path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,100%,100%);fill-opacity:0.298039;" d="M 30 225.75 L 30 224.25 L 26.8125 224.25 L 29.066406 221.996094 L 28.003906 220.933594 L 25.75 223.1875 L 25.75 220 L 24.25 220 L 24.25 223.1875 L 21.996094 220.933594 L 20.933594 221.996094 L 23.1875 224.25 L 20 224.25 L 20 225.75 L 23.1875 225.75 L 20.933594 228.003906 L 21.996094 229.066406 L 24.25 226.8125 L 24.25 230 L 25.75 230 L 25.75 226.8125 L 28.003906 229.066406 L 29.066406 228.003906 L 26.8125 225.75 Z M 30 225.75 "/>
 <path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,100%,100%);fill-opacity:0.298039;" d="M 50 225.75 L 50 224.25 L 46.8125 224.25 L 49.066406 221.996094 L 48.003906 220.933594 L 45.75 223.1875 L 45.75 220 L 44.25 220 L 44.25 223.1875 L 41.996094 220.933594 L 40.933594 221.996094 L 43.1875 224.25 L 40 224.25 L 40 225.75 L 43.1875 225.75 L 40.933594 228.003906 L 41.996094 229.066406 L 44.25 226.8125 L 44.25 230 L 45.75 230 L 45.75 226.8125 L 48.003906 229.066406 L 49.066406 228.003906 L 46.8125 225.75 Z M 50 225.75 "/>
 <path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,100%,100%);fill-opacity:0.298039;" d="M 70 225.75 L 70 224.25 L 66.8125 224.25 L 69.066406 221.996094 L 68.003906 220.933594 L 65.75 223.1875 L 65.75 220 L 64.25 220 L 64.25 223.1875 L 61.996094 220.933594 L 60.933594 221.996094 L 63.1875 224.25 L 60 224.25 L 60 225.75 L 63.1875 225.75 L 60.933594 228.003906 L 61.996094 229.066406 L 64.25 226.8125 L 64.25 230 L 65.75 230 L 65.75 226.8125 L 68.003906 229.066406 L 69.066406 228.003906 L 66.8125 225.75 Z M 70 225.75 "/>
@@ -413,32 +413,32 @@ c</code></pre><?xml version="1.0" encoding="UTF-8"?>
 <clipPath id="clip3">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface444" clip-path="url(#clip3)">
+<g id="surface477" clip-path="url(#clip3)">
 <path style="fill-rule:nonzero;fill:rgb(100%,64.705882%,0%);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-dasharray:4,2;stroke-miterlimit:10;" d="M 0 0 C 0 27.613281 -22.386719 50 -50 50 C -77.613281 50 -100 27.613281 -100 0 C -100 -27.613281 -77.613281 -50 -50 -50 C -22.386719 -50 0 -27.613281 0 0 " transform="matrix(1,0,0,-1,125,125)"/>
 </g>
 <clipPath id="clip4">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface447" clip-path="url(#clip4)">
+<g id="surface480" clip-path="url(#clip4)">
 <path style="fill-rule:nonzero;fill:rgb(0%,50.196078%,50.196078%);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 50 0 C 50 27.613281 27.613281 50 0 50 C -27.613281 50 -50 27.613281 -50 0 C -50 -27.613281 -27.613281 -50 0 -50 C 27.613281 -50 50 -27.613281 50 0 " transform="matrix(1,0,0,-1,125,125)"/>
 </g>
 <clipPath id="clip5">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface450" clip-path="url(#clip5)">
+<g id="surface483" clip-path="url(#clip5)">
 <path style="fill-rule:nonzero;fill:rgb(100%,0%,0%);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 20 80 C 20 91.046875 11.046875 100 0 100 C -11.046875 100 -20 91.046875 -20 80 C -20 68.953125 -11.046875 60 0 60 C 11.046875 60 20 68.953125 20 80 " transform="matrix(1,0,0,-1,125,125)"/>
 </g>
 <clipPath id="clip6">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface453" clip-path="url(#clip6)">
+<g id="surface486" clip-path="url(#clip6)">
 <path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-dasharray:4,2;stroke-miterlimit:10;" d="M 18.539062 87.5 L 46.351562 18.75 " transform="matrix(1,0,0,-1,125,125)"/>
 <path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-dasharray:4,2;stroke-miterlimit:10;" d="M -18.539062 87.5 L -46.351562 18.75 " transform="matrix(1,0,0,-1,125,125)"/>
 </g>
 <clipPath id="clip7">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface456" clip-path="url(#clip7)">
+<g id="surface489" clip-path="url(#clip7)">
 <g style="fill:rgb(100%,100%,100%);fill-opacity:1;">
   <use xlink:href="#glyph0-1" x="79.363281" y="131.463867"/>
   <use xlink:href="#glyph0-2" x="89.763672" y="131.463867"/>
@@ -455,18 +455,18 @@ c</code></pre><?xml version="1.0" encoding="UTF-8"?>
 <clipPath id="clip1">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface458" clip-path="url(#clip1)">
-<use xlink:href="#surface441"/>
-<use xlink:href="#surface444"/>
-<use xlink:href="#surface447"/>
-<use xlink:href="#surface450"/>
-<use xlink:href="#surface453"/>
-<use xlink:href="#surface456"/>
+<g id="surface491" clip-path="url(#clip1)">
+<use xlink:href="#surface474"/>
+<use xlink:href="#surface477"/>
+<use xlink:href="#surface480"/>
+<use xlink:href="#surface483"/>
+<use xlink:href="#surface486"/>
+<use xlink:href="#surface489"/>
 </g>
 </defs>
-<g id="surface436">
+<g id="surface469">
 <rect x="0" y="0" width="250" height="250" style="fill:rgb(100%,38.823529%,27.843137%);fill-opacity:1;stroke:none;"/>
-<use xlink:href="#surface458"/>
+<use xlink:href="#surface491"/>
 </g>
 </svg>
 <p>A piece of art, really.</p><p>Let&#39;s use a clipping mask. A clipping mask is a shape outside of which nothing is drawn. First, we create a diamond shape with a rotated square:</p><pre><code class="language-julia">diamond = rect!(l, O, 140, 140, deg(45))
@@ -509,7 +509,7 @@ c</code></pre><?xml version="1.0" encoding="UTF-8"?>
 <clipPath id="clip2">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface502" clip-path="url(#clip2)">
+<g id="surface535" clip-path="url(#clip2)">
 <path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,100%,100%);fill-opacity:0.298039;" d="M 30 225.75 L 30 224.25 L 26.8125 224.25 L 29.066406 221.996094 L 28.003906 220.933594 L 25.75 223.1875 L 25.75 220 L 24.25 220 L 24.25 223.1875 L 21.996094 220.933594 L 20.933594 221.996094 L 23.1875 224.25 L 20 224.25 L 20 225.75 L 23.1875 225.75 L 20.933594 228.003906 L 21.996094 229.066406 L 24.25 226.8125 L 24.25 230 L 25.75 230 L 25.75 226.8125 L 28.003906 229.066406 L 29.066406 228.003906 L 26.8125 225.75 Z M 30 225.75 "/>
 <path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,100%,100%);fill-opacity:0.298039;" d="M 50 225.75 L 50 224.25 L 46.8125 224.25 L 49.066406 221.996094 L 48.003906 220.933594 L 45.75 223.1875 L 45.75 220 L 44.25 220 L 44.25 223.1875 L 41.996094 220.933594 L 40.933594 221.996094 L 43.1875 224.25 L 40 224.25 L 40 225.75 L 43.1875 225.75 L 40.933594 228.003906 L 41.996094 229.066406 L 44.25 226.8125 L 44.25 230 L 45.75 230 L 45.75 226.8125 L 48.003906 229.066406 L 49.066406 228.003906 L 46.8125 225.75 Z M 50 225.75 "/>
 <path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,100%,100%);fill-opacity:0.298039;" d="M 70 225.75 L 70 224.25 L 66.8125 224.25 L 69.066406 221.996094 L 68.003906 220.933594 L 65.75 223.1875 L 65.75 220 L 64.25 220 L 64.25 223.1875 L 61.996094 220.933594 L 60.933594 221.996094 L 63.1875 224.25 L 60 224.25 L 60 225.75 L 63.1875 225.75 L 60.933594 228.003906 L 61.996094 229.066406 L 64.25 226.8125 L 64.25 230 L 65.75 230 L 65.75 226.8125 L 68.003906 229.066406 L 69.066406 228.003906 L 66.8125 225.75 Z M 70 225.75 "/>
@@ -635,32 +635,32 @@ c</code></pre><?xml version="1.0" encoding="UTF-8"?>
 <clipPath id="clip3">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface505" clip-path="url(#clip3)">
+<g id="surface538" clip-path="url(#clip3)">
 <path style="fill-rule:nonzero;fill:rgb(100%,64.705882%,0%);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-dasharray:4,2;stroke-miterlimit:10;" d="M 0 0 C 0 27.613281 -22.386719 50 -50 50 C -77.613281 50 -100 27.613281 -100 0 C -100 -27.613281 -77.613281 -50 -50 -50 C -22.386719 -50 0 -27.613281 0 0 " transform="matrix(1,0,0,-1,125,125)"/>
 </g>
 <clipPath id="clip4">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface508" clip-path="url(#clip4)">
+<g id="surface541" clip-path="url(#clip4)">
 <path style="fill-rule:nonzero;fill:rgb(0%,50.196078%,50.196078%);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 50 0 C 50 27.613281 27.613281 50 0 50 C -27.613281 50 -50 27.613281 -50 0 C -50 -27.613281 -27.613281 -50 0 -50 C 27.613281 -50 50 -27.613281 50 0 " transform="matrix(1,0,0,-1,125,125)"/>
 </g>
 <clipPath id="clip5">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface511" clip-path="url(#clip5)">
+<g id="surface544" clip-path="url(#clip5)">
 <path style="fill-rule:nonzero;fill:rgb(100%,0%,0%);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 20 80 C 20 91.046875 11.046875 100 0 100 C -11.046875 100 -20 91.046875 -20 80 C -20 68.953125 -11.046875 60 0 60 C 11.046875 60 20 68.953125 20 80 " transform="matrix(1,0,0,-1,125,125)"/>
 </g>
 <clipPath id="clip6">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface514" clip-path="url(#clip6)">
+<g id="surface547" clip-path="url(#clip6)">
 <path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-dasharray:4,2;stroke-miterlimit:10;" d="M 18.539062 87.5 L 46.351562 18.75 " transform="matrix(1,0,0,-1,125,125)"/>
 <path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-dasharray:4,2;stroke-miterlimit:10;" d="M -18.539062 87.5 L -46.351562 18.75 " transform="matrix(1,0,0,-1,125,125)"/>
 </g>
 <clipPath id="clip7">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface517" clip-path="url(#clip7)">
+<g id="surface550" clip-path="url(#clip7)">
 <g style="fill:rgb(100%,100%,100%);fill-opacity:1;">
   <use xlink:href="#glyph0-1" x="79.363281" y="131.463867"/>
   <use xlink:href="#glyph0-2" x="89.763672" y="131.463867"/>
@@ -677,25 +677,25 @@ c</code></pre><?xml version="1.0" encoding="UTF-8"?>
 <clipPath id="clip8">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface520" clip-path="url(#clip8)">
+<g id="surface553" clip-path="url(#clip8)">
 <path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 0 -98.996094 L 98.996094 0 L 0 98.996094 L -98.996094 0 Z M 0 -98.996094 " transform="matrix(1,0,0,-1,125,125)"/>
 </g>
 <clipPath id="clip1">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface522" clip-path="url(#clip1)">
-<use xlink:href="#surface502"/>
-<use xlink:href="#surface505"/>
-<use xlink:href="#surface508"/>
-<use xlink:href="#surface511"/>
-<use xlink:href="#surface514"/>
-<use xlink:href="#surface517"/>
-<use xlink:href="#surface520"/>
+<g id="surface555" clip-path="url(#clip1)">
+<use xlink:href="#surface535"/>
+<use xlink:href="#surface538"/>
+<use xlink:href="#surface541"/>
+<use xlink:href="#surface544"/>
+<use xlink:href="#surface547"/>
+<use xlink:href="#surface550"/>
+<use xlink:href="#surface553"/>
 </g>
 </defs>
-<g id="surface497">
+<g id="surface530">
 <rect x="0" y="0" width="250" height="250" style="fill:rgb(100%,38.823529%,27.843137%);fill-opacity:1;stroke:none;"/>
-<use xlink:href="#surface522"/>
+<use xlink:href="#surface555"/>
 </g>
 </svg>
 <p>We don&#39;t want to see the square, though, but only use it as a clipping mask. First, we can make it invisible by adding the <code>Invisible</code> attribute (a shorthand for <code>Visible(false)</code>):</p><pre><code class="language-julia">diamond + Invisible
@@ -738,7 +738,7 @@ c</code></pre><?xml version="1.0" encoding="UTF-8"?>
 <clipPath id="clip2">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface571" clip-path="url(#clip2)">
+<g id="surface604" clip-path="url(#clip2)">
 <path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,100%,100%);fill-opacity:0.298039;" d="M 30 225.75 L 30 224.25 L 26.8125 224.25 L 29.066406 221.996094 L 28.003906 220.933594 L 25.75 223.1875 L 25.75 220 L 24.25 220 L 24.25 223.1875 L 21.996094 220.933594 L 20.933594 221.996094 L 23.1875 224.25 L 20 224.25 L 20 225.75 L 23.1875 225.75 L 20.933594 228.003906 L 21.996094 229.066406 L 24.25 226.8125 L 24.25 230 L 25.75 230 L 25.75 226.8125 L 28.003906 229.066406 L 29.066406 228.003906 L 26.8125 225.75 Z M 30 225.75 "/>
 <path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,100%,100%);fill-opacity:0.298039;" d="M 50 225.75 L 50 224.25 L 46.8125 224.25 L 49.066406 221.996094 L 48.003906 220.933594 L 45.75 223.1875 L 45.75 220 L 44.25 220 L 44.25 223.1875 L 41.996094 220.933594 L 40.933594 221.996094 L 43.1875 224.25 L 40 224.25 L 40 225.75 L 43.1875 225.75 L 40.933594 228.003906 L 41.996094 229.066406 L 44.25 226.8125 L 44.25 230 L 45.75 230 L 45.75 226.8125 L 48.003906 229.066406 L 49.066406 228.003906 L 46.8125 225.75 Z M 50 225.75 "/>
 <path style=" stroke:none;fill-rule:nonzero;fill:rgb(100%,100%,100%);fill-opacity:0.298039;" d="M 70 225.75 L 70 224.25 L 66.8125 224.25 L 69.066406 221.996094 L 68.003906 220.933594 L 65.75 223.1875 L 65.75 220 L 64.25 220 L 64.25 223.1875 L 61.996094 220.933594 L 60.933594 221.996094 L 63.1875 224.25 L 60 224.25 L 60 225.75 L 63.1875 225.75 L 60.933594 228.003906 L 61.996094 229.066406 L 64.25 226.8125 L 64.25 230 L 65.75 230 L 65.75 226.8125 L 68.003906 229.066406 L 69.066406 228.003906 L 66.8125 225.75 Z M 70 225.75 "/>
@@ -864,32 +864,32 @@ c</code></pre><?xml version="1.0" encoding="UTF-8"?>
 <clipPath id="clip3">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface574" clip-path="url(#clip3)">
+<g id="surface607" clip-path="url(#clip3)">
 <path style="fill-rule:nonzero;fill:rgb(100%,64.705882%,0%);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-dasharray:4,2;stroke-miterlimit:10;" d="M 0 0 C 0 27.613281 -22.386719 50 -50 50 C -77.613281 50 -100 27.613281 -100 0 C -100 -27.613281 -77.613281 -50 -50 -50 C -22.386719 -50 0 -27.613281 0 0 " transform="matrix(1,0,0,-1,125,125)"/>
 </g>
 <clipPath id="clip4">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface577" clip-path="url(#clip4)">
+<g id="surface610" clip-path="url(#clip4)">
 <path style="fill-rule:nonzero;fill:rgb(0%,50.196078%,50.196078%);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 50 0 C 50 27.613281 27.613281 50 0 50 C -27.613281 50 -50 27.613281 -50 0 C -50 -27.613281 -27.613281 -50 0 -50 C 27.613281 -50 50 -27.613281 50 0 " transform="matrix(1,0,0,-1,125,125)"/>
 </g>
 <clipPath id="clip5">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface580" clip-path="url(#clip5)">
+<g id="surface613" clip-path="url(#clip5)">
 <path style="fill-rule:nonzero;fill:rgb(100%,0%,0%);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 20 80 C 20 91.046875 11.046875 100 0 100 C -11.046875 100 -20 91.046875 -20 80 C -20 68.953125 -11.046875 60 0 60 C 11.046875 60 20 68.953125 20 80 " transform="matrix(1,0,0,-1,125,125)"/>
 </g>
 <clipPath id="clip6">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface583" clip-path="url(#clip6)">
+<g id="surface616" clip-path="url(#clip6)">
 <path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-dasharray:4,2;stroke-miterlimit:10;" d="M 18.539062 87.5 L 46.351562 18.75 " transform="matrix(1,0,0,-1,125,125)"/>
 <path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-dasharray:4,2;stroke-miterlimit:10;" d="M -18.539062 87.5 L -46.351562 18.75 " transform="matrix(1,0,0,-1,125,125)"/>
 </g>
 <clipPath id="clip7">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface586" clip-path="url(#clip7)">
+<g id="surface619" clip-path="url(#clip7)">
 <g style="fill:rgb(100%,100%,100%);fill-opacity:1;">
   <use xlink:href="#glyph0-1" x="79.363281" y="131.463867"/>
   <use xlink:href="#glyph0-2" x="89.763672" y="131.463867"/>
@@ -906,20 +906,20 @@ c</code></pre><?xml version="1.0" encoding="UTF-8"?>
 <clipPath id="clip1">
   <rect x="0" y="0" width="250" height="250"/>
 </clipPath>
-<g id="surface588" clip-path="url(#clip1)">
-<use xlink:href="#surface571"/>
-<use xlink:href="#surface574"/>
-<use xlink:href="#surface577"/>
-<use xlink:href="#surface580"/>
-<use xlink:href="#surface583"/>
-<use xlink:href="#surface586"/>
+<g id="surface621" clip-path="url(#clip1)">
+<use xlink:href="#surface604"/>
+<use xlink:href="#surface607"/>
+<use xlink:href="#surface610"/>
+<use xlink:href="#surface613"/>
+<use xlink:href="#surface616"/>
+<use xlink:href="#surface619"/>
 </g>
 </defs>
-<g id="surface566">
+<g id="surface599">
 <rect x="0" y="0" width="250" height="250" style="fill:rgb(100%,38.823529%,27.843137%);fill-opacity:1;stroke:none;"/>
-<use xlink:href="#surface588"/>
+<use xlink:href="#surface621"/>
 </g>
 </svg>
 <p>Now we assign a clip to the top layer using the diamond as the clipping shape.</p><pre><code class="language-julia">l + Clip(diamond)
 
-c</code></pre><p><img src="../diamond.svg" alt/></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Start</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Monday 29 June 2020 08:23">Monday 29 June 2020</span>. Using Julia version 1.4.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+c</code></pre><p><img src="../diamond.svg" alt/></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Start</a></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Monday 29 June 2020 14:01">Monday 29 June 2020</span>. Using Julia version 1.4.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
