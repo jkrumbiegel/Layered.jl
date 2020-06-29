@@ -32,8 +32,8 @@ using Layered
 
 c, l = canvas(200, 200)
 
-layers = map(-50:50:50, -15:15:15) do x, ang
-    layer!(l, translation = X(x), rotation = deg(ang))
+layers = map([-45, 0, 50], -15:15:15, 0.8:0.2:1.2) do x, ang, scale
+    layer!(l, translation = X(x), rotation = deg(ang), scale = scale)
 end
 
 rs = map(layers) do l
@@ -48,7 +48,8 @@ p = point!(l, Y(90)) + Fill("orange")
 
 arrs = map(rs) do r
     path!(l, r, p) do r, p
-        arrow(p, topleft(r), 6, 6, 2, 2, 0)
+        l = Line(p, topleft(r))
+        arrow(extend(l, -7, 0.5), 6, 2)
     end
 end .+ Fill("black") .+ Stroke(nothing)
 
@@ -63,7 +64,7 @@ Shapes have attributes such as linewidth, fill color, and line style. Unspecifie
 ```@example attrs
 using Layered
 
-c, l = canvas(300, 300, color = Gray(0.95))
+c, l = canvas(200, 200, color = Gray(0.95))
 
 circ = circle!(l, O, 50)
 rect!(l, O, 120, 120, deg(45))
