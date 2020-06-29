@@ -55,7 +55,7 @@ end
 
 needed_attributes(::Type{Path}) = (Visible, Linewidth, Stroke, Linestyle, Fill)
 
-function arrow(from::Point, to::Point, tiplength, tipwidth, shaftwidthback, shaftwidthfront, tipretraction)
+function arrow(from::Point, to::Point, tiplength, tipwidth, shaftwidthback, shaftwidthfront, tipretraction = 0)
     vector = from → to
     tipconnection = to - normalize(vector) * tiplength
     tipconnection_retracted = to - normalize(vector) * tiplength * (1-tipretraction)
@@ -77,6 +77,11 @@ function arrow(from::Point, to::Point, tiplength, tipwidth, shaftwidthback, shaf
         Close()
     ])
 end
+
+arrow(from::Point, to::Point, tipsize, shaftsize, tipretraction = 0) =
+    arrow(from, to, tipsize, tipsize, shaftsize, shaftsize, tipretraction)
+
+arrow(l::Line, args...) = arrow(l.from, l.to, args...)
 
 reversed(b::Bezier) = Bezier(b.to, b.c2, b.c1, b.from)
 reversed(b::Path) = Path(reverse!(reversed.(b.segments)), b.closed)
