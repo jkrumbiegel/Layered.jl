@@ -206,6 +206,8 @@ function draw_rgba(canvas::Canvas; px_per_pt=1/0.75)
 
     C.translate(cc, (size_pixel./2)...)
     C.scale(cc, px_per_pt, px_per_pt)
+    # flip all y-coordinates
+    C.scale(cc, 1, -1)
 
     canvasmatrix = C.get_matrix(cc)
 
