@@ -3,7 +3,8 @@ import FFMPEG
 
 export record
 
-function record(f_canvas, filename, timestamps; fps = 60, px_per_pt = 1)
+function record(f_canvas, filename, timestamps;
+        fps = 60, px_per_pt = 1, ffmpeg_options = [])
 
     nframes = length(timestamps)
     bname = basename(filename)
@@ -14,7 +15,7 @@ function record(f_canvas, filename, timestamps; fps = 60, px_per_pt = 1)
             png(canv, joinpath(dir, "$(lpad(i, 5, '0')).png"); px_per_pt = 1)
         end
 
-        FFMPEG.exe(` -i $dir/%5d.png -framerate $fps $dir/$bname`)
+        FFMPEG.exe(` -i $(joinpath(dir, "%5d.png")) -framerate $fps $ffmpeg_options $(joinpath(dir, bname))`)
         cp(joinpath(dir, bname), filename, force = true)
     end
 end
