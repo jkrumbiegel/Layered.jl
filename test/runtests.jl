@@ -13,9 +13,9 @@ end
 
 function test_or_generate_png(surface, filename)
     if generate_images
-        png(surface, originalimagepath(filename); dpi=100)
+        png(surface, originalimagepath(filename); px_per_pt = 1)
     else
-        png(surface, testimagepath(filename); dpi=100)
+        png(surface, testimagepath(filename); px_per_pt = 1)
         testimg = load(testimagepath(filename))
         originalimg = load(originalimagepath(filename))
         @test testimg == originalimg
@@ -50,7 +50,7 @@ end
 end
 
 @testset "image_lines_1" begin
-    c, tl = canvas(1, 1)
+    c, tl = canvas(100, 100)
     l = layer_in_rect!(tl, c.rect, :w; margin=5)
     line!(l, P(-1,  -1), P(1,  -1)) + Stroke("red") + Linewidth(2)
     line!(l, P(-1,  -0.8), P(1,  -0.8)) + Stroke("blue") + Linewidth(3)
@@ -61,7 +61,7 @@ end
 end
 
 @testset "image_circle_1" begin
-    c, tl = canvas(1, 1)
+    c, tl = canvas(100, 100)
     circle!(tl, O, 25) + Fill("orange") + Stroke("black") + Linewidth(5)
 
     filename = "image_circle_1.png"
@@ -70,7 +70,7 @@ end
 
 @testset "petals" begin
 
-    c, tl = canvas(4, 4)
+    c, tl = canvas(400, 400)
 
     l = layer_in_rect!(tl, c.rect, :w, margin=30)
 
@@ -94,7 +94,7 @@ end
 
 @testset "gradients" begin
 
-    c, tl = canvas(1, 1)
+    c, tl = canvas(100, 100)
 
     l = layer_in_rect!(tl, c.rect, :w) + Stroke(nothing)
 
@@ -109,7 +109,7 @@ end
 end
 
 @testset "svg to path" begin
-    c, tl = canvas(1, 1)
+    c, tl = canvas(100, 100)
 
     l = layer_in_rect!(tl, c.rect, :w; margin=10)
 
@@ -128,7 +128,7 @@ end
 
 @testset "gridrects" begin
 
-    c, tl = canvas(1, 1)
+    c, tl = canvas(100, 100)
 
     rects!(tl, c.rect) do r
         gridrects(r, 3, 4, 5, 5, 5)
@@ -141,7 +141,7 @@ end
 
 @testset "linaxis" begin
 
-    c, tl = canvas(1, 1)
+    c, tl = canvas(100, 100)
 
     ax = LinAxis((0, 10), (1, -1), 0.1, 0.1)
     xx = 0:0.1:10
@@ -153,4 +153,11 @@ end
 
     filename = "image_linaxis.png"
     test_or_generate_png(c, filename)
+end
+
+@testset "record" begin
+    record("test.mp4", 0:3) do t
+        c, l = canvas(50, 50)
+        c
+    end
 end
