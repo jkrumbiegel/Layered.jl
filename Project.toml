@@ -1,7 +1,7 @@
 name = "Layered"
 uuid = "543da890-fecb-4311-ac3c-00ed56aa0c09"
 authors = ["Julius Krumbiegel "]
-version = "0.2.0"
+version = "0.2.1"
 
 [deps]
 Cairo = "159f3aea-2a34-519c-b102-8c37f9878175"
