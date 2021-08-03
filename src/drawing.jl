@@ -559,14 +559,16 @@ function draw!(cc, canvasmatrix, t::Txt, a::Attributes)
     end
 
     shift = rotate(P(shiftx, shifty), -t.angle)
+    shiftflipped = P(shift.x, -shift.y)
 
-    pos = t.pos + shift
+    pos = t.pos + shiftflipped
 
     C.save(cc) # this is needed if multiple texts are drawn in one go
 
-    C.scale(cc, 1, -1)
-
+    
     C.move_to(cc, pos.xy...)
+    
+    C.scale(cc, 1, -1)
 
     C.rotate(cc, rad(-t.angle))
 
