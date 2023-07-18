@@ -1,7 +1,6 @@
 const C = Cairo
 
 export applytransform!
-export draw_canvas
 
 function fill!(cc, f::Fill)
     fill!(cc, f.val)
