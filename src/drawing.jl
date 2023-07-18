@@ -116,21 +116,6 @@ function draw_svg(canvas::Canvas)
     iobuffer
 end
 
-function _prep_context(canvas :: Canvas, surface :: C.CairoSurface)
-    context = C.CairoContext(surface);
-
-    C.rectangle(context, 0, 0, canvas.size...)
-    C.set_source_rgba(context, rgba(canvas.color)...)
-    C.fill(context)
-
-    C.translate(context, (canvas.size ./ 2)...)
-    # flip all y-coordinates
-    C.scale(context, 1, -1)
-
-    canvasmatrix = C.get_matrix(context)
-    context, canvasmatrix
-end
-
 function _prep_context(canvas, surface)
     context = C.CairoContext(surface);
     
